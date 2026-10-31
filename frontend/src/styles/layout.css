@@ -1,0 +1,215 @@
+/* Only the middle navigation region scrolls. Header and account controls stay put. */
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden !important;
+  padding: 0 !important;
+  height: 100dvh;
+  bottom: auto;
+}
+.sidebar-header {
+  flex: 0 0 auto;
+  padding: 26px 18px 0;
+  background: #fff;
+  position: relative;
+}
+.sidebar-header > .brand {
+  padding-left: 9px;
+  margin-bottom: 25px;
+}
+.sidebar-header .workspace-switch {
+  margin: 0 1px 23px;
+}
+.sidebar-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0 17px;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: #cfc2df transparent;
+  outline: none;
+}
+.sidebar-scroll:focus-visible {
+  box-shadow: inset 0 0 0 1px #d9caeb;
+}
+.sidebar-scroll .sidebar-label {
+  margin-top: 2px;
+}
+.sidebar-scroll nav > button {
+  width: 100%;
+}
+.sidebar-scroll .sidebar-projects {
+  margin-top: 27px;
+}
+.sidebar-scroll .sidebar-projects > button {
+  min-width: 0;
+}
+.sidebar-scroll .sidebar-projects > button > span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sidebar-scroll .sidebar-projects .sidebar-label {
+  margin-bottom: 8px;
+}
+.sidebar-footer {
+  flex: 0 0 auto;
+  padding: 11px 17px 0;
+  background: #fff;
+  border-top: 1px solid #eee8f4;
+}
+.sidebar-footer .sidebar-user {
+  margin: 7px -17px 0;
+  padding: 14px 18px;
+}
+.sidebar-footer .sidebar-user > div {
+  flex: 1;
+  min-width: 0;
+}
+.sidebar-footer .sidebar-user strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 10px;
+}
+.sidebar-footer .sidebar-user small {
+  font-size: 8px;
+}
+.sidebar-footer .settings-link {
+  padding: 7px 11px;
+}
+.nav-scroll-end {
+  padding: 27px 9px 18px;
+  font-size: 8px;
+  line-height: 1.8;
+  color: #b6a4c4;
+}
+.sidebar-scroll nav .nav-new {
+  font-size: 7px;
+  color: #aa8dc3;
+  background: #f0e7fa;
+  border: 1px solid #e8dcf3;
+  padding: 2px 4px;
+  border-radius: 3px;
+  margin-left: auto;
+  letter-spacing: 0.4px;
+}
+.sidebar.mobile-open > .brand {
+  padding-top: 0;
+}
+.sidebar-header .close-navigation {
+  right: 8px;
+  top: 8px;
+}
+.sample-workspace-note {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #ac95ba;
+  font-size: 9px;
+  margin: -6px 0 20px;
+  padding: 9px 12px;
+  background: #faf6fd;
+  border: 1px dashed #e8dcf2;
+  border-radius: 6px;
+}
+.sample-workspace-note > span {
+  color: #9f7db7;
+  font-weight: 600;
+}
+.app-main main.chat-page {
+  max-width: 1700px;
+  padding-bottom: 0;
+}
+.chat-page > .page-footer {
+  display: none;
+}
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #d3c7e0 transparent;
+}
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #d3c7e0;
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #bba5cc;
+}
+.sidebar-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+.sidebar-scroll::-webkit-scrollbar-thumb {
+  background: #d8cce3;
+  border: 0;
+  border-radius: 8px;
+}
+.sidebar-scroll::-webkit-scrollbar-thumb:hover {
+  background: #bba2ce;
+}
+@media (max-height: 850px) {
+  .sidebar-header {
+    padding-top: 19px;
+  }
+  .sidebar-header > .brand {
+    margin-bottom: 19px;
+  }
+  .sidebar-header .workspace-switch {
+    margin-bottom: 20px;
+  }
+  .sidebar-footer .sidebar-user {
+    padding-top: 11px;
+    padding-bottom: 11px;
+  }
+  .sidebar-scroll nav > button {
+    min-height: 34px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+}
+@media (max-width: 760px) {
+  .sidebar {
+    height: 100dvh;
+    overflow: hidden !important;
+  }
+  .sidebar-header {
+    padding-top: 25px;
+  }
+  .sidebar-scroll {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+  .sidebar-scroll nav > button {
+    min-height: 35px;
+  }
+  .sidebar-footer {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+  .sidebar-footer .sidebar-user {
+    margin-left: -12px;
+    margin-right: -12px;
+    padding-left: 14px;
+    padding-right: 10px;
+  }
+  .sidebar-header > .brand {
+    margin-bottom: 20px;
+  }
+  .sample-workspace-note {
+    font-size: 8px;
+    align-items: flex-start;
+    line-height: 1.7;
+  }
+  .sample-workspace-note svg {
+    margin-top: 2px;
+  }
+}

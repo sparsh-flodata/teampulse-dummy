@@ -1,0 +1,117 @@
+/* Bounded regions keep dense work views from growing with row count. */
+.table-scroll {
+  height: clamp(300px, 49dvh, 480px);
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  max-width: 100%;
+  min-width: 0;
+  position: relative;
+}
+.table-scroll:focus-visible,
+.organization-tree-scroll:focus-visible {
+  outline: 2px solid #a995d5;
+  outline-offset: -2px;
+}
+.work-table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+.work-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: #faf9fc;
+  box-shadow: 0 1px 0 #eae3f0;
+}
+.table-scroll > .empty {
+  min-height: 100%;
+}
+.organization-tree-scroll {
+  max-height: min(660px, 65dvh);
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+.department-branch {
+  border: 1px solid #eee6f4;
+  border-radius: 9px;
+  background: #fff;
+  padding: 0 16px 14px !important;
+}
+.department-branch .team-tree-heading {
+  min-height: 68px;
+}
+.department-branch:has(.department-expander[aria-expanded="false"]) {
+  padding-bottom: 0 !important;
+}
+.department-branch:has(.department-expander[aria-expanded="false"])
+  .team-tree-heading {
+  border-bottom: 0;
+}
+.department-expander {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  flex: 1;
+  min-width: 0;
+  padding: 9px 0;
+  color: #846297;
+}
+.department-expander > span:last-child {
+  min-width: 0;
+}
+.department-expander strong {
+  font-size: 12px;
+  font-weight: 600;
+  display: block;
+  color: #795687;
+}
+.department-expander small {
+  font-size: 9px;
+  display: block;
+  margin-top: 5px;
+  color: #a086ae;
+}
+.department-branch .team-tree-members > button > span:nth-child(2) {
+  min-width: 0;
+  flex: 1;
+  overflow-wrap: anywhere;
+}
+.department-branch .team-tree-members small {
+  font-size: 8px;
+  line-height: 1.7;
+  color: #a58db3;
+}
+.project-collaboration {
+  color: #9b7cae;
+  font-size: 9px;
+  margin: 13px 0 0;
+}
+@media (max-width: 760px) {
+  .table-scroll {
+    height: clamp(300px, 52dvh, 440px);
+  }
+  .organization-tree-scroll {
+    max-height: 62dvh;
+  }
+  .team-tree {
+    padding: 14px;
+  }
+  .department-branch {
+    padding: 0 10px 10px !important;
+  }
+  .department-branch .team-tree-members {
+    grid-template-columns: 1fr;
+  }
+  .department-expander {
+    gap: 7px;
+  }
+  .department-expander strong {
+    font-size: 11px;
+  }
+  .department-branch .team-tree-heading > .button {
+    font-size: 8px;
+    padding: 6px;
+  }
+}

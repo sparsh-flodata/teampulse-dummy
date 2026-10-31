@@ -1,0 +1,358 @@
+[
+    {
+        "name": "Ujjwal Gupta",
+        "department": "Management",
+        "email": "ujjwal@flodataanalytics.com",
+        "children": [
+            {
+                "name": "Swati Kashyap",
+                "department": "Growth",
+                "email": "swati.kashyap@flodataanalytics.com",
+                "children": [
+                    {
+                        "name": "Khushi Agarwal",
+                        "department": "Growth",
+                        "email": "khushi.agarwal@flodataanalytics.com",
+                        "children": []
+                    },
+                    {
+                        "name": "Vanshika Goel",
+                        "department": "Engineering and Analytics",
+                        "email": "vanshika.goel@flodataanalytics.com",
+                        "children": []
+                    }
+                ]
+            },
+            {
+                "name": "Aishwarya Chawla",
+                "department": "Growth",
+                "email": "aishwarya.chawla@flodataanalytics.com",
+                "children": []
+            },
+            {
+                "name": "Akshay Roy",
+                "department": "GIS",
+                "email": "akshay.roy@flodataanalytics.com",
+                "children": []
+            },
+            {
+                "name": "Albin George",
+                "department": "Data Science",
+                "email": "albin.george@flodataanalytics.com",
+                "children": []
+            },
+            {
+                "name": "Amit Singh",
+                "department": "Data Science",
+                "email": "amit.singh@flodataanalytics.com",
+                "children": []
+            },
+            {
+                "name": "Aniket Balayaan",
+                "department": "Engineering and Analytics",
+                "email": "aniket.balayaan@flodataanalytics.com",
+                "children": []
+            },
+            {
+                "name": "Harsh Kumar Jha",
+                "department": "Data Science",
+                "email": "harsh.jha@flodataanalytics.com",
+                "children": []
+            },
+            {
+                "name": "Ishu Singhal",
+                "department": "Growth",
+                "email": "ishu@flodataanalytics.com",
+                "children": []
+            },
+            {
+                "name": "Jahnavi Nischal",
+                "department": "Data Science",
+                "email": "jahnavi.nischal@flodataanalytics.com",
+                "children": []
+            },
+            {
+                "name": "Joseph Abraham Anthraper",
+                "department": "Data Science",
+                "email": "joseph.anthraper@flodataanalytics.com",
+                "children": []
+            },
+            {
+                "name": "Kush Prakhar",
+                "department": "Data Science",
+                "email": "kush.prakhar@flodataanalytics.com",
+                "children": [
+                    {
+                        "name": "Vikas Patel",
+                        "department": "Data Science",
+                        "email": "vikas@flodataanalytics.com",
+                        "children": []
+                    },
+                    {
+                        "name": "Raghav Bhardwaj",
+                        "department": "Data Science",
+                        "email": "raghav.bhardwaj@flodataanalytics.com",
+                        "children": []
+                    }
+                ]
+            },
+            {
+                "name": "Manav Vaish",
+                "department": "Data Science",
+                "email": "manav.vaish@flodataanalytics.com",
+                "children": []
+            },
+            {
+                "name": "Neha Kumari",
+                "department": "Accounts",
+                "email": "neha.kumari@flodataanalytics.com",
+                "children": []
+            },
+            {
+                "name": "Nimit Singh",
+                "department": "Data Science",
+                "email": "nimit.singh@flodataanalytics.com",
+                "children": []
+            },
+            {
+                "name": "Nitish Kumar",
+                "department": "Solutions",
+                "email": "nitish.kumar@flodataanalytics.com",
+                "children": [
+                    {
+                        "name": "Kapil Sharma",
+                        "department": "Solutions",
+                        "email": "kapil.sharma@flodataanalytics.com",
+                        "children": []
+                    },
+                    {
+                        "name": "Ankit Jha",
+                        "department": "Solutions",
+                        "email": "ankit.jha@flodataanalytics.com",
+                        "children": []
+                    },
+                    {
+                        "name": "Pratham Golhani",
+                        "department": "Solutions",
+                        "email": "pratham.golhani@flodataanalytics.com",
+                        "children": []
+                    },
+                    {
+                        "name": "Raj Paswan",
+                        "department": "Solutions",
+                        "email": "raj.paswan@flodataanalytics.com",
+                        "children": []
+                    },
+                    {
+                        "name": "Sahil Singh",
+                        "department": "Solutions",
+                        "email": "sahil.singh@flodataanalytics.com",
+                        "children": []
+                    },
+                    {
+                        "name": "Sandeep Kumar Suman",
+                        "department": "Solutions",
+                        "email": "sandeep.kumar@flodataanalytics.com",
+                        "children": []
+                    },
+                    {
+                        "name": "Sparsh Mecwan",
+                        "department": "Solutions",
+                        "email": "sparsh.mecwan@flodataanalytics.com",
+                        "children": []
+                    }
+                ]
+            },
+            {
+                "name": "Nitish Singh Sengar",
+                "department": "Data Science",
+                "email": "nitish.sengar@flodataanalytics.com",
+                "children": []
+            },
+            {
+                "name": "Piyush Goswami",
+                "department": "Data Science",
+                "email": "piyush.goswami@flodataanalytics.com",
+                "children": []
+            },
+            {
+                "name": "Pushkar Singh Manral",
+                "department": "GIS",
+                "email": "pushkar.manral@flodataanalytics.com",
+                "children": []
+            },
+            {
+                "name": "Raj Mishra",
+                "department": "Accounts",
+                "email": "raj.mishra@flodataanalytics.com",
+                "children": []
+            },
+            {
+                "name": "Rohit Singh",
+                "department": "Growth",
+                "email": "rohit.singh@flodataanalytics.com",
+                "children": []
+            },
+            {
+                "name": "Sundeep Kumar S",
+                "department": "Growth",
+                "email": "sundeep.kumar@flodataanalytics.com",
+                "children": []
+            },
+            {
+                "name": "U Gupta",
+                "department": "Data Science",
+                "email": "ug@flodataanalytics.com",
+                "children": []
+            },
+            {
+                "name": "Utkarsh Sharma",
+                "department": "Data Science",
+                "email": "utkarsh.sharma@flodataanalytics.com",
+                "children": []
+            }
+        ]
+    },
+    {
+        "name": "Vaibhav Gupta",
+        "department": "Management",
+        "email": "vaibhav@flodataanalytics.com",
+        "children": [
+            {
+                "name": "Ankita Kushwaha",
+                "department": "HR & Admin",
+                "email": "ankita.kushwaha@flodataanalytics.com",
+                "children": [
+                    {
+                        "name": "Himanshi Chauhan",
+                        "department": "HR & Admin",
+                        "email": "himanshi.chauhan@flodataanalytics.com",
+                        "children": []
+                    },
+                    {
+                        "name": "Megha Banchhiwal",
+                        "department": "HR & Admin",
+                        "email": "megha.banchhiwal@flodataanalytics.com",
+                        "children": []
+                    }
+                ]
+            },
+            {
+                "name": "Anirudh Duvvuri",
+                "department": "Engineering and Analytics",
+                "email": "anirudh.duvvuri@flodataanalytics.com",
+                "children": [
+                    {
+                        "name": "Chirag Dawar",
+                        "department": "Engineering and Analytics",
+                        "email": "chirag.dawar@flodataanalytics.com",
+                        "children": []
+                    },
+                    {
+                        "name": "Diksha Nautiyal",
+                        "department": "Solutions",
+                        "email": "diksha.nautiyal@flodataanalytics.com",
+                        "children": []
+                    },
+                    {
+                        "name": "Piyush Tyagi",
+                        "department": "Engineering and Analytics",
+                        "email": "piyush.tyagi@flodataanalytics.com",
+                        "children": []
+                    },
+                    {
+                        "name": "Vidit Rajesh Shrivastava",
+                        "department": "Engineering and Analytics",
+                        "email": "vidit.shrivastava@flodataanalytics.com",
+                        "children": []
+                    },
+                    {
+                        "name": "Prashant Kumar Singh",
+                        "department": "Engineering and Analytics",
+                        "email": "prashant.singh@flodataanalytics.com",
+                        "children": []
+                    }
+                ]
+            },
+            {
+                "name": "Anshit Mittal",
+                "department": "Data Science",
+                "email": "anshit.mittal@flodataanalytics.com",
+                "children": []
+            },
+            {
+                "name": "Apoorva Vaishya",
+                "department": "Solutions",
+                "email": "apoorva.vaishya@flodataanalytics.com",
+                "children": []
+            },
+            {
+                "name": "Ashtami Patro",
+                "department": "Engineering and Analytics",
+                "email": "ashtami.patro@flodataanalytics.com",
+                "children": []
+            },
+            {
+                "name": "Ayush Rathaur",
+                "department": "Solutions",
+                "email": "ayush.rathaur@flodataanalytics.com",
+                "children": []
+            },
+            {
+                "name": "Pooja Jha",
+                "department": "Solutions",
+                "email": "pooja@flodataanalytics.com",
+                "children": []
+            },
+            {
+                "name": "Prince Raj",
+                "department": "GIS",
+                "email": "prince.raj@flodataanalytics.com",
+                "children": []
+            },
+            {
+                "name": "Rajat Kumar",
+                "department": "Solutions",
+                "email": "rajat.kumar@flodataanalytics.com",
+                "children": [
+                    {
+                        "name": "Gaurav Chand Rikhari",
+                        "department": "Solutions",
+                        "email": "gaurav.rikhari@flodataanalytics.com",
+                        "children": []
+                    },
+                    {
+                        "name": "Jeeteshwar Singh",
+                        "department": "Engineering and Analytics",
+                        "email": "jeeteshwar.singh@flodataanalytics.com",
+                        "children": []
+                    }
+                ]
+            },
+            {
+                "name": "Rohit Kumar",
+                "department": "Solutions",
+                "email": "rohit.kumar@flodataanalytics.com",
+                "children": []
+            },
+            {
+                "name": "Samata Sadhukhan",
+                "department": "GIS",
+                "email": "samata.sadhukhan@flodataanalytics.com",
+                "children": []
+            },
+            {
+                "name": "Shubhankit Chauhan",
+                "department": "Solutions",
+                "email": "shubhankit.chauhan@flodataanalytics.com",
+                "children": []
+            },
+            {
+                "name": "Sourav Mohanty",
+                "department": "Engineering and Analytics",
+                "email": "sourav.mohanty@flodataanalytics.com",
+                "children": []
+            }
+        ]
+    }
+]

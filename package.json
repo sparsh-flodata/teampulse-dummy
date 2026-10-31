@@ -1,0 +1,14 @@
+{
+  "name": "teampulse",
+  "private": true,
+  "version": "0.3.0",
+  "workspaces": [
+    "frontend"
+  ],
+  "scripts": {
+    "dev": "npm --workspace @teampulse/frontend run dev",
+    "build": "npm --workspace @teampulse/frontend run build",
+    "preview": "npm --workspace @teampulse/frontend run preview",
+    "format": "npm --workspace @teampulse/frontend run format"
+  }
+}

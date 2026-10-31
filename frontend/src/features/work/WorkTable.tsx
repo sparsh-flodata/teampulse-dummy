@@ -1,0 +1,134 @@
+import { ChevronRight, Flag } from "lucide-react";
+import { Avatar, Badge, Empty } from "../../components/ui";
+import { State, Work, dateLabel } from "../../lib";
+
+export function WorkTable({
+  works,
+  state,
+  onWork,
+  onPerson,
+}: {
+  works: Work[];
+  state: State;
+  onWork: (w: Work) => void;
+  onPerson: (p: { id: number }) => void;
+}) {
+  return (
+    <div
+      className="table-scroll"
+      role="region"
+      aria-label="Commitments table"
+      tabIndex={0}
+    >
+      {works.length ? (
+        <table className="work-table">
+          <thead>
+            <tr>
+              <th>Commitment</th>
+              <th>Owner</th>
+              <th>Status</th>
+              <th>Expected</th>
+              <th>Progress</th>
+              <th />
+            </tr>
+          </thead>
+          <tbody>
+            {works.map((w) => {
+              const p = state.directory.find((p) => p.id === w.owner_id),
+                project = state.projects.find((p) => p.id === w.project_id);
+              return (
+                <tr key={w.id} className={"work-row tone-" + w.tone}>
+                  <td>
+                    <button className="work-title" onClick={() => onWork(w)}>
+                      {w.title}
+                    </button>
+                    <div className="subline">
+                      <span
+                        className="project-dot"
+                        style={{ background: project?.color }}
+                      />
+                      {project?.name}
+                      {w.priority === "Urgent" && (
+                        <Flag size={11} className="red-text" />
+                      )}
+                    </div>
+                  </td>
+                  <td>
+                    {p ? (
+                      <button
+                        className="person-inline"
+                        disabled={!p.can_view_profile}
+                        title={
+                          p.can_view_profile
+                            ? "Open work profile"
+                            : "Shared project colleague; full profile is outside your reporting scope"
+                        }
+                        onClick={() => onPerson(p)}
+                      >
+                        <Avatar person={p} size={27} />
+                        <span>{p.name.split(" ")[0]}</span>
+                      </button>
+                    ) : (
+                      <span className="muted">Unassigned</span>
+                    )}
+                  </td>
+                  <td>
+                    <Badge value={w.status} />
+                    <small
+                      className={"health-label " + w.tone}
+                      title={w.health_reason}
+                    >
+                      {w.health}
+                    </small>
+                  </td>
+                  <td>
+                    <span
+                      className={
+                        w.health === "Overdue" ? "red-text" : "date-cell"
+                      }
+                    >
+                      {dateLabel(w.due_date, state.today)}
+                    </span>
+                    <small className="muted">{w.remaining_hours}h left</small>
+                  </td>
+                  <td>
+                    <div className="progress-cell">
+                      <div className="progress-track">
+                        <i
+                          style={{
+                            width: w.progress + "%",
+                            background: {
+                              green: "#52a185",
+                              amber: "#c89b4b",
+                              red: "#d3797b",
+                              neutral: "#a9a2b5",
+                            }[w.tone],
+                          }}
+                        />
+                      </div>
+                      <span>{w.progress}%</span>
+                    </div>
+                  </td>
+                  <td>
+                    <button
+                      className="icon-button"
+                      aria-label={"Open " + w.title}
+                      onClick={() => onWork(w)}
+                    >
+                      <ChevronRight size={16} />
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      ) : (
+        <Empty
+          title="A little breathing room"
+          description="No commitments match this view. Try a different filter or create a new commitment."
+        />
+      )}
+    </div>
+  );
+}

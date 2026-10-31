@@ -1,0 +1,17 @@
+[project]
+name = "teampulse"
+version = "0.3.0"
+description = "A thoughtful workspace for commitments, dependencies, and team capacity"
+requires-python = ">=3.11"
+dependencies = [
+  "fastapi>=0.115,<1", "uvicorn>=0.34,<1", "sqlalchemy>=2.0,<3",
+  "psycopg[binary]>=3.2,<4", "httpx>=0.28,<1", "python-dotenv>=1,<2", "tzdata>=2025.1"
+]
+
+[dependency-groups]
+dev = ["pytest>=8,<10"]
+
+[tool.pytest.ini_options]
+testpaths = ["backend/tests"]
+cache_dir = ".cache/pytest"
+pythonpath = ["."]
