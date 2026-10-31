@@ -103,7 +103,7 @@ export function ReportingForm({
             <select name="role" defaultValue={person.role}>
               <option value="employee">Employee</option>
               <option value="manager">Manager</option>
-              <option value="admin">Employer / administrator</option>
+              <option value="admin">Management / administrator</option>
             </select>
           </label>
         </div>

@@ -14,7 +14,7 @@ Teams have optional parents and leads. Employees have roles, primary teams, repo
 
 `backend/app/core/access.py` resolves the transitive reporting hierarchy. Company directory visibility is separate from operational profile access.
 
-| Operation | Employee | Manager | Employer / administrator |
+| Operation | Employee | Manager | Management / administrator |
 | --- | --- | --- | --- |
 | Browse organization/team structure | Yes | Yes | Yes |
 | Open complete work profiles/capacity | Self | Self + direct/indirect reports | Organization |

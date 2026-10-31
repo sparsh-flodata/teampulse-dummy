@@ -25,7 +25,7 @@ TeamPulse coordinates employee-reported and manager-assigned work. The pilot pro
 - Multi-day commitments suppress unnecessary daily planning prompts.
 - Only the work owner can confirm completion and revised dates. Managers can set priorities with an explanation.
 - Work cannot complete with unresolved dependencies; dependency cycles are rejected.
-- Conversations are private; project work and its update history are shared with the owning team. Managers can open full profiles for direct/indirect reports; the employer can inspect the organization.
+- Conversations are private; project work and its update history are shared with the owning team. Managers can open full profiles for direct/indirect reports; the Management can inspect the organization.
 - Recorded changes and proposals are auditable. No surveillance or performance scoring.
 
 The seven original pilot profiles are retained alongside 58 supplied company email accounts. Reporting lines, titles, skills, projects, and work are illustrative and editable. The remaining production and intelligence work is recorded in ROADMAP.md.

@@ -143,7 +143,7 @@ def test_all_58_company_accounts_hierarchy_and_samples_are_idempotent(ctx):
         assert db.get(WorkItem,sample.id).title=='Renamed sample work to preserve'
         assert people['ankita.kushwaha@flodataanalytics.com'].password_hash==original_hash
         assert people['ankita.kushwaha@flodataanalytics.com'].title=='A custom title to preserve'
-        employer=people['ujjwal@flodataanalytics.com'].id
+        Management=people['ujjwal@flodataanalytics.com'].id
         manager=people['nitish.kumar@flodataanalytics.com'].id
         outsider=people['himanshi.chauhan@flodataanalytics.com'].id
         worker=people['kapil.sharma@flodataanalytics.com'].id
@@ -163,7 +163,7 @@ def test_all_58_company_accounts_hierarchy_and_samples_are_idempotent(ctx):
             assert c.get('/api/people/'+str(outsider)+'/profile').status_code==403
         if email=='kapil.sharma@flodataanalytics.com':
             assert state['profile_ids']==[worker]
-            assert c.get('/api/people/'+str(employer)+'/profile').status_code==403
+            assert c.get('/api/people/'+str(Management)+'/profile').status_code==403
     attempts.clear()
     c.post('/api/auth/login',json={'email':'nitish.kumar@flodataanalytics.com','password':'test-password-2026!'})
     ambiguity=c.post('/api/assistant/chat',json={'message':'Ask Piyush for a status update'}).json()

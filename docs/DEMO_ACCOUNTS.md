@@ -2,14 +2,14 @@
 
 The reporting lines and departments now follow the supplied root `org-tree.json`: **58 active employees, 8 departments, two organization roots**. Names and reporting parents are matched by email. Existing account IDs and password hashes were preserved.
 
-Sign in with any supplied email and **`TeamPulse-demo-2026!`**. Changing `DEMO_PASSWORD` does not reset existing accounts. Access roles are derived from the file: root nodes are employer/administrators, people with reports are managers, and leaves are employees. Job titles are generic role labels because the file does not provide job titles.
+Sign in with any supplied email and **`TeamPulse-demo-2026!`**. Changing `DEMO_PASSWORD` does not reset existing accounts. Access roles are derived from the file: root nodes are Management/administrators, people with reports are managers, and leaves are employees. Job titles are generic role labels because the file does not provide job titles.
 
 ## Recommended profile walkthrough
 
 | Profile | Email | What to explore |
 | --- | --- | --- |
-| Employer | `ujjwal@flodataanalytics.com` | All 58 profiles, all 8 projects, green/amber/red project health, organization management |
-| Employer | `vaibhav@flodataanalytics.com` | Second organization root and their reporting branch |
+| Management | `ujjwal@flodataanalytics.com` | All 58 profiles, all 8 projects, green/amber/red project health, organization management |
+| Management | `vaibhav@flodataanalytics.com` | Second organization root and their reporting branch |
 | Solutions manager | `nitish.kumar@flodataanalytics.com` | Personal plan, 7 direct reports, their profiles and delivery work |
 | Growth manager | `swati.kashyap@flodataanalytics.com` | Khushi in Growth and Vanshika in Engineering and Analytics; reporting differs from department membership |
 | Engineering manager | `anirudh.duvvuri@flodataanalytics.com` | Five reports, including Diksha in Solutions |

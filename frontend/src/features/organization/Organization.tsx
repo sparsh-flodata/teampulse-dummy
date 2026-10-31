@@ -400,7 +400,7 @@ export function Organization({
         <p>
           The tree shares organization structure, not private work profiles,
           capacity records, or assistant conversations. Managers can inspect
-          direct and indirect reports. The employer can inspect the
+          direct and indirect reports. The Management can inspect the
           organization.
         </p>
       </div>

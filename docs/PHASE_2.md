@@ -4,7 +4,7 @@ Delivered on 31 October 2026, following the user's hierarchy and attention-color
 
 ## Explore
 
-- **Overview → My workspace:** personal work for every role, including the employer.
+- **Overview → My workspace:** personal work for every role, including the Management.
 - **Overview → Reporting team:** direct and indirect reports, excluding your own commitments.
 - **Overview → Organization:** administrator-only organization scope.
 - **My profile:** your complete work dashboard.
@@ -12,7 +12,7 @@ Delivered on 31 October 2026, following the user's hierarchy and attention-color
 - **Organization:** reporting tree and nested team tree. Everyone can browse the structure. Full profile buttons follow server permissions.
 - **Organization → Edit reporting / New team / Edit team:** administrator management of reporting lines, parent teams, leads, roles, transfers, and active accounts. Cycles and unsafe demotions/deactivations are rejected.
 
-Demo: Nitish is the employer/administrator. Rahul is a reporting manager with Priya and Karan as reports. Ananya remains an employee. The original pilot commitments and history are preserved.
+Demo: Nitish is the Management/administrator. Rahul is a reporting manager with Priya and Karan as reports. Ananya remains an employee. The original pilot commitments and history are preserved.
 
 ## Health
 

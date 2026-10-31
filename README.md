@@ -27,7 +27,7 @@ All 58 supplied company emails are ready. The initial password is `TeamPulse-dem
 
 | Demo view | Email |
 | --- | --- |
-| Employer / administrator | `ujjwal@flodataanalytics.com` |
+| Management / administrator | `ujjwal@flodataanalytics.com` |
 | Solutions manager | `nitish.kumar@flodataanalytics.com` |
 | Growth manager | `swati.kashyap@flodataanalytics.com` |
 | Employee | `kapil.sharma@flodataanalytics.com` |

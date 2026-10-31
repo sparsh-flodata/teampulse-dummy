@@ -120,7 +120,7 @@ export function Login({ onLogin }: { onLogin: () => void }) {
             <div>
               <strong>Explore the local pilot</strong>
               <p>
-                Employer: ujjwal@flodataanalytics.com
+                Management: ujjwal@flodataanalytics.com
                 <br />
                 Manager: nitish.kumar@flodataanalytics.com
                 <br />

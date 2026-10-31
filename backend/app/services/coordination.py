@@ -19,7 +19,7 @@ def validate_recipients(db,user,ids):
     allowed={p.id:p for p in allowed_recipients(db,user)}
     unique=list(dict.fromkeys(ids))
     if not unique:raise HTTPException(422,'Choose at least one person in your reporting scope.')
-    if any(i not in allowed for i in unique):raise HTTPException(403,'You can request updates only from active people in your reporting team. The employer can request organization-wide updates.')
+    if any(i not in allowed for i in unique):raise HTTPException(403,'You can request updates only from active people in your reporting team. The Management can request organization-wide updates.')
     return [allowed[i] for i in unique]
 
 

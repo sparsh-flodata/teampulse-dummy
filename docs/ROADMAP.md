@@ -2,7 +2,7 @@
 
 ## Delivered in v0.2
 
-- Employee, manager, and employer access with universal personal workspaces.
+- Employee, manager, and Management access with universal personal workspaces.
 - Complete person dashboards, reporting-team summaries, organization and nested team trees.
 - Direct/indirect reporting permissions, directory/profile separation, and server checks across work, history, assignments, and profiles.
 - Administrator management of teams, reporting lines, roles, transfers, and active accounts, with cycle and lockout checks.

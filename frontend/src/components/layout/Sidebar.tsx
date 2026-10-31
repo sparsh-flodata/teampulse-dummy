@@ -158,7 +158,7 @@ export function Sidebar({
             <strong title={state.user.name}>{state.user.name}</strong>
             <small>
               {state.user.role === "admin"
-                ? "Employer / administrator"
+                ? "Management / administrator"
                 : manager
                   ? "Reporting manager"
                   : "Team member"}
