@@ -27,6 +27,7 @@ import {
 } from "../../lib";
 import { Avatar, Badge, Empty, Modal } from "../../components/ui";
 import { UpdateReplyDialog } from "./UpdateReplyDialog";
+import { useChatViewport } from "./useChatViewport";
 
 type Message = { role: string; message: string };
 type ChatResult = {
@@ -43,6 +44,7 @@ export function ChatWorkspace({
   onDone: (message?: string) => Promise<void>;
   onWork: (work: Work) => void;
 }) {
+  const chatRoot = useChatViewport();
   const [messages, setMessages] = useState<Message[]>([]),
     [actions, setActions] = useState<AgentAction[]>([]),
     [requests, setRequests] = useState<UpdateRequest[]>([]),
@@ -179,10 +181,20 @@ export function ChatWorkspace({
     outgoing = requests.filter((r) => r.requester_id === state.user.id),
     shown = requestTab === "My inbox" ? inbox : outgoing;
   return (
-    <div className={"chat-workspace mobile-pane-" + mobilePane.toLowerCase()}>
-      <div className="chat-mobile-tabs">
+    <div
+      ref={chatRoot}
+      className={"chat-workspace mobile-pane-" + mobilePane.toLowerCase()}
+    >
+      <div
+        className="chat-mobile-tabs"
+        role="tablist"
+        aria-label="Chat workspace panels"
+      >
         <button
           className={mobilePane === "Chat" ? "active" : ""}
+          role="tab"
+          aria-selected={mobilePane === "Chat"}
+          aria-controls="pulse-conversation"
           onClick={() => setMobilePane("Chat")}
         >
           <MessageSquare size={14} />
@@ -190,13 +202,20 @@ export function ChatWorkspace({
         </button>
         <button
           className={mobilePane === "Updates" ? "active" : ""}
+          role="tab"
+          aria-selected={mobilePane === "Updates"}
+          aria-controls="pulse-updates"
           onClick={() => setMobilePane("Updates")}
         >
           <Inbox size={14} />
           Updates<span>{inbox.filter((r) => r.can_reply).length}</span>
         </button>
       </div>
-      <section className="coord-chat panel">
+      <section
+        className="coord-chat panel"
+        id="pulse-conversation"
+        aria-label="Pulse conversation"
+      >
         <header className="coord-chat-header">
           <span className="chat-pulse-logo">
             <Sparkles size={22} />
@@ -223,7 +242,7 @@ export function ChatWorkspace({
             value={context}
             onChange={(e) => setContext(e.target.value)}
           >
-            <option value="">My plan & team coordination</option>
+            <option value="">My plan & team</option>
             {ownWork.map((w) => (
               <option key={w.id} value={w.id}>
                 {w.title}
@@ -233,13 +252,15 @@ export function ChatWorkspace({
           <div className="people-picker-wrap">
             <button
               className="add-people-button"
+              aria-expanded={picker}
+              aria-controls="chat-people-picker"
               onClick={() => setPicker(!picker)}
             >
               <Plus size={13} />
               Add people
             </button>
             {picker && (
-              <div className="people-picker">
+              <div className="people-picker" id="chat-people-picker">
                 <div className="split">
                   <strong>Mention a teammate</strong>
                   <button
@@ -447,7 +468,12 @@ export function ChatWorkspace({
               maxLength={4000}
               rows={2}
               onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
+                if (
+                  e.key === "Enter" &&
+                  !e.shiftKey &&
+                  !e.nativeEvent.isComposing &&
+                  window.matchMedia("(min-width: 761px)").matches
+                ) {
                   e.preventDefault();
                   send();
                 }
@@ -474,7 +500,11 @@ export function ChatWorkspace({
           </p>
         </div>
       </section>
-      <aside className="coord-updates panel">
+      <aside
+        className="coord-updates panel"
+        id="pulse-updates"
+        aria-label="Update center"
+      >
         <header>
           <span className="updates-symbol">
             <Inbox size={18} />

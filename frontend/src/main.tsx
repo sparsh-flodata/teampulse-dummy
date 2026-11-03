@@ -6,6 +6,7 @@ import "./styles/health.css";
 import "./styles/layout.css";
 import "./styles/chat.css";
 import "./styles/organization.css";
+import "./styles/responsive.css";
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <App />

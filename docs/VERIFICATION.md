@@ -48,3 +48,14 @@ Not verified: real AI-provider credentials, Docker image execution, PostgreSQL e
 - Browser: Kapil's employee login shows 3 personal commitments, no manager-only team navigation, and an incoming check-in from Nitish. The initial manager session was restored after QA. Browser console had no application errors during these checks.
 - Saved previews: `previews/imported-org-tree.png`, `previews/imported-department-tree.png`, `previews/fixed-height-table.png`, and `previews/mobile-fixed-table.png`.
 - Pre-import source and integrity-checked database recovery copies are retained in `data/backups/`. Latest SQLite backup verified successfully. Docker/PostgreSQL, real AI-provider credentials, and WhatsApp remain outside this local verification.
+
+## Mobile login, compact reporting, and chat — 1 November 2026
+
+- Production TypeScript/Vite build passed. No backend behavior or schema changed; backend tests were not rerun for these presentation changes.
+- Login overflow reproduced at 320px (400px document width). The rebuilt login fits at 320px, 390px, and 768px, with 16px phone inputs, visible branding, wrapping demo account text, and reachable sign-in controls. Desktop keeps the original two-column layout.
+- My profile and other profiles share a compact ReportingTeam component above commitments. Large teams show at most 12 tiles including an overflow tile. The management profile's 23 reports render as 11 avatars plus a count tile; the desktop section is about 150px high. Hover/focus details, a searchable View all dialog, retained search focus, and navigation to Nitish and Kapil were verified in the browser.
+- Chat fills the visible phone viewport, keeps its composer pinned, and scrolls messages and update lists separately. Verified 320×568, 390×440, and 390×844: no page overflow; the composer stays within the viewport, with 168px of message space even in the short 440px viewport. This is responsive browser QA, not a physical iOS/Android keyboard test.
+- The visual-viewport hook adapts height when a mobile keyboard changes the visible viewport and uses a compact header for reduced space. Phone Enter inserts a newline; desktop Enter still sends. The test draft was cleared without sending. The people picker stays within the phone width; a 57-request update panel scrolls internally rather than growing the page.
+- Browser console check found no application errors. The original Nitish session was restored and the temporary viewport override was reset. The pre-existing local preview server was left running.
+- Previews: `previews/mobile-login-responsive.png`, `previews/mobile-profile-reporting.png`, `previews/mobile-chat-responsive.png`, and `previews/desktop-reporting-avatars.png`.
+- These changes are local. To update the remote server, deploy the rebuilt contents of `frontend/dist/`, keeping its `index.html` and hashed `assets/` together. No database copy or backend configuration change is required for this UI update.

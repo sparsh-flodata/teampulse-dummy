@@ -29,3 +29,11 @@ Forms use native labels and validation, loading states, inline errors, success n
 - Organization includes a collapsible reporting tree, nested team tree, directory search, inactive-account toggle for admins, and team/reporting edit forms. Directory-only people show a lock instead of an operational profile link.
 - Green gradients mean confirmed work without exceptions. Amber means review. Red means intervention. Gray means missing/stale confirmation. Health reasons and next actions are shown in work detail, alongside explicit labels and icons.
 - Settings exposes opt-in automatic progress updates. Significant assistant changes remain reviewable proposals. Private conversations are excluded from person dashboards.
+
+## Responsive login, reporting, and chat
+
+Phones use a branded single-column login card with wrapping account hints and 16px inputs. Desktop retains the original story/form split.
+
+Profiles place a bounded reporting-avatar strip above commitments. Hover or focus reveals a person's name, role, and department; clicking opens their authorized profile. View all opens a searchable, scrollable dialog so a large reporting team does not lengthen the profile page.
+
+Phone chat uses a viewport-filling layout with large Chat/Updates tabs, internal scrolling, a compact work/people toolbar, and a pinned composer. The visual viewport is tracked for keyboard resizing, with compact headers on short screens. Enter inserts a newline on phones, and the send button submits; desktop retains Enter-to-send. The people picker and update list remain inside their respective viewport panels.

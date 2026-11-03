@@ -370,7 +370,10 @@ export default function App() {
           }
         }}
       />
-      <div className="app-main" inert={smallScreen && mobile}>
+      <div
+        className={"app-main" + (view === "AI chat" ? " has-chat" : "")}
+        inert={smallScreen && mobile}
+      >
         <header className="topbar">
           <div className="breadcrumb">
             <button
@@ -538,9 +541,11 @@ export default function App() {
             <div className="sample-workspace-note">
               <ShieldCheck size={13} />
               <span>Demo projects</span>{" "}
-              {state.organization_source
-                ? "Reporting and departments follow your organization file. Projects and work are fictional."
-                : "Sample projects and work are illustrative and editable."}
+              <span className="sample-note-detail">
+                {state.organization_source
+                  ? "Reporting and departments follow your organization file. Projects and work are fictional."
+                  : "Sample projects and work are illustrative and editable."}
+              </span>
             </div>
           )}
           {connection && (

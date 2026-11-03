@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import {
   Link2,
   ArrowUpRight,
-  ChevronRight,
   Clock3,
   Loader2,
   Flag,
@@ -17,6 +16,7 @@ import { WorkTable } from "../work/WorkTable";
 import { DependencyCard } from "../work/DependencyCard";
 import { HealthSignal } from "./HealthSignal";
 import { ReportingForm } from "./ReportingForm";
+import { ReportingTeam } from "./ReportingTeam";
 import { api, State, Work, Profile, ago, openDependency } from "../../lib";
 
 export function ProfileDashboard({
@@ -147,6 +147,12 @@ export function ProfileDashboard({
           </div>
         ))}
       </div>
+      <ReportingTeam
+        key={p.id}
+        reports={data.reports}
+        state={state}
+        onProfile={onProfile}
+      />
       <div className="profile-layout">
         <section className="panel profile-work-panel">
           <div className="panel-heading">
@@ -300,34 +306,10 @@ export function ProfileDashboard({
                 ))}
             </div>
           </section>
-          <section className="panel profile-reports">
-            <h3>Reporting team</h3>
-            {data.reports.filter((p) => p.active).length ? (
-              data.reports
-                .filter((p) => p.active)
-                .map((r) => (
-                  <button
-                    key={r.id}
-                    disabled={!r.can_view_profile}
-                    onClick={() => onProfile(r.id)}
-                  >
-                    <Avatar person={r} size={30} />
-                    <span>
-                      {r.name}
-                      <small>{r.title}</small>
-                    </span>
-                    <ChevronRight size={14} />
-                  </button>
-                ))
-            ) : (
-              <p>No direct reports.</p>
-            )}
-            <div className="privacy-note">
-              <LockKeyhole size={13} />
-              Private assistant conversations are never included in this
-              profile.
-            </div>
-          </section>
+          <div className="privacy-note">
+            <LockKeyhole size={13} />
+            Private assistant conversations are never included in this profile.
+          </div>
         </aside>
       </div>
       {editing && (

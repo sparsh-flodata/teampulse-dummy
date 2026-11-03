@@ -30,6 +30,10 @@ export function Login({ onLogin }: { onLogin: () => void }) {
   }
   return (
     <div className="login-page">
+      <div className="login-mobile-brand">
+        <Logo />
+        <span>Work, in sync.</span>
+      </div>
       <div className="login-story">
         <Logo />
         <span className="login-kicker">A calmer way to work together</span>
