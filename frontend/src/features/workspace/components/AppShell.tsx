@@ -1,0 +1,382 @@
+import { useEffect, useRef, useState } from "react";
+import {
+  Outlet,
+  useMatches,
+  useNavigate,
+  useParams,
+} from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import {
+  Users,
+  Search,
+  Bell,
+  Plus,
+  ChevronRight,
+  CalendarDays,
+  Menu,
+  ShieldCheck,
+  Sun,
+  Wifi,
+  GitBranch,
+  UserRound,
+} from "lucide-react";
+import { Avatar } from "@/components/ui";
+import { signOut } from "@/features/auth/session";
+import { WorkDetail } from "@/features/work/components/WorkDetail";
+import { CreateDialog } from "./CreateDialog";
+import { stateQuery } from "../api";
+import { isManager } from "../domain";
+import { useMediaQuery, useWorkspace } from "../hooks";
+import {
+  useWorkspaceNavigation,
+  useWorkspaceSearch,
+  type View,
+  type WorkScope,
+} from "../navigation";
+import { NotificationsPopover } from "./NotificationsPopover";
+import { Sidebar } from "./Sidebar";
+import { Toast } from "./Toast";
+
+const descriptions: Record<View, string> = {
+  Overview: "A little clarity on where things stand.",
+  "My work": "Your commitments, your priorities, your space.",
+  "All commitments": "A shared view of what the team is delivering.",
+  Projects: "The bigger picture, one initiative at a time.",
+  Dependencies: "See what's waiting. Help work move forward.",
+  "Team & capacity": "Make room for the right work, together.",
+  Activity: "The context behind every change.",
+  Settings: "Make TeamPulse work at your rhythm.",
+  "AI chat": "Give instructions, coordinate updates, and keep work in sync.",
+  "My profile":
+    "Your commitments, delivery context, and capacity in one place.",
+  "My team": "A clear view of your direct and indirect reports.",
+  Organization: "Understand where everyone fits, and how work connects.",
+  Profile: "A complete work profile, within your reporting permissions.",
+};
+
+/** Pages where typing in the global search jumps to All commitments. */
+const SEARCH_REDIRECT: View[] = [
+  "Profile",
+  "My profile",
+  "My team",
+  "Organization",
+  "Settings",
+];
+
+function greeting(name: string) {
+  const hour = new Date().getHours();
+  return `Good ${hour < 12 ? "morning" : hour < 17 ? "afternoon" : "evening"}, ${name.split(" ")[0]}`;
+}
+
+export function AppShell() {
+  const state = useWorkspace();
+  const { error, refetch } = useQuery(stateQuery);
+  const view: View =
+    useMatches({ select: (m) => m.at(-1)?.staticData.title }) ?? "Overview";
+  const { personId } = useParams({ strict: false });
+  const search = useWorkspaceSearch();
+  const nav = useWorkspaceNavigation();
+  const navigate = useNavigate();
+  const [mobile, setMobile] = useState(false),
+    [notices, setNotices] = useState(false);
+  const smallScreen = useMediaQuery("(max-width:760px)");
+  const searchRef = useRef<HTMLInputElement>(null);
+  const sidebarRef = useRef<HTMLElement>(null);
+
+  // Mobile navigation drawer: focus trap + Escape, restoring focus on close.
+  useEffect(() => {
+    if (!mobile || !smallScreen) return;
+    const previous = document.activeElement as HTMLElement | null;
+    const sidebar = sidebarRef.current;
+    sidebar?.querySelector<HTMLElement>("button")?.focus();
+    const key = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMobile(false);
+      if (e.key === "Tab") {
+        const items = sidebar?.querySelectorAll<HTMLElement>(
+          "button:not(:disabled),input,select",
+        );
+        if (!items?.length) return;
+        const first = items[0],
+          last = items[items.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    };
+    document.addEventListener("keydown", key);
+    return () => {
+      document.removeEventListener("keydown", key);
+      previous?.focus();
+    };
+  }, [mobile, smallScreen]);
+
+  // Ctrl/Cmd+K focuses the workspace search.
+  useEffect(() => {
+    const key = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+        e.preventDefault();
+        searchRef.current?.focus();
+      }
+    };
+    document.addEventListener("keydown", key);
+    return () => document.removeEventListener("keydown", key);
+  }, []);
+
+  const me = state.user,
+    manager = isManager(me),
+    overviewScope = search.scope ?? "personal",
+    unread = state.notifications.filter((n) => !n.read).length,
+    selected = search.work
+      ? state.work.find((w) => w.id === search.work)
+      : undefined,
+    connection = error ? error.message : "";
+
+  const goTo = (target: Exclude<View, "Profile">) => {
+    setMobile(false);
+    void nav.go(target);
+  };
+  const setScope = (scope: WorkScope) =>
+    nav.patchSearch({ scope: scope === "personal" ? undefined : scope });
+
+  return (
+    <div className="app-shell">
+      {mobile && (
+        <div className="mobile-backdrop" onClick={() => setMobile(false)} />
+      )}
+      <Sidebar
+        state={state}
+        view={view}
+        mobile={mobile}
+        smallScreen={smallScreen}
+        sidebarRef={sidebarRef}
+        onNavigate={goTo}
+        onCreateProject={() => {
+          setMobile(false);
+          void nav.openCreate("project");
+        }}
+        onProject={(id) => {
+          setMobile(false);
+          void nav.go("All commitments", { project: id });
+        }}
+        onClose={() => setMobile(false)}
+        onLogout={() => void signOut()}
+      />
+      <div
+        className={"app-main" + (view === "AI chat" ? " has-chat" : "")}
+        inert={smallScreen && mobile}
+      >
+        <header className="topbar">
+          <div className="breadcrumb">
+            <button
+              className="icon-button menu-toggle"
+              aria-label="Open navigation"
+              onClick={() => setMobile(true)}
+            >
+              <Menu size={19} />
+            </button>
+            <span>Workspace</span>
+            <ChevronRight size={13} />
+            <strong>{view}</strong>
+          </div>
+          <div className="topbar-actions">
+            <div className="global-search">
+              <Search size={16} />
+              <input
+                ref={searchRef}
+                value={search.q ?? ""}
+                onChange={(e) => {
+                  const q = e.target.value || undefined;
+                  if (SEARCH_REDIRECT.includes(view))
+                    void navigate({
+                      to: "/commitments",
+                      search: { status: "all", q },
+                    });
+                  else void nav.patchSearch({ q }, true);
+                }}
+                placeholder="Search your workspace…"
+                aria-label="Search workspace"
+              />
+              <kbd>Ctrl K</kbd>
+            </div>
+            <span className="topbar-divider" />
+            <button
+              className={
+                "icon-button notification-button " +
+                (unread ? "has-notifications" : "")
+              }
+              aria-label={"Notifications, " + unread + " unread"}
+              onClick={() => setNotices(!notices)}
+            >
+              <Bell size={19} />
+            </button>
+            <Avatar person={me} size={31} />
+          </div>
+        </header>
+        <main className={view === "AI chat" ? "chat-page" : ""}>
+          <div className="page-heading">
+            <div>
+              <div className="heading-eyebrow">
+                {view === "Overview" ? (
+                  <>
+                    <Sun size={15} />
+                    YOUR TEAM, IN SYNC
+                  </>
+                ) : (
+                  "FLODATA WORKSPACE"
+                )}
+              </div>
+              <h1>
+                {view === "Overview" ? greeting(me.name) : ""}
+                <span className="greeting-dot">
+                  {view === "Overview" ? "." : ""}
+                </span>
+                {view !== "Overview" &&
+                  (view === "Profile"
+                    ? state.directory.find((p) => p.id === Number(personId))
+                        ?.name || "Individual profile"
+                    : view)}
+              </h1>
+              <p>{descriptions[view]}</p>
+            </div>
+            <div className="heading-actions">
+              <span className="today-label">
+                <CalendarDays size={15} />
+                {new Date(state.today + "T12:00:00").toLocaleDateString(
+                  "en-IN",
+                  {
+                    weekday: "short",
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric",
+                  },
+                )}
+              </span>
+              {["Overview", "My work", "All commitments"].includes(view) && (
+                <button
+                  className="button primary"
+                  onClick={() => nav.openCreate("work")}
+                >
+                  <Plus size={16} />
+                  New commitment
+                </button>
+              )}
+              {view === "Projects" && manager && (
+                <button
+                  className="button primary"
+                  onClick={() => nav.openCreate("project")}
+                >
+                  <Plus size={16} />
+                  New project
+                </button>
+              )}
+              {view === "Team & capacity" && manager && (
+                <button
+                  className="button primary"
+                  onClick={() => nav.openCreate("employee")}
+                >
+                  <Plus size={16} />
+                  Add teammate
+                </button>
+              )}
+            </div>
+          </div>
+          {view === "Overview" && (
+            <div className="workspace-context">
+              <div className="context-tabs">
+                <button
+                  className={overviewScope === "personal" ? "active" : ""}
+                  onClick={() => setScope("personal")}
+                >
+                  <UserRound size={15} />
+                  My workspace
+                </button>
+                {manager && (
+                  <button
+                    className={overviewScope === "team" ? "active" : ""}
+                    onClick={() => setScope("team")}
+                  >
+                    <Users size={15} />
+                    Reporting team
+                  </button>
+                )}
+                {state.can_manage_org && (
+                  <button
+                    className={overviewScope === "organization" ? "active" : ""}
+                    onClick={() => setScope("organization")}
+                  >
+                    <GitBranch size={15} />
+                    Organization
+                  </button>
+                )}
+              </div>
+              <span>
+                <ShieldCheck size={13} />
+                {overviewScope === "personal"
+                  ? "Your own commitments"
+                  : overviewScope === "team"
+                    ? "Direct and indirect reports"
+                    : "Organization-wide access"}
+              </span>
+            </div>
+          )}
+          {state.demo_mode && (
+            <div className="sample-workspace-note">
+              <ShieldCheck size={13} />
+              <span>Demo projects</span>{" "}
+              <span className="sample-note-detail">
+                {state.organization_source
+                  ? "Reporting and departments follow your organization file. Projects and work are fictional."
+                  : "Sample projects and work are illustrative and editable."}
+              </span>
+            </div>
+          )}
+          {connection && (
+            <div className="error connection-error">
+              <Wifi size={16} />
+              {connection}
+              <button className="text-button" onClick={() => void refetch()}>
+                Reconnect
+              </button>
+            </div>
+          )}
+          <Outlet />
+          <footer className="page-footer">
+            <span>
+              <span className="live-dot" />
+              Your team's shared source of context
+            </span>
+            <span>Built for progress, with people in mind.</span>
+          </footer>
+        </main>
+      </div>
+      {selected && !search.create && (
+        <WorkDetail
+          key={selected.id}
+          work={selected}
+          state={state}
+          onClose={nav.closeWork}
+          onDependency={() => nav.openCreate("dependency", selected.id)}
+        />
+      )}
+      {search.create && (
+        <CreateDialog
+          kind={search.create}
+          state={state}
+          work={search.create === "dependency" ? selected : undefined}
+          onClose={nav.closeCreate}
+        />
+      )}
+      {notices && (
+        <NotificationsPopover
+          notifications={state.notifications}
+          onClose={() => setNotices(false)}
+        />
+      )}
+      <Toast />
+    </div>
+  );
+}

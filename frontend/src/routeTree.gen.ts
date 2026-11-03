@@ -9,50 +9,351 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppRouteImport } from './routes/_app'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as AppIndexRouteImport } from './routes/_app/index'
+import { Route as AppActivityRouteImport } from './routes/_app/activity'
+import { Route as AppCapacityRouteImport } from './routes/_app/capacity'
+import { Route as AppChatRouteImport } from './routes/_app/chat'
+import { Route as AppCommitmentsRouteImport } from './routes/_app/commitments'
+import { Route as AppDependenciesRouteImport } from './routes/_app/dependencies'
+import { Route as AppMeRouteImport } from './routes/_app/me'
+import { Route as AppMyWorkRouteImport } from './routes/_app/my-work'
+import { Route as AppOrganizationRouteImport } from './routes/_app/organization'
+import { Route as AppProjectsRouteImport } from './routes/_app/projects'
+import { Route as AppSettingsRouteImport } from './routes/_app/settings'
+import { Route as AppTeamRouteImport } from './routes/_app/team'
+import { Route as AppPeoplePersonIdRouteImport } from './routes/_app/people.$personId'
 
-const IndexRoute = IndexRouteImport.update({
+const AppRoute = AppRouteImport.update({
+  id: '/_app',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AppRoute,
+} as any)
+const AppActivityRoute = AppActivityRouteImport.update({
+  id: '/activity',
+  path: '/activity',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCapacityRoute = AppCapacityRouteImport.update({
+  id: '/capacity',
+  path: '/capacity',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppChatRoute = AppChatRouteImport.update({
+  id: '/chat',
+  path: '/chat',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCommitmentsRoute = AppCommitmentsRouteImport.update({
+  id: '/commitments',
+  path: '/commitments',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppDependenciesRoute = AppDependenciesRouteImport.update({
+  id: '/dependencies',
+  path: '/dependencies',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMeRoute = AppMeRouteImport.update({
+  id: '/me',
+  path: '/me',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMyWorkRoute = AppMyWorkRouteImport.update({
+  id: '/my-work',
+  path: '/my-work',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppOrganizationRoute = AppOrganizationRouteImport.update({
+  id: '/organization',
+  path: '/organization',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppProjectsRoute = AppProjectsRouteImport.update({
+  id: '/projects',
+  path: '/projects',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSettingsRoute = AppSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppTeamRoute = AppTeamRouteImport.update({
+  id: '/team',
+  path: '/team',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPeoplePersonIdRoute = AppPeoplePersonIdRouteImport.update({
+  id: '/people/$personId',
+  path: '/people/$personId',
+  getParentRoute: () => AppRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
+  '/': typeof AppIndexRoute
+  '/login': typeof LoginRoute
+  '/activity': typeof AppActivityRoute
+  '/capacity': typeof AppCapacityRoute
+  '/chat': typeof AppChatRoute
+  '/commitments': typeof AppCommitmentsRoute
+  '/dependencies': typeof AppDependenciesRoute
+  '/me': typeof AppMeRoute
+  '/my-work': typeof AppMyWorkRoute
+  '/organization': typeof AppOrganizationRoute
+  '/projects': typeof AppProjectsRoute
+  '/settings': typeof AppSettingsRoute
+  '/team': typeof AppTeamRoute
+  '/people/$personId': typeof AppPeoplePersonIdRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/activity': typeof AppActivityRoute
+  '/capacity': typeof AppCapacityRoute
+  '/chat': typeof AppChatRoute
+  '/commitments': typeof AppCommitmentsRoute
+  '/dependencies': typeof AppDependenciesRoute
+  '/me': typeof AppMeRoute
+  '/my-work': typeof AppMyWorkRoute
+  '/organization': typeof AppOrganizationRoute
+  '/projects': typeof AppProjectsRoute
+  '/settings': typeof AppSettingsRoute
+  '/team': typeof AppTeamRoute
+  '/': typeof AppIndexRoute
+  '/people/$personId': typeof AppPeoplePersonIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
+  '/_app': typeof AppRouteWithChildren
+  '/login': typeof LoginRoute
+  '/_app/activity': typeof AppActivityRoute
+  '/_app/capacity': typeof AppCapacityRoute
+  '/_app/chat': typeof AppChatRoute
+  '/_app/commitments': typeof AppCommitmentsRoute
+  '/_app/dependencies': typeof AppDependenciesRoute
+  '/_app/me': typeof AppMeRoute
+  '/_app/my-work': typeof AppMyWorkRoute
+  '/_app/organization': typeof AppOrganizationRoute
+  '/_app/projects': typeof AppProjectsRoute
+  '/_app/settings': typeof AppSettingsRoute
+  '/_app/team': typeof AppTeamRoute
+  '/_app/': typeof AppIndexRoute
+  '/_app/people/$personId': typeof AppPeoplePersonIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/activity'
+    | '/capacity'
+    | '/chat'
+    | '/commitments'
+    | '/dependencies'
+    | '/me'
+    | '/my-work'
+    | '/organization'
+    | '/projects'
+    | '/settings'
+    | '/team'
+    | '/people/$personId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/login'
+    | '/activity'
+    | '/capacity'
+    | '/chat'
+    | '/commitments'
+    | '/dependencies'
+    | '/me'
+    | '/my-work'
+    | '/organization'
+    | '/projects'
+    | '/settings'
+    | '/team'
+    | '/'
+    | '/people/$personId'
+  id:
+    | '__root__'
+    | '/_app'
+    | '/login'
+    | '/_app/activity'
+    | '/_app/capacity'
+    | '/_app/chat'
+    | '/_app/commitments'
+    | '/_app/dependencies'
+    | '/_app/me'
+    | '/_app/my-work'
+    | '/_app/organization'
+    | '/_app/projects'
+    | '/_app/settings'
+    | '/_app/team'
+    | '/_app/'
+    | '/_app/people/$personId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
+  AppRoute: typeof AppRouteWithChildren
+  LoginRoute: typeof LoginRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app/': {
+      id: '/_app/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/activity': {
+      id: '/_app/activity'
+      path: '/activity'
+      fullPath: '/activity'
+      preLoaderRoute: typeof AppActivityRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/capacity': {
+      id: '/_app/capacity'
+      path: '/capacity'
+      fullPath: '/capacity'
+      preLoaderRoute: typeof AppCapacityRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/chat': {
+      id: '/_app/chat'
+      path: '/chat'
+      fullPath: '/chat'
+      preLoaderRoute: typeof AppChatRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/commitments': {
+      id: '/_app/commitments'
+      path: '/commitments'
+      fullPath: '/commitments'
+      preLoaderRoute: typeof AppCommitmentsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/dependencies': {
+      id: '/_app/dependencies'
+      path: '/dependencies'
+      fullPath: '/dependencies'
+      preLoaderRoute: typeof AppDependenciesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/me': {
+      id: '/_app/me'
+      path: '/me'
+      fullPath: '/me'
+      preLoaderRoute: typeof AppMeRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/my-work': {
+      id: '/_app/my-work'
+      path: '/my-work'
+      fullPath: '/my-work'
+      preLoaderRoute: typeof AppMyWorkRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/organization': {
+      id: '/_app/organization'
+      path: '/organization'
+      fullPath: '/organization'
+      preLoaderRoute: typeof AppOrganizationRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/projects': {
+      id: '/_app/projects'
+      path: '/projects'
+      fullPath: '/projects'
+      preLoaderRoute: typeof AppProjectsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/settings': {
+      id: '/_app/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AppSettingsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/team': {
+      id: '/_app/team'
+      path: '/team'
+      fullPath: '/team'
+      preLoaderRoute: typeof AppTeamRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/people/$personId': {
+      id: '/_app/people/$personId'
+      path: '/people/$personId'
+      fullPath: '/people/$personId'
+      preLoaderRoute: typeof AppPeoplePersonIdRouteImport
+      parentRoute: typeof AppRoute
     }
   }
 }
 
+interface AppRouteChildren {
+  AppActivityRoute: typeof AppActivityRoute
+  AppCapacityRoute: typeof AppCapacityRoute
+  AppChatRoute: typeof AppChatRoute
+  AppCommitmentsRoute: typeof AppCommitmentsRoute
+  AppDependenciesRoute: typeof AppDependenciesRoute
+  AppMeRoute: typeof AppMeRoute
+  AppMyWorkRoute: typeof AppMyWorkRoute
+  AppOrganizationRoute: typeof AppOrganizationRoute
+  AppProjectsRoute: typeof AppProjectsRoute
+  AppSettingsRoute: typeof AppSettingsRoute
+  AppTeamRoute: typeof AppTeamRoute
+  AppIndexRoute: typeof AppIndexRoute
+  AppPeoplePersonIdRoute: typeof AppPeoplePersonIdRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppActivityRoute: AppActivityRoute,
+  AppCapacityRoute: AppCapacityRoute,
+  AppChatRoute: AppChatRoute,
+  AppCommitmentsRoute: AppCommitmentsRoute,
+  AppDependenciesRoute: AppDependenciesRoute,
+  AppMeRoute: AppMeRoute,
+  AppMyWorkRoute: AppMyWorkRoute,
+  AppOrganizationRoute: AppOrganizationRoute,
+  AppProjectsRoute: AppProjectsRoute,
+  AppSettingsRoute: AppSettingsRoute,
+  AppTeamRoute: AppTeamRoute,
+  AppIndexRoute: AppIndexRoute,
+  AppPeoplePersonIdRoute: AppPeoplePersonIdRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
+  AppRoute: AppRouteWithChildren,
+  LoginRoute: LoginRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

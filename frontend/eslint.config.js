@@ -40,4 +40,10 @@ export default defineConfig(
       ],
     },
   },
+  {
+    // Node dev scripts (fixture capture) may print progress.
+    files: ["scripts/**/*.mjs"],
+    languageOptions: { globals: globals.node },
+    rules: { "no-console": "off" },
+  },
 );

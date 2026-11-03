@@ -1,6 +1,7 @@
 import { defineConfig } from "vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import viteReact from "@vitejs/plugin-react";
+import { msw } from "msw/vite";
 
 export default defineConfig({
   resolve: { tsconfigPaths: true },
@@ -13,5 +14,7 @@ export default defineConfig({
       spa: { enabled: true, prerender: { outputPath: "/index" } },
     }),
     viteReact(),
+    // Serves /mockServiceWorker.js in dev only; nothing is emitted in builds.
+    msw({ mode: "worker-only" }),
   ],
 });
