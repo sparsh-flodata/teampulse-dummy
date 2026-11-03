@@ -106,7 +106,7 @@ export function Sidebar({
         tabIndex={0}
         aria-label="Scrollable workspace navigation"
       >
-        <div className="sidebar-label">WORKSPACE</div>
+        <div className="sidebar-label">Workspace</div>
         <nav>
           {items
             .filter((i) => i.label !== "My team" || manager)
@@ -120,13 +120,13 @@ export function Sidebar({
                 <span>{label}</span>
                 {label === "My work" && <small>{myWork}</small>}
                 {label === "Dependencies" && openDeps > 0 && <b>{openDeps}</b>}
-                {label === "AI chat" && <span className="nav-new">NEW</span>}
+                {label === "AI chat" && <span className="nav-new">New</span>}
               </button>
             ))}
         </nav>
         <div className="sidebar-projects">
           <div className="split sidebar-label">
-            <span>PROJECTS</span>
+            <span>Projects</span>
             {manager && (
               <button
                 className="icon-button"

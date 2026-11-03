@@ -367,7 +367,7 @@ export function ChatWorkspace() {
                 <Sparkles size={30} />
               </span>
               <span className="eyebrow">
-                A CLEARER PICTURE, ONE CONVERSATION AT A TIME
+                A clearer picture, one conversation at a time
               </span>
               <h2>What should we move forward?</h2>
               <p>

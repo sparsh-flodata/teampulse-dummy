@@ -244,10 +244,10 @@ export function AppShell() {
                 {view === "Overview" ? (
                   <>
                     <Sun size={15} />
-                    YOUR TEAM, IN SYNC
+                    Your team, in sync
                   </>
                 ) : (
-                  "FLODATA WORKSPACE"
+                  "FloData workspace"
                 )}
               </div>
               <h1>

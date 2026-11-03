@@ -20,7 +20,7 @@
 }
 .reporting-team-compact {
   padding: 18px 20px;
-  margin-bottom: 22px;
+  margin-bottom: 14px;
   min-width: 0;
 }
 .reporting-team-heading {
@@ -35,12 +35,12 @@
   gap: var(--space-8);
   font-size: var(--text-13);
   font-weight: var(--weight-semibold);
-  color: #79568c;
+  color: oklch(30.0% 0.012 40);
 }
 .reporting-team-heading h3 > span {
   font-size: var(--text-10);
-  background: #f1eaf8;
-  color: #8a6b9f;
+  background: oklch(94.7% 0.006 55);
+  color: oklch(43.5% 0.012 40);
   padding: 3px 6px;
   border-radius: var(--radius-5);
 }
@@ -51,7 +51,7 @@
   font-size: var(--text-10);
   line-height: 1.6;
   margin-top: 5px;
-  color: #9d84ae;
+  color: oklch(46.8% 0.012 40);
 }
 .report-avatar-list {
   display: flex;
@@ -69,7 +69,7 @@
   height: 44px;
   flex: 0 0 44px;
   padding: 3px;
-  border: 1px solid #eee5f5;
+  border: 1px solid oklch(93.4% 0.007 55);
   border-radius: var(--radius-round);
   background: var(--color-surface);
   transition:
@@ -78,12 +78,12 @@
 }
 .report-avatar-button:hover,
 .report-avatar-more:hover {
-  background: #f5effb;
-  border-color: #cbb4de;
+  background: oklch(96.0% 0.005 55);
+  border-color: oklch(80.3% 0.009 55);
 }
 .report-avatar-button:focus-visible,
 .report-avatar-more:focus-visible {
-  outline: 2px solid #9270ba;
+  outline: 2px solid oklch(24.0% 0.012 40);
   outline-offset: 3px;
 }
 .report-avatar-button .avatar {
@@ -92,8 +92,8 @@
 .report-avatar-more {
   font-size: var(--text-12);
   font-weight: var(--weight-semibold);
-  color: #78518f;
-  background: #f4edf9;
+  color: oklch(30.0% 0.012 40);
+  background: oklch(95.5% 0.005 55);
 }
 .report-avatar-tooltip {
   position: fixed;
@@ -102,9 +102,9 @@
   max-width: calc(100vw - 24px);
   padding: 12px 14px;
   border-radius: var(--radius-9);
-  background: #543a68;
+  background: oklch(39.8% 0.012 40);
   color: var(--color-on-brand);
-  box-shadow: 0 5px 20px #39264b26;
+  box-shadow: 0 5px 20px oklch(30.9% 0.012 40 / 0.149);
   pointer-events: none;
   overflow-wrap: anywhere;
 }
@@ -119,7 +119,7 @@
   font-size: var(--text-10);
   line-height: 1.6;
   margin-top: 3px;
-  color: #eadff2;
+  color: oklch(58.8% 0.008 55);
 }
 .reporting-team-dialog {
   padding: 18px 22px 22px;
@@ -129,9 +129,9 @@
   align-items: center;
   gap: var(--space-9);
   padding: 0 12px;
-  border: 1px solid #e9dff2;
+  border: 1px solid oklch(91.7% 0.008 55);
   border-radius: var(--radius-8);
-  color: #a18bb5;
+  color: oklch(47.7% 0.012 40);
 }
 .reporting-team-search input {
   width: 100%;
@@ -141,7 +141,7 @@
   outline: 0;
   background: transparent;
   font-size: var(--text-14);
-  color: #715382;
+  color: oklch(36.9% 0.012 40);
 }
 .reporting-team-results {
   max-height: min(420px, 55dvh);
@@ -156,11 +156,11 @@
   width: 100%;
   gap: var(--space-11);
   padding: 13px 3px;
-  border-bottom: 1px solid #f0e9f5;
-  color: #80628f;
+  border-bottom: 1px solid oklch(94.3% 0.005 55);
+  color: oklch(41.9% 0.012 40);
 }
 .reporting-team-results > button:hover {
-  background: #fcf9fe;
+  background: oklch(98.6% 0.004 55);
 }
 .reporting-team-results > button > .avatar {
   flex-shrink: 0;
@@ -180,7 +180,7 @@
   font-size: var(--text-10);
   margin-top: 5px;
   line-height: 1.6;
-  color: #9e86ad;
+  color: oklch(47.0% 0.012 40);
 }
 
 @media (max-width: 900px) {
@@ -189,8 +189,8 @@
     min-height: 100svh;
     background: linear-gradient(
       160deg,
-      #f5effc 0%,
-      #faf8fd 48%,
+      oklch(96.1% 0.006 55) 0%,
+      oklch(98.2% 0.004 55) 48%,
       var(--color-surface) 100%
     );
   }
@@ -209,7 +209,7 @@
     font-size: var(--text-23);
   }
   .login-mobile-brand > span {
-    color: #987eaa;
+    color: oklch(46.0% 0.012 40);
     font-size: var(--text-12);
     padding-left: 1px;
   }
@@ -223,9 +223,9 @@
     max-width: 100%;
     padding: 25px;
     background: var(--color-surface);
-    border: 1px solid #ece1f5;
+    border: 1px solid oklch(92.4% 0.009 55);
     border-radius: var(--radius-16);
-    box-shadow: 0 10px 40px #77519908;
+    box-shadow: 0 10px 40px oklch(24.0% 0.012 40 / 0.031);
   }
   .login-form h2 {
     font-size: 28px;
@@ -237,7 +237,7 @@
     line-height: 1.7;
   }
   .login-form .form {
-    gap: 18px;
+    gap: 12px;
     padding: 27px 0 20px;
   }
   .login-form .form label {
@@ -268,7 +268,7 @@
   }
   .login-privacy {
     line-height: 1.7;
-    margin-top: 20px;
+    margin-top: 12px;
   }
 }
 @media (max-width: 380px) {
@@ -285,7 +285,7 @@
 @media (max-width: 760px) {
   .reporting-team-compact {
     padding: 15px;
-    margin-bottom: 17px;
+    margin-bottom: 12px;
   }
   .reporting-team-heading {
     gap: var(--space-6);
@@ -520,7 +520,7 @@
   .coord-welcome > span:first-child {
     width: 44px;
     height: 44px;
-    margin-bottom: 17px;
+    margin-bottom: 12px;
     border-radius: 13px;
   }
   .coord-welcome > .eyebrow {
@@ -539,7 +539,7 @@
     display: flex;
     gap: var(--space-8);
     overflow-x: auto;
-    margin-top: 17px;
+    margin-top: 12px;
     text-align: left;
     padding-bottom: 5px;
   }

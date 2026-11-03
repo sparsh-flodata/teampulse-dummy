@@ -9,7 +9,7 @@ import {
   LockKeyhole,
   Pencil,
 } from "lucide-react";
-import { Avatar } from "@/components/ui";
+import { Avatar, Badge, healthTone } from "@/components/ui";
 import { summarizeHealth } from "@/features/workspace/domain";
 import { useWorkspace } from "@/features/workspace/hooks";
 import { useWorkspaceNavigation } from "@/features/workspace/navigation";
@@ -135,9 +135,7 @@ export function OrganizationPage() {
             </small>
           </div>
           {health && (
-            <span className={"health-label " + health.tone}>
-              {health.label}
-            </span>
+            <Badge value={health.label} tone={healthTone(health.tone)} />
           )}
           <div className="org-node-actions">
             {state.can_manage_org && (

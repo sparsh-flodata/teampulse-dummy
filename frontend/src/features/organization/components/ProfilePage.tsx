@@ -80,7 +80,7 @@ export function ProfilePage({ personId }: { personId: number }) {
         <Avatar person={p} size={68} />
         <div className="profile-identity">
           <span className="eyebrow">
-            {own ? "YOUR WORK PROFILE" : "INDIVIDUAL WORK PROFILE"}
+            {own ? "Your work profile" : "Individual work profile"}
           </span>
           <h2>
             {p.name}

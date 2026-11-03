@@ -19,7 +19,7 @@ export function ActivityPage() {
           <h2>The story behind the work</h2>
           <p>Updates, commitments, and decisions in one shared timeline.</p>
         </div>
-        <span className="eyebrow">LATEST 100 EVENTS</span>
+        <span className="eyebrow">Latest 100 events</span>
       </div>
       <div className="activity-list">
         {state.activity

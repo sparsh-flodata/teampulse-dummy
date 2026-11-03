@@ -1,10 +1,6 @@
-/* Self-hosted fonts (no CDN). Manrope is variable so the 650 weight renders
-   exactly as before; DM Sans uses the same static weights the app loaded. */
-@import "@fontsource-variable/manrope/wght.css";
-@import "@fontsource/dm-sans/400.css";
-@import "@fontsource/dm-sans/500.css";
-@import "@fontsource/dm-sans/600.css";
-@import "@fontsource/dm-sans/700.css";
+/* Self-hosted fonts (no CDN): Geist and Geist Mono, both variable. */
+@import "@fontsource-variable/geist/wght.css";
+@import "@fontsource-variable/geist-mono/wght.css";
 
 @import "./tokens.css";
 
@@ -16,3 +12,5 @@
 @import "./organization.css";
 @import "./responsive.css";
 @import "./account-menu.css";
+/* Coral: containers, badges, sidebar rules and density. Loaded last. */
+@import "./coral.css";

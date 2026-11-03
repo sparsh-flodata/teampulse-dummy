@@ -173,7 +173,7 @@ export function CommitmentsDashboard({ view }: { view: CommitmentsView }) {
           {view === "My work" && (
             <div className="my-capacity">
               <div>
-                <span className="eyebrow">YOUR NEXT FIVE WORKDAYS</span>
+                <span className="eyebrow">Your next five workdays</span>
                 <h3>
                   {me.capacity.confirmed
                     ? `${me.capacity.available}h of confirmed room`
@@ -345,7 +345,7 @@ export function CommitmentsDashboard({ view }: { view: CommitmentsView }) {
               <div className="split">
                 <span className="eyebrow">
                   <Sparkles size={14} />
-                  THE DAILY BRIEF
+                  The daily brief
                 </span>
                 <span className="briefing-date">{dateLabel(state.today)}</span>
               </div>

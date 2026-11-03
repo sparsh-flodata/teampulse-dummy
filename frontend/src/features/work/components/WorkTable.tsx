@@ -1,13 +1,13 @@
 import { ChevronRight, Flag } from "lucide-react";
-import { Avatar, Badge, Empty } from "@/components/ui";
+import { Avatar, Badge, Empty, healthTone } from "@/components/ui";
 import { dateLabel } from "@/lib/format";
 import type { Work, WorkspaceState } from "@/features/workspace/types";
 
 const PROGRESS_COLORS = {
-  green: "#52a185",
-  amber: "#c89b4b",
-  red: "#d3797b",
-  neutral: "#a9a2b5",
+  green: "var(--color-done-ink)",
+  amber: "var(--color-warn-ink)",
+  red: "var(--color-late-ink)",
+  neutral: "var(--color-rule-2)",
 };
 
 export function WorkTable({
@@ -82,12 +82,9 @@ export function WorkTable({
                   </td>
                   <td>
                     <Badge value={w.status} />
-                    <small
-                      className={"health-label " + w.tone}
-                      title={w.health_reason}
-                    >
-                      {w.health}
-                    </small>
+                    <span className="health-badge" title={w.health_reason}>
+                      <Badge value={w.health} tone={healthTone(w.tone)} />
+                    </span>
                   </td>
                   <td>
                     <span

@@ -1,5 +1,5 @@
 import { FolderKanban, Plus, ArrowUpRight } from "lucide-react";
-import { Avatar } from "@/components/ui";
+import { Avatar, Badge, healthTone } from "@/components/ui";
 import { isManager } from "@/features/workspace/domain";
 import { useWorkspace } from "@/features/workspace/hooks";
 import {
@@ -51,9 +51,7 @@ export function ProjectsPage() {
                 <ArrowUpRight size={19} />
               </div>
               <h2>{p.name}</h2>
-              <span className={"health-label " + p.health.tone}>
-                {p.health.label}
-              </span>
+              <Badge value={p.health.label} tone={healthTone(p.health.tone)} />
               <p>{p.description || "A shared initiative with room to grow."}</p>
               <div className="project-collaboration">
                 {people.length} participants ·{" "}

@@ -1,5 +1,6 @@
 export { Avatar } from "./Avatar";
-export { Badge } from "./Badge";
+export { Badge, badgeTone, healthTone } from "./Badge";
+export type { BadgeTone } from "./Badge";
 export { Empty } from "./Empty";
 export { Logo } from "./Logo";
 export { Modal } from "./Modal";

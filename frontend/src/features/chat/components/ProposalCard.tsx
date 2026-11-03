@@ -34,7 +34,7 @@ export function ProposalCard({
     <div className="coord-proposal">
       <span className="eyebrow">
         <Sparkles size={13} />
-        {request ? "REVIEW UPDATE REQUEST" : "REVIEW PROPOSED WORK CHANGE"}
+        {request ? "Review update request" : "Review proposed work change"}
       </span>
       {request ? (
         <>

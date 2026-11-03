@@ -1,0 +1,337 @@
+/*
+ * Coral layer, loaded last.
+ *
+ * - Every block sits in a container; blocks that need attention take the
+ *   soft tint of their status family (red late, amber review, green settled).
+ * - Status badges are tinted pills with an icon and a bold word.
+ * - Pages are dense: one 12px gap between blocks.
+ * - The sidebar destinations sit in one sheet, separated by hairlines.
+ */
+
+body {
+  background: var(--color-canvas);
+  color: var(--color-text);
+}
+h1,
+h2,
+h3,
+h4 {
+  color: var(--color-ink);
+  letter-spacing: -0.015em;
+}
+::selection {
+  background: color-mix(in oklab, var(--color-accent) 45%, transparent);
+}
+a:hover {
+  text-decoration-color: var(--color-accent-2);
+}
+
+/* Labels: sentence case, never tracked */
+.eyebrow,
+.heading-eyebrow,
+.sidebar-label,
+.login-kicker {
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+/* ---------- Sidebar ---------- */
+.sidebar,
+.sidebar-header,
+.sidebar-footer {
+  background: var(--color-paper-2);
+}
+.sidebar {
+  border-right: 1px solid var(--color-rule);
+}
+.sidebar-header > .brand {
+  margin-bottom: 16px;
+}
+.sidebar-header .workspace-switch {
+  margin-bottom: 14px;
+  border: 0;
+  background: var(--color-cotton);
+  box-shadow: var(--shadow-card);
+}
+.sidebar-label {
+  font-size: var(--text-9);
+  font-weight: var(--weight-medium);
+  color: var(--color-muted);
+  padding: 0 4px;
+  margin-bottom: 6px;
+}
+.sidebar nav,
+.sidebar-projects {
+  gap: 0;
+  border-radius: var(--radius-8);
+  background: var(--color-cotton);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+.sidebar nav {
+  display: flex;
+  flex-direction: column;
+}
+.sidebar nav > button,
+.sidebar-projects > button {
+  border-radius: 0;
+  min-height: 38px;
+  padding: 9px 12px;
+}
+.sidebar nav > button + button,
+.sidebar-projects > button + button,
+.sidebar-projects > .sidebar-label + button {
+  border-top: 1px solid var(--color-rule);
+}
+.sidebar nav > button:hover,
+.sidebar-projects > button:hover {
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+.sidebar nav > button.active {
+  background: var(--color-paper-2);
+  color: var(--color-ink);
+  font-weight: var(--weight-semibold);
+}
+.sidebar nav > button.active:before {
+  left: 0;
+  height: 100%;
+  width: 3px;
+  border-radius: 0;
+  background: var(--color-ink);
+}
+.sidebar nav b,
+.sidebar nav small {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+.sidebar nav b {
+  color: var(--color-late-ink);
+  background: var(--color-late-soft);
+}
+.sidebar-scroll nav .nav-new {
+  font-size: var(--text-8);
+  letter-spacing: 0;
+  color: var(--color-info-ink);
+  background: var(--color-info-soft);
+  border-color: color-mix(in oklab, var(--color-info-ink) 18%, var(--color-info-soft));
+}
+.sidebar-scroll .sidebar-projects {
+  margin-top: 14px;
+}
+.sidebar-projects .sidebar-label {
+  margin: 0;
+  padding: 8px 8px 8px 12px;
+  background: var(--color-paper);
+  border-bottom: 1px solid var(--color-rule);
+}
+.nav-scroll-end {
+  padding: 14px 6px 12px;
+  color: var(--color-muted);
+}
+.settings-link {
+  color: var(--color-ink-2);
+}
+.settings-link:hover,
+.settings-link.active {
+  background: var(--color-cotton);
+  color: var(--color-ink);
+  box-shadow: var(--shadow-card);
+}
+.sidebar-user small,
+.sidebar-footer .sidebar-user small {
+  color: var(--color-muted);
+}
+
+/* ---------- Top bar ---------- */
+.topbar {
+  height: 58px;
+  padding: 0 22px;
+  background: color-mix(in oklab, var(--color-paper) 92%, transparent);
+  border-bottom-color: var(--color-rule);
+}
+
+/* ---------- Page density ---------- */
+.app-main main {
+  padding: 14px 20px 0;
+}
+.page-heading {
+  margin-bottom: var(--space-block);
+  padding: 14px 18px;
+  border-radius: var(--radius-8);
+  background: var(--color-cotton);
+  box-shadow: var(--shadow-card);
+}
+.page-heading h1 {
+  font-size: 24px;
+  letter-spacing: -0.02em;
+  font-weight: var(--weight-semibold);
+}
+.page-heading .heading-actions {
+  margin-top: 0;
+}
+.heading-eyebrow {
+  margin-bottom: 4px;
+  color: var(--color-muted);
+  font-weight: var(--weight-medium);
+}
+.greeting-dot {
+  color: var(--color-accent-2);
+}
+
+/* ---------- Containers ---------- */
+.stat-grid,
+.overview-grid {
+  gap: var(--space-block);
+}
+.stat-grid {
+  margin-bottom: var(--space-block);
+}
+.stat-card {
+  border-color: transparent;
+}
+.stat-card.tone-red {
+  background: var(--color-late-soft);
+}
+.stat-card.tone-amber {
+  background: var(--color-warn-soft);
+}
+.stat-card.tone-green {
+  background: var(--color-done-soft);
+}
+.stat-card > strong {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Tinted rows in every work table */
+.work-table th {
+  background: var(--color-paper);
+  border-color: var(--color-rule);
+  color: var(--color-muted);
+}
+.work-table td {
+  border-bottom-color: var(--color-rule);
+}
+.work-row.tone-red td {
+  background: color-mix(in oklab, var(--color-late-soft) 70%, var(--color-cotton));
+}
+.work-row.tone-amber td {
+  background: color-mix(in oklab, var(--color-warn-soft) 70%, var(--color-cotton));
+}
+.work-table tbody tr:hover td {
+  background: var(--color-paper);
+}
+.work-title:hover {
+  text-decoration: underline;
+  text-decoration-color: var(--color-accent-2);
+}
+
+/* ---------- Status badges ---------- */
+.badge {
+  --badge-soft: var(--color-wait-soft);
+  --badge-ink: var(--color-wait-ink);
+  gap: 4px;
+  min-height: 22px;
+  padding: 2px 7px;
+  border: 1px solid color-mix(in oklab, var(--badge-ink) 18%, var(--badge-soft));
+  border-radius: var(--radius-6);
+  background: var(--badge-soft);
+  color: var(--badge-ink);
+  font-size: var(--text-9);
+  font-weight: var(--weight-semibold);
+}
+.badge.green {
+  --badge-soft: var(--color-done-soft);
+  --badge-ink: var(--color-done-ink);
+}
+.badge.red {
+  --badge-soft: var(--color-late-soft);
+  --badge-ink: var(--color-late-ink);
+}
+.badge.amber {
+  --badge-soft: var(--color-warn-soft);
+  --badge-ink: var(--color-warn-ink);
+}
+.badge.purple {
+  --badge-soft: var(--color-info-soft);
+  --badge-ink: var(--color-info-ink);
+}
+.badge.neutral {
+  --badge-soft: var(--color-wait-soft);
+  --badge-ink: var(--color-wait-ink);
+}
+.badge.green,
+.badge.red,
+.badge.amber,
+.badge.purple,
+.badge.neutral {
+  border-color: color-mix(in oklab, var(--badge-ink) 18%, var(--badge-soft));
+  background: var(--badge-soft);
+  color: var(--badge-ink);
+}
+.health-label.red {
+  color: var(--color-late-ink);
+}
+.health-label.amber {
+  color: var(--color-warn-ink);
+}
+.health-label.green {
+  color: var(--color-done-ink);
+}
+.red-text {
+  color: var(--color-late-ink);
+}
+
+/* ---------- Controls ---------- */
+.button {
+  border-color: var(--color-rule-2);
+  background: var(--color-cotton);
+  color: var(--color-print);
+  border-radius: var(--radius-8);
+}
+.button.primary {
+  border-color: var(--color-board);
+  background: var(--color-board);
+  color: var(--color-board-type);
+}
+.button.primary:hover {
+  background: var(--color-ink-2);
+}
+button:focus-visible,
+a:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 1px;
+}
+
+@media (max-width: 760px) {
+  .app-main main {
+    padding: 12px 12px 0;
+  }
+  .page-heading {
+    padding: 12px 14px;
+  }
+}
+
+/* Sidebar projects: one hairline under the label, none doubled */
+.sidebar-scroll .sidebar-projects .sidebar-label {
+  margin: 0;
+}
+.sidebar-projects > .sidebar-label + button {
+  border-top: 0;
+}
+
+/* Work tables: status and health badges stack in the status cell */
+.work-table .health-badge {
+  display: flex;
+  margin-top: 4px;
+}

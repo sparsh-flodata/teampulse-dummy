@@ -12,7 +12,7 @@ export function Avatar({
       className="avatar"
       style={
         {
-          "--avatar-color": person?.color || "#9b9aa8",
+          "--avatar-color": person?.color || "var(--color-muted)",
           width: size,
           height: size,
           fontSize: size * 0.32,

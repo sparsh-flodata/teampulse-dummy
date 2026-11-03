@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ArrowUpRight, ShieldCheck } from "lucide-react";
-import { Avatar, Empty } from "@/components/ui";
+import { Avatar, Empty, Badge, healthTone } from "@/components/ui";
 import { summarizeHealth } from "@/features/workspace/domain";
 import { useWorkspace } from "@/features/workspace/hooks";
 import { useWorkspaceNavigation } from "@/features/workspace/navigation";
@@ -60,9 +60,10 @@ export function MyTeamPage() {
             >
               <div className="split">
                 <Avatar person={p} size={43} />
-                <span className={"health-label " + personHealth.tone}>
-                  {personHealth.label}
-                </span>
+                <Badge
+                  value={personHealth.label}
+                  tone={healthTone(personHealth.tone)}
+                />
               </div>
               <h3>{p.name}</h3>
               <p>{p.title}</p>

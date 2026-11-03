@@ -20,7 +20,7 @@ export function CapacityPage() {
     <>
       <div className="capacity-explainer">
         <div>
-          <span className="eyebrow">THE NEXT FIVE WORKDAYS</span>
+          <span className="eyebrow">The next five workdays</span>
           <h2>Good planning leaves a little room.</h2>
           <p>
             Capacity = working hours − reserved time − remaining committed

@@ -108,7 +108,7 @@ export function LoginPage({
       </div>
       <div className="login-form-wrap">
         <div className="login-form">
-          <span className="eyebrow">WELCOME TO TEAMPULSE</span>
+          <span className="eyebrow">Welcome to TeamPulse</span>
           <h2>Good to see you.</h2>
           <p>{intro[mode]}</p>
           <form

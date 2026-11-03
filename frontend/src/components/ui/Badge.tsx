@@ -1,3 +1,11 @@
+import {
+  CircleAlert,
+  CircleArrowRight,
+  CircleCheck,
+  Clock,
+  TriangleAlert,
+} from "lucide-react";
+
 const GREEN = [
   "Completed",
   "Verified",
@@ -27,22 +35,46 @@ const AMBER = [
   "Review dependency",
   "Awaiting verification",
 ];
-const PURPLE = ["In Progress", "Accepted", "Fully allocated"];
+const BLUE = ["In Progress", "Accepted", "Fully allocated"];
 
-export function Badge({ value }: { value: string }) {
-  const tone = GREEN.includes(value)
+export type BadgeTone = "green" | "red" | "amber" | "purple" | "neutral";
+
+export function badgeTone(value: string): BadgeTone {
+  return GREEN.includes(value)
     ? "green"
     : RED.includes(value)
       ? "red"
       : AMBER.includes(value)
         ? "amber"
-        : PURPLE.includes(value)
+        : BLUE.includes(value)
           ? "purple"
           : "neutral";
+}
+
+/* Coral status pill: a soft tint by meaning, an icon and the word.
+   "purple" is kept as the class name for the in-hand family (now blue). */
+const ICONS = {
+  green: CircleCheck,
+  red: TriangleAlert,
+  amber: CircleAlert,
+  purple: CircleArrowRight,
+  neutral: Clock,
+} as const;
+
+export function Badge({ value, tone }: { value: string; tone?: BadgeTone }) {
+  const t = tone ?? badgeTone(value);
+  const Icon = ICONS[t];
   return (
-    <span className={"badge " + tone}>
-      <i />
+    <span className={"badge " + t}>
+      <Icon size={13} strokeWidth={2.4} aria-hidden="true" />
       {value}
     </span>
   );
+}
+
+/** Work-health tone (green/amber/red/neutral) to its badge family. */
+export function healthTone(tone: string): BadgeTone {
+  return tone === "green" || tone === "amber" || tone === "red"
+    ? tone
+    : "neutral";
 }
