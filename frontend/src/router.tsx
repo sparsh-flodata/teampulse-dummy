@@ -28,7 +28,16 @@ export function getRouter() {
     ),
   });
   if (typeof window !== "undefined")
-    setupAuth({ queryClient, navigate: (to) => void router.navigate({ to }) });
+    setupAuth({
+      queryClient,
+      navigate: (d) =>
+        void (d.to === "/login"
+          ? router.navigate({
+              to: "/login",
+              search: d.expired ? { expired: d.expired } : {},
+            })
+          : router.navigate({ to: "/" })),
+    });
   return router;
 }
 

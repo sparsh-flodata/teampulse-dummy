@@ -15,6 +15,7 @@ import {
   notify,
   now,
   profileFor,
+  reloadDb,
   share,
   stateFor,
   viewOf,
@@ -38,12 +39,15 @@ function authed(handler: Handler) {
     request: Request;
     params: PathParams;
   }) => {
-    const userId = authUser(request);
-    if (userId === null) return unauthorized();
     const body =
       request.method === "GET"
         ? {}
         : ((await request.json().catch(() => ({}))) as Record<string, unknown>);
+    // Read, mutate and persist synchronously from here on (no awaits), so a
+    // request never acts on a copy another tab has since changed.
+    reloadDb();
+    const userId = authUser(request);
+    if (userId === null) return unauthorized();
     return handler({ userId, params, body });
   };
 }

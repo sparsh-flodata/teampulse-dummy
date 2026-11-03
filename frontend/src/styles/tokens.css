@@ -92,4 +92,6 @@
 
   /* Elevation */
   --shadow-card: 0 3px 16px #29253f04;
+  --shadow-popover: 0 15px 70px #42265018;
+  --color-popover-border: #e8dcf2;
 }

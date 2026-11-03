@@ -21,7 +21,7 @@ import {
   UserRound,
 } from "lucide-react";
 import { Avatar } from "@/components/ui";
-import { signOut } from "@/features/auth/session";
+import { AccountMenu } from "@/features/auth/components/AccountMenu";
 import { WorkDetail } from "@/features/work/components/WorkDetail";
 import { CreateDialog } from "./CreateDialog";
 import { stateQuery } from "../api";
@@ -78,7 +78,8 @@ export function AppShell() {
   const nav = useWorkspaceNavigation();
   const navigate = useNavigate();
   const [mobile, setMobile] = useState(false),
-    [notices, setNotices] = useState(false);
+    [notices, setNotices] = useState(false),
+    [accountsOpen, setAccountsOpen] = useState(false);
   const smallScreen = useMediaQuery("(max-width:760px)");
   const searchRef = useRef<HTMLInputElement>(null);
   const sidebarRef = useRef<HTMLElement>(null);
@@ -163,7 +164,12 @@ export function AppShell() {
           void nav.go("All commitments", { project: id });
         }}
         onClose={() => setMobile(false)}
-        onLogout={() => void signOut()}
+        onLogout={() => {
+          // Sign-out lives in the account menu (one account or all).
+          setMobile(false);
+          setNotices(false);
+          setAccountsOpen(true);
+        }}
       />
       <div
         className={"app-main" + (view === "AI chat" ? " has-chat" : "")}
@@ -209,11 +215,26 @@ export function AppShell() {
                 (unread ? "has-notifications" : "")
               }
               aria-label={"Notifications, " + unread + " unread"}
-              onClick={() => setNotices(!notices)}
+              onClick={() => {
+                setAccountsOpen(false);
+                setNotices(!notices);
+              }}
             >
               <Bell size={19} />
             </button>
-            <Avatar person={me} size={31} />
+            <button
+              className="account-trigger"
+              data-account-trigger
+              aria-label={"Accounts · signed in as " + me.name}
+              aria-haspopup="menu"
+              aria-expanded={accountsOpen}
+              onClick={() => {
+                setNotices(false);
+                setAccountsOpen(!accountsOpen);
+              }}
+            >
+              <Avatar person={me} size={31} />
+            </button>
           </div>
         </header>
         <main className={view === "AI chat" ? "chat-page" : ""}>
@@ -376,6 +397,7 @@ export function AppShell() {
           onClose={() => setNotices(false)}
         />
       )}
+      {accountsOpen && <AccountMenu onClose={() => setAccountsOpen(false)} />}
       <Toast />
     </div>
   );

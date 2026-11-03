@@ -1,6 +1,6 @@
 // The one fetch client every API function goes through. It attaches the
-// active account's access token and normalizes error messages. It never
-// logs request or token details.
+// active account's access token, refreshes once on 401 and retries, and
+// normalizes error messages. It never logs request or token details.
 
 export class ApiError extends Error {
   constructor(
@@ -12,19 +12,23 @@ export class ApiError extends Error {
   }
 }
 
-type TokenSource = () => string | null;
-type UnauthorizedHandler = () => void;
+type AuthHooks = {
+  getAccessToken: () => string | null;
+  /** Returns a fresh access token, or null when the session cannot be renewed. */
+  refreshAccessToken: (failedToken: string) => Promise<string | null>;
+  /** Called when refresh failed: the account must be signed out. */
+  onAuthFailure: (failedToken: string) => void;
+};
 
-let getAccessToken: TokenSource = () => null;
-let onUnauthorized: UnauthorizedHandler = () => {};
+let auth: AuthHooks = {
+  getAccessToken: () => null,
+  refreshAccessToken: async () => null,
+  onAuthFailure: () => {},
+};
 
 /** Wired by the auth feature so this module stays free of app imports. */
-export function configureApiClient(options: {
-  getAccessToken: TokenSource;
-  onUnauthorized: UnauthorizedHandler;
-}) {
-  getAccessToken = options.getAccessToken;
-  onUnauthorized = options.onUnauthorized;
+export function configureApiClient(hooks: AuthHooks) {
+  auth = hooks;
 }
 
 export const API_BASE = "/api";
@@ -32,7 +36,7 @@ export const API_BASE = "/api";
 export type RequestOptions = {
   method?: "GET" | "POST" | "PATCH" | "DELETE";
   body?: unknown;
-  /** Skip the Authorization header (sign-in, refresh). */
+  /** Skip the Authorization header and refresh handling (sign-in, refresh). */
   anonymous?: boolean;
 };
 
@@ -46,26 +50,41 @@ async function errorMessage(response: Response) {
   return "Please check the form.";
 }
 
-export async function apiRequest<T = unknown>(
+function send(
   path: string,
-  { method, body, anonymous = false }: RequestOptions = {},
-): Promise<T> {
+  method: string,
+  body: unknown,
+  token: string | null,
+) {
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
     "X-TeamPulse-Request": "1",
   };
-  const token = anonymous ? null : getAccessToken();
   if (token) headers.Authorization = "Bearer " + token;
-  const response = await fetch(API_BASE + path, {
-    method: method ?? (body === undefined ? "GET" : "POST"),
+  return fetch(API_BASE + path, {
+    method,
     headers,
     body: body === undefined ? undefined : JSON.stringify(body),
   });
-  if (!response.ok) {
-    const error = new ApiError(await errorMessage(response), response.status);
-    if (response.status === 401 && !anonymous) onUnauthorized();
-    throw error;
+}
+
+export async function apiRequest<T = unknown>(
+  path: string,
+  { method, body, anonymous = false }: RequestOptions = {},
+): Promise<T> {
+  const verb = method ?? (body === undefined ? "GET" : "POST");
+  const token = anonymous ? null : auth.getAccessToken();
+  let response = await send(path, verb, body, token);
+
+  // On 401: refresh once, then retry once. A second 401 ends the session.
+  if (response.status === 401 && !anonymous && token) {
+    const fresh = await auth.refreshAccessToken(token);
+    if (fresh) response = await send(path, verb, body, fresh);
+    if (!fresh || response.status === 401) auth.onAuthFailure(token);
   }
+
+  if (!response.ok)
+    throw new ApiError(await errorMessage(response), response.status);
   return response.json() as Promise<T>;
 }
 

@@ -1,5 +1,10 @@
 import { apiRequest } from "@/lib/api/client";
-import { loginResponseSchema, type LoginResponse } from "./types";
+import {
+  loginResponseSchema,
+  tokenPairSchema,
+  type LoginResponse,
+  type TokenPair,
+} from "./types";
 
 export async function login(email: string, password: string) {
   const data = await apiRequest<unknown>("/auth/login", {
@@ -8,6 +13,16 @@ export async function login(email: string, password: string) {
     anonymous: true,
   });
   return loginResponseSchema.parse(data) as LoginResponse;
+}
+
+/** Rotating refresh: the presented refresh token is revoked by the server. */
+export async function refresh(refreshToken: string): Promise<TokenPair> {
+  const data = await apiRequest<unknown>("/auth/refresh", {
+    method: "POST",
+    body: { refresh_token: refreshToken },
+    anonymous: true,
+  });
+  return tokenPairSchema.parse(data);
 }
 
 export function logout(refreshToken: string) {

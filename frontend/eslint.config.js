@@ -8,14 +8,7 @@ import globals from "globals";
 
 export default defineConfig(
   {
-    ignores: [
-      "dist",
-      ".tanstack",
-      ".output",
-      "src/routeTree.gen.ts",
-      // Reference copy of the old app; deleted once Phase 2 is ported.
-      "src/legacy",
-    ],
+    ignores: ["dist", ".tanstack", ".output", "src/routeTree.gen.ts"],
   },
   js.configs.recommended,
   tseslint.configs.recommended,

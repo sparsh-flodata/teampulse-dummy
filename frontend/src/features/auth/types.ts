@@ -7,6 +7,9 @@ export type Account = {
   email: string;
   accessToken: string;
   refreshToken: string;
+  /** Display-only, for the account switcher. */
+  name?: string;
+  color?: string;
 };
 
 export type AuthState = {
@@ -23,7 +26,12 @@ export const tokenPairSchema = z.object({
 });
 
 export const loginResponseSchema = tokenPairSchema.extend({
-  user: z.looseObject({ id: z.number().int(), email: z.string() }),
+  user: z.looseObject({
+    id: z.number().int(),
+    email: z.string(),
+    name: z.string(),
+    color: z.string(),
+  }),
 });
 
 export type TokenPair = z.infer<typeof tokenPairSchema>;

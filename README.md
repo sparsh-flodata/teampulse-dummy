@@ -90,7 +90,7 @@ Use two terminals for hot reload:
 pnpm dev
 ```
 
-The Vite server prints its local URL (normally port 5173) and proxies `/api` to port 8787. Add changed origins to `ALLOWED_ORIGINS` if necessary. Built assets are served by FastAPI for the one-process launch.
+The Vite server prints its local URL (normally port 5173). In development the frontend uses an in-browser mock API by default (`VITE_API_MOCKS=true` in `frontend/.env.development`); set it to `false` to proxy `/api` to port 8787. The frontend expects JWT auth endpoints that the current backend does not provide yet; see [the frontend guide](docs/FRONTEND.md) for the contract. Add changed origins to `ALLOWED_ORIGINS` if necessary. Built assets are served by FastAPI for the one-process launch.
 
 ```powershell
 .venv/Scripts/python.exe -m pytest -q

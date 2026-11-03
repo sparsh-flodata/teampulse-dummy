@@ -5,7 +5,7 @@
 //   POST /api/auth/logout   {refresh_token}    -> {ok: true}  (revokes it)
 //   GET  /api/auth/me       Bearer access      -> Person
 import { http, HttpResponse } from "msw";
-import { DEMO_PASSWORD, db, employee } from "../db";
+import { DEMO_PASSWORD, db, employee, reloadDb } from "../db";
 import { API, authUser, fail, saved, unauthorized } from "../http";
 
 const ACCESS_TTL_SECONDS = 15 * 60;
@@ -41,6 +41,7 @@ export const authHandlers = [
       email?: string;
       password?: string;
     };
+    reloadDb();
     const account = db.accounts.find(
       (a) => a.email.toLowerCase() === email.trim().toLowerCase(),
     );
@@ -54,6 +55,7 @@ export const authHandlers = [
     const { refresh_token = "" } = (await request.json()) as {
       refresh_token?: string;
     };
+    reloadDb();
     const session = db.refreshTokens[refresh_token];
     if (!session || session.expiresAt <= Date.now())
       return fail(401, "Your session has expired. Please sign in again.");
@@ -65,11 +67,13 @@ export const authHandlers = [
     const { refresh_token = "" } = (await request.json()) as {
       refresh_token?: string;
     };
+    reloadDb();
     delete db.refreshTokens[refresh_token];
     return HttpResponse.json(saved({ ok: true }));
   }),
 
   http.get(`${API}/auth/me`, ({ request }) => {
+    reloadDb();
     const userId = authUser(request);
     return userId === null
       ? unauthorized()

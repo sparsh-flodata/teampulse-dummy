@@ -91,6 +91,16 @@ function load(): MockDb {
 
 export const db: MockDb = load();
 
+/**
+ * Re-reads the shared database before handling a request. Each tab runs its
+ * own copy of the handlers, so without this one tab would act on stale data
+ * (and overwrite another tab's changes) — e.g. a manager tab assigning work
+ * that an employee tab then updates.
+ */
+export function reloadDb() {
+  Object.assign(db, load());
+}
+
 export function persist() {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(db));

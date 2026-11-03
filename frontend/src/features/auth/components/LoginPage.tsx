@@ -12,18 +12,41 @@ import {
 import { z } from "zod";
 import { FormError, Logo } from "@/components/ui";
 import { bind, errorMessage } from "@/lib/forms";
+import { useSelector } from "@tanstack/react-store";
+import { Link } from "@tanstack/react-router";
 import { signIn } from "../session";
+import { authStore } from "../store";
 
 const loginSchema = z.object({
   email: z.email("Enter your work email."),
   password: z.string().min(1, "Enter your password."),
 });
 
-export function LoginPage() {
+const intro = {
+  signin: "Sign in to find your team's rhythm.",
+  add: "Add another account. You stay signed in to the others.",
+  expired: "Your session ended. Sign in again to continue.",
+};
+
+export function LoginPage({
+  mode = "signin",
+  email,
+}: {
+  mode?: "signin" | "add" | "expired";
+  email?: string;
+}) {
   const navigate = useNavigate();
   const [error, setError] = useState("");
+  const signedIn = useSelector(
+    authStore,
+    (s) => Object.keys(s.accounts).length > 0,
+  );
   const form = useForm({
-    defaultValues: { email: "nitish.kumar@flodataanalytics.com", password: "" },
+    defaultValues: {
+      email:
+        email ?? (mode === "add" ? "" : "nitish.kumar@flodataanalytics.com"),
+      password: "",
+    },
     onSubmit: async ({ value }) => {
       setError("");
       try {
@@ -87,7 +110,7 @@ export function LoginPage() {
         <div className="login-form">
           <span className="eyebrow">WELCOME TO TEAMPULSE</span>
           <h2>Good to see you.</h2>
-          <p>Sign in to find your team's rhythm.</p>
+          <p>{intro[mode]}</p>
           <form
             className="form"
             onSubmit={(e) => {
@@ -138,6 +161,11 @@ export function LoginPage() {
               )}
             </form.Subscribe>
           </form>
+          {mode !== "signin" && signedIn && (
+            <Link to="/" className="text-button login-back">
+              Back to workspace
+            </Link>
+          )}
           <div className="login-demo">
             <ShieldCheck size={19} />
             <div>
