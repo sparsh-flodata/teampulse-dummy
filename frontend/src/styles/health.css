@@ -1,27 +1,27 @@
 /* Shared attention semantics: the same work has the same color in every view. */
 .tone-green {
-  --signal: #2e8065;
-  --signal-border: #d7ebdf;
-  --signal-soft: #edf7ef;
-  --signal-wash: #f8fcf9;
+  --signal: var(--health-green);
+  --signal-border: var(--health-green-border);
+  --signal-soft: var(--health-green-soft);
+  --signal-wash: var(--health-green-wash);
 }
 .tone-amber {
-  --signal: #a27430;
-  --signal-border: #f0e2c6;
-  --signal-soft: #fcf4e6;
-  --signal-wash: #fffdf8;
+  --signal: var(--health-amber);
+  --signal-border: var(--health-amber-border);
+  --signal-soft: var(--health-amber-soft);
+  --signal-wash: var(--health-amber-wash);
 }
 .tone-red {
-  --signal: #b45f65;
-  --signal-border: #f0d8dc;
-  --signal-soft: #fceff0;
-  --signal-wash: #fffafb;
+  --signal: var(--health-red);
+  --signal-border: var(--health-red-border);
+  --signal-soft: var(--health-red-soft);
+  --signal-wash: var(--health-red-wash);
 }
 .tone-neutral {
-  --signal: #8d839a;
-  --signal-border: #e6e1eb;
-  --signal-soft: #f4f1f7;
-  --signal-wash: #fcfbfd;
+  --signal: var(--health-gray);
+  --signal-border: var(--health-gray-border);
+  --signal-soft: var(--health-gray-soft);
+  --signal-wash: var(--health-gray-wash);
 }
 .pulse-banner[class*="tone-"] {
   background: linear-gradient(110deg, var(--signal-soft), var(--signal-wash));
@@ -39,7 +39,11 @@
   color: var(--signal);
 }
 .stat-card[class*="tone-"] {
-  background: linear-gradient(135deg, #fff 12%, var(--signal-soft));
+  background: linear-gradient(
+    135deg,
+    var(--color-surface) 12%,
+    var(--signal-soft)
+  );
   border-color: var(--signal-border);
 }
 .stat-card[class*="tone-"] .stat-icon {
@@ -50,16 +54,16 @@
   color: var(--signal);
 }
 .work-row.tone-green {
-  background: linear-gradient(90deg, #f5fbf6, #fff 52%);
+  background: linear-gradient(90deg, #f5fbf6, var(--color-surface) 52%);
 }
 .work-row.tone-amber {
-  background: linear-gradient(90deg, #fffbf3, #fff 52%);
+  background: linear-gradient(90deg, #fffbf3, var(--color-surface) 52%);
 }
 .work-row.tone-red {
-  background: linear-gradient(90deg, #fff3f4, #fff 55%);
+  background: linear-gradient(90deg, #fff3f4, var(--color-surface) 55%);
 }
 .work-row.tone-neutral {
-  background: #fff;
+  background: var(--color-surface);
 }
 .work-row td:first-child {
   box-shadow: inset 3px 0 var(--signal-border);
@@ -67,17 +71,17 @@
 .health-label {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  font-size: 9px;
+  gap: var(--space-5);
+  font-size: var(--text-9);
   line-height: 1.6;
-  font-weight: 500;
+  font-weight: var(--weight-medium);
 }
 .health-label:before {
   content: "";
   width: 5px;
   height: 5px;
   background: currentColor;
-  border-radius: 50%;
+  border-radius: var(--radius-round);
   flex-shrink: 0;
 }
 .health-label.green {
@@ -94,7 +98,7 @@
 }
 .work-table .health-label {
   display: flex;
-  font-size: 8px;
+  font-size: var(--text-8);
   white-space: normal;
   margin-top: 6px;
   max-width: 135px;
@@ -104,17 +108,25 @@
   opacity: 1;
 }
 .dependency-card[class*="tone-"] {
-  background: linear-gradient(130deg, var(--signal-wash), #fff 70%);
+  background: linear-gradient(
+    130deg,
+    var(--signal-wash),
+    var(--color-surface) 70%
+  );
   border-color: var(--signal-border);
   border-top: 3px solid var(--signal-border);
 }
 .dependency-card.compact[class*="tone-"] {
-  background: linear-gradient(130deg, var(--signal-wash), #fff);
+  background: linear-gradient(130deg, var(--signal-wash), var(--color-surface));
   border-color: var(--signal-border);
 }
 .project-card[class*="tone-"] {
   border-top: 3px solid var(--signal-border);
-  background: linear-gradient(150deg, #fff 20%, var(--signal-wash));
+  background: linear-gradient(
+    150deg,
+    var(--color-surface) 20%,
+    var(--signal-wash)
+  );
 }
 .project-card > .health-label {
   margin: 2px 0 9px;
@@ -123,22 +135,22 @@
   margin-top: 22px;
   padding: 15px 17px;
   border: 1px solid var(--signal-border);
-  border-radius: 8px;
+  border-radius: var(--radius-8);
   background: linear-gradient(115deg, var(--signal-soft), var(--signal-wash));
   color: var(--signal);
 }
 .health-explanation strong {
-  font-size: 12px;
+  font-size: var(--text-12);
 }
 .health-explanation p {
-  font-size: 11px;
+  font-size: var(--text-11);
   margin-top: 5px;
 }
 .health-explanation > span {
   display: block;
   margin-top: 8px;
-  font-size: 10px;
-  font-weight: 500;
+  font-size: var(--text-10);
+  font-weight: var(--weight-medium);
 }
 .workspace-context {
   display: flex;
@@ -153,15 +165,15 @@
   gap: 3px;
   padding: 4px;
   border: 1px solid #e9e4ef;
-  border-radius: 8px;
-  background: #fff;
+  border-radius: var(--radius-8);
+  background: var(--color-surface);
 }
 .context-tabs button {
   display: flex;
-  gap: 7px;
+  gap: var(--space-7);
   align-items: center;
-  font-size: 11px;
-  border-radius: 5px;
+  font-size: var(--text-11);
+  border-radius: var(--radius-5);
   color: #9b88a7;
   padding: 8px 11px;
 }
@@ -175,8 +187,8 @@
 .workspace-context > span {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 9px;
+  gap: var(--space-6);
+  font-size: var(--text-9);
   color: #ac99ba;
 }
 .profile-loading {
@@ -184,10 +196,10 @@
   text-align: center;
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: var(--space-15);
   align-items: center;
   color: #a58ab5;
-  font-size: 11px;
+  font-size: var(--text-11);
 }
 .profile-topline {
   display: flex;
@@ -196,7 +208,7 @@
   margin-bottom: 20px;
 }
 .profile-topline > .text-button {
-  font-size: 10px;
+  font-size: var(--text-10);
 }
 .profile-hero {
   display: flex;
@@ -204,8 +216,12 @@
   gap: 20px;
   padding: 26px 28px;
   border: 1px solid var(--signal-border);
-  border-radius: 11px;
-  background: linear-gradient(115deg, #fff 20%, var(--signal-soft));
+  border-radius: var(--radius-11);
+  background: linear-gradient(
+    115deg,
+    var(--color-surface) 20%,
+    var(--signal-soft)
+  );
   margin-bottom: 22px;
 }
 .profile-identity {
@@ -213,7 +229,7 @@
   min-width: 0;
 }
 .profile-identity > .eyebrow {
-  font-size: 8px;
+  font-size: var(--text-8);
   letter-spacing: 0.8px;
   color: #a797b2;
 }
@@ -225,11 +241,11 @@
   margin: 8px 0 5px;
   display: flex;
   align-items: center;
-  gap: 9px;
+  gap: var(--space-9);
   flex-wrap: wrap;
 }
 .profile-identity > p {
-  font-size: 11px;
+  font-size: var(--text-11);
   color: #a18aad;
 }
 .you-tag {
@@ -241,7 +257,7 @@
   background: #efe7f7;
   border: 1px solid #e4d8f0;
   color: #a48ab9;
-  border-radius: 4px;
+  border-radius: var(--radius-4);
   vertical-align: middle;
   margin-left: 5px;
   letter-spacing: 0;
@@ -249,10 +265,10 @@
 .reporting-line {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: var(--space-5);
   flex-wrap: wrap;
   color: #ad99b8;
-  font-size: 9px;
+  font-size: var(--text-9);
   margin-top: 13px;
 }
 .reporting-line button {
@@ -275,7 +291,7 @@
   padding: 17px 19px;
   color: var(--signal);
   border: 1px solid var(--signal-border);
-  border-radius: 8px;
+  border-radius: var(--radius-8);
   background: linear-gradient(110deg, var(--signal-soft), var(--signal-wash));
 }
 .signal-orb {
@@ -284,27 +300,27 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
+  border-radius: var(--radius-round);
   background: var(--signal-wash);
   border: 1px solid var(--signal-border);
   flex-shrink: 0;
 }
 .health-signal strong {
-  font-size: 12px;
-  font-weight: 600;
+  font-size: var(--text-12);
+  font-weight: var(--weight-semibold);
 }
 .health-signal p {
-  font-size: 10px;
+  font-size: var(--text-10);
   margin-top: 5px;
   opacity: 0.85;
 }
 .health-signal.compact {
   padding: 10px 12px;
   background: #ffffff8c;
-  gap: 8px;
+  gap: var(--space-8);
 }
 .health-signal.compact strong {
-  font-size: 10px;
+  font-size: var(--text-10);
   white-space: nowrap;
 }
 .health-signal.compact .signal-orb {
@@ -322,7 +338,7 @@
   display: flex;
   flex-direction: column;
   padding: 20px;
-  gap: 7px;
+  gap: var(--space-7);
 }
 .profile-stat > svg {
   position: absolute;
@@ -332,13 +348,14 @@
 }
 .profile-stat > strong {
   font:
-    600 28px "Manrope",
+    600 28px "Manrope Variable",
+    "Manrope",
     sans-serif;
   color: #8d719f;
   letter-spacing: -0.7px;
 }
 .profile-stat > span {
-  font-size: 10px;
+  font-size: var(--text-10);
   color: #ad96bb;
 }
 .profile-layout {
@@ -356,7 +373,7 @@
   gap: 22px;
 }
 .profile-tabs button {
-  font-size: 10px;
+  font-size: var(--text-10);
 }
 .profile-dependencies {
   padding: 20px;
@@ -375,20 +392,20 @@
 }
 .profile-capacity h3,
 .profile-reports h3 {
-  font-size: 13px;
+  font-size: var(--text-13);
   color: #876297;
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
 }
 .profile-capacity > p {
-  font-size: 9px;
+  font-size: var(--text-9);
   color: #b19ac0;
   margin: 8px 0 14px;
 }
 .profile-capacity > .badge {
-  font-size: 9px;
+  font-size: var(--text-9);
 }
 .profile-capacity dl {
-  font-size: 10px;
+  font-size: var(--text-10);
   margin: 18px 0;
   color: #a78ab7;
 }
@@ -399,23 +416,23 @@
   border-bottom: 1px solid #f3edf7;
 }
 .profile-capacity dd {
-  font-weight: 500;
+  font-weight: var(--weight-medium);
   color: #8d6a9e;
   margin: 0;
 }
 .profile-capacity p.capacity-note {
-  font-size: 9px;
+  font-size: var(--text-9);
   line-height: 1.8;
   padding: 10px;
-  border-radius: 5px;
+  border-radius: var(--radius-5);
   background: #faf7fc;
   color: #ac92bb;
 }
 .profile-capacity h4 {
-  font-size: 10px;
+  font-size: var(--text-10);
   color: #ae92bf;
   margin-top: 20px;
-  font-weight: 500;
+  font-weight: var(--weight-medium);
 }
 .profile-capacity .skill-tags {
   margin-top: 10px;
@@ -423,7 +440,7 @@
 .profile-reports > button {
   display: flex;
   align-items: center;
-  gap: 9px;
+  gap: var(--space-9);
   width: 100%;
   text-align: left;
   padding: 16px 0;
@@ -432,24 +449,24 @@
 }
 .profile-reports > button > span:nth-child(2) {
   flex: 1;
-  font-size: 10px;
+  font-size: var(--text-10);
 }
 .profile-reports small {
   display: block;
-  font-size: 8px;
+  font-size: var(--text-8);
   color: #bba2cc;
   margin-top: 4px;
 }
 .profile-reports > p {
-  font-size: 10px;
+  font-size: var(--text-10);
   color: #b39ac2;
   padding: 17px 0;
 }
 .privacy-note {
   display: flex;
   align-items: flex-start;
-  gap: 7px;
-  font-size: 9px;
+  gap: var(--space-7);
+  font-size: var(--text-9);
   line-height: 1.8;
   color: #b49dc3;
   margin-top: 18px;
@@ -469,20 +486,21 @@
 .team-summary-number {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-10);
   padding: 13px 19px;
   border: 1px solid #e8e0ef;
-  border-radius: 8px;
-  background: #fff;
+  border-radius: var(--radius-8);
+  background: var(--color-surface);
 }
 .team-summary-number strong {
   font:
-    600 31px "Manrope",
+    600 31px "Manrope Variable",
+    "Manrope",
     sans-serif;
   color: #977baa;
 }
 .team-summary-number span {
-  font-size: 9px;
+  font-size: var(--text-9);
   color: #ab95b9;
   max-width: 90px;
   line-height: 1.7;
@@ -495,8 +513,12 @@
 .report-card {
   text-align: left;
   border: 1px solid var(--signal-border);
-  border-radius: 9px;
-  background: linear-gradient(140deg, #fff 35%, var(--signal-soft));
+  border-radius: var(--radius-9);
+  background: linear-gradient(
+    140deg,
+    var(--color-surface) 35%,
+    var(--signal-soft)
+  );
   padding: 22px;
 }
 .report-card:hover {
@@ -504,29 +526,29 @@
   box-shadow: 0 7px 25px #987aac10;
 }
 .report-card h3 {
-  font-size: 15px;
+  font-size: var(--text-15);
   color: #7f5d91;
   margin-top: 18px;
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
 }
 .report-card > p {
-  font-size: 10px;
+  font-size: var(--text-10);
   color: #ac91bd;
   margin-top: 7px;
 }
 .report-card-work {
-  font-size: 9px;
+  font-size: var(--text-9);
   color: #a58bb4;
   margin-top: 23px;
   display: flex;
-  gap: 6px;
+  gap: var(--space-6);
   align-items: center;
   flex-wrap: wrap;
 }
 .report-card-work strong {
-  font-size: 15px;
+  font-size: var(--text-15);
   color: #9573a8;
-  font-weight: 500;
+  font-weight: var(--weight-medium);
 }
 .report-card-work > span {
   color: #d0bbdf;
@@ -539,14 +561,14 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 8px;
-  font-size: 8px;
+  gap: var(--space-8);
+  font-size: var(--text-8);
   color: #b094c1;
 }
 .report-card-footer > span:last-child {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: var(--space-5);
   color: #a37fb7;
 }
 .organization-intro {
@@ -554,7 +576,7 @@
   align-items: center;
   gap: 18px;
   border: 1px solid #e8e0f0;
-  border-radius: 10px;
+  border-radius: var(--radius-10);
   padding: 25px;
   background: linear-gradient(110deg, #f5effa, #f9f6fd);
   margin-bottom: 24px;
@@ -572,12 +594,12 @@
 }
 .organization-intro h2 {
   font-size: 19px;
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
   letter-spacing: -0.5px;
   color: #9774ac;
 }
 .organization-intro p {
-  font-size: 10px;
+  font-size: var(--text-10);
   color: #ad92be;
   margin-top: 8px;
 }
@@ -591,24 +613,25 @@
 }
 .org-count strong {
   font:
-    600 18px "Manrope",
+    600 18px "Manrope Variable",
+    "Manrope",
     sans-serif;
   color: #ad8bc3;
 }
 .org-count span {
-  font-size: 9px;
+  font-size: var(--text-9);
 }
 .org-toolbar-actions {
   display: flex;
   align-items: center;
-  gap: 9px;
+  gap: var(--space-9);
 }
 .org-toolbar-actions input {
-  font-size: 10px;
+  font-size: var(--text-10);
   color: #a184b3;
   padding: 9px 11px;
   border: 1px solid #e9deef;
-  border-radius: 6px;
+  border-radius: var(--radius-6);
   width: 180px;
   background: white;
 }
@@ -616,7 +639,7 @@
   color: #b59fc4;
 }
 .org-tree-panel > .panel-heading {
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--color-border);
   padding: 21px 24px;
 }
 .org-tree-panel > .panel-heading > svg {
@@ -644,11 +667,11 @@
 .org-person {
   display: flex;
   align-items: center;
-  gap: 11px;
+  gap: var(--space-11);
   padding: 14px 12px;
   border: 1px solid #eee7f4;
-  border-radius: 8px;
-  background: #fff;
+  border-radius: var(--radius-8);
+  background: var(--color-surface);
   min-width: 0;
   position: relative;
 }
@@ -661,7 +684,7 @@
   border-top: 1px solid #e7dfef;
 }
 .org-person.is-you {
-  background: linear-gradient(110deg, #f7f2fc, #fff);
+  background: linear-gradient(110deg, #f7f2fc, var(--color-surface));
   border-color: #e5d9f1;
 }
 .tree-expander {
@@ -680,7 +703,7 @@
 .tree-expander:disabled span {
   width: 4px;
   height: 4px;
-  border-radius: 50%;
+  border-radius: var(--radius-round);
   background: #e2d9eb;
 }
 .org-person-name {
@@ -688,29 +711,29 @@
   min-width: 90px;
 }
 .org-person-name strong {
-  font-size: 11px;
+  font-size: var(--text-11);
   color: #8c699f;
-  font-weight: 500;
+  font-weight: var(--weight-medium);
 }
 .org-person-name small {
   display: block;
   color: #b59ac7;
-  font-size: 9px;
+  font-size: var(--text-9);
   margin-top: 5px;
   line-height: 1.7;
 }
 .org-node-actions {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-6);
   margin-left: auto;
 }
 .scope-lock {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: var(--space-5);
   color: #c1abd0;
-  font-size: 8px;
+  font-size: var(--text-8);
   white-space: nowrap;
 }
 .team-tree {
@@ -730,7 +753,7 @@
 .team-tree-heading {
   display: flex;
   align-items: center;
-  gap: 11px;
+  gap: var(--space-11);
   border-bottom: 1px solid #f1eaf6;
   padding-bottom: 14px;
 }
@@ -742,15 +765,15 @@
   color: #b398c8;
   width: 40px;
   height: 40px;
-  border-radius: 9px;
+  border-radius: var(--radius-9);
 }
 .team-tree-heading h3 {
-  font-size: 14px;
+  font-size: var(--text-14);
   color: #9b75b0;
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
 }
 .team-tree-heading p {
-  font-size: 9px;
+  font-size: var(--text-9);
   color: #b59ac8;
   margin-top: 5px;
 }
@@ -760,16 +783,16 @@
 .team-tree-members {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
+  gap: var(--space-10);
   margin-top: 16px;
 }
 .team-tree-members > button {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-8);
   padding: 12px;
   border: 1px solid #eee6f4;
-  border-radius: 6px;
+  border-radius: var(--radius-6);
   background: #fdfbff;
   text-align: left;
   color: #a184b5;
@@ -781,12 +804,12 @@
 }
 .team-tree-members > button > span:nth-child(2) {
   flex: 1;
-  font-size: 10px;
+  font-size: var(--text-10);
   min-width: 0;
 }
 .team-tree-members small {
   display: block;
-  font-size: 8px;
+  font-size: var(--text-8);
   color: #bca6cc;
   margin-top: 4px;
   line-height: 1.6;
@@ -807,7 +830,7 @@
     gap: 16px;
   }
   .profile-identity h2 {
-    font-size: 23px;
+    font-size: var(--text-23);
   }
   .report-card-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -856,18 +879,18 @@
     display: none;
   }
   .org-person {
-    gap: 8px;
+    gap: var(--space-8);
     padding: 12px 9px;
   }
   .org-node-actions .button {
-    font-size: 9px;
+    font-size: var(--text-9);
     padding: 6px 8px;
   }
   .scope-lock {
-    font-size: 7px;
+    font-size: var(--text-7);
   }
   .org-person-name small {
-    font-size: 8px;
+    font-size: var(--text-8);
   }
   .organization-intro h2 {
     font-size: 17px;
@@ -876,7 +899,7 @@
     padding: 10px;
   }
   .team-tree-members small {
-    font-size: 7px;
+    font-size: var(--text-7);
   }
 }
 @media (max-width: 760px) {
@@ -893,7 +916,7 @@
     min-height: 33px;
     padding-top: 7px;
     padding-bottom: 7px;
-    font-size: 11px;
+    font-size: var(--text-11);
   }
   .sidebar > .brand {
     margin-bottom: 22px;
@@ -912,9 +935,9 @@
     justify-content: space-between;
   }
   .context-tabs button {
-    font-size: 9px;
+    font-size: var(--text-9);
     padding: 7px;
-    gap: 5px;
+    gap: var(--space-5);
   }
   .context-tabs button svg {
     width: 12px;
@@ -926,24 +949,24 @@
   .profile-hero > .avatar {
     width: 50px !important;
     height: 50px !important;
-    font-size: 16px !important;
+    font-size: var(--text-16) !important;
   }
   .profile-identity h2 {
     font-size: 22px;
   }
   .profile-identity > .eyebrow {
-    font-size: 7px;
+    font-size: var(--text-7);
   }
   .profile-identity > p {
-    font-size: 10px;
+    font-size: var(--text-10);
   }
   .reporting-line {
-    font-size: 8px;
+    font-size: var(--text-8);
     gap: 4px;
   }
   .profile-stat-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 11px;
+    gap: var(--space-11);
     margin-bottom: 17px;
   }
   .profile-stat {
@@ -953,7 +976,7 @@
     font-size: 25px;
   }
   .profile-stat > span {
-    font-size: 9px;
+    font-size: var(--text-9);
   }
   .profile-stat > svg {
     width: 14px;
@@ -983,16 +1006,16 @@
     padding: 15px;
   }
   .team-page-summary {
-    gap: 11px;
+    gap: var(--space-11);
   }
   .team-page-summary > .health-signal {
     padding: 13px;
   }
   .team-page-summary .health-signal p {
-    font-size: 8px;
+    font-size: var(--text-8);
   }
   .team-page-summary .health-signal strong {
-    font-size: 11px;
+    font-size: var(--text-11);
   }
   .team-summary-number {
     display: none;
@@ -1004,17 +1027,17 @@
     padding: 17px;
   }
   .report-card h3 {
-    font-size: 13px;
+    font-size: var(--text-13);
   }
   .report-card > .split > .health-label {
-    font-size: 8px;
+    font-size: var(--text-8);
   }
   .report-card-work {
-    font-size: 8px;
+    font-size: var(--text-8);
     gap: 4px;
   }
   .report-card-footer {
-    font-size: 7px;
+    font-size: var(--text-7);
   }
   .organization-intro {
     padding: 19px 16px;
@@ -1023,33 +1046,33 @@
   .organization-symbol {
     width: 38px;
     height: 38px;
-    border-radius: 10px;
+    border-radius: var(--radius-10);
   }
   .organization-symbol svg {
     width: 21px;
   }
   .organization-intro h2 {
-    font-size: 15px;
+    font-size: var(--text-15);
     line-height: 1.5;
   }
   .organization-intro p {
-    font-size: 9px;
+    font-size: var(--text-9);
     line-height: 1.8;
   }
   .org-toolbar-actions {
     flex-wrap: wrap;
     width: 100%;
-    gap: 8px;
+    gap: var(--space-8);
   }
   .org-toolbar-actions input {
     flex: 1;
     width: auto;
     min-width: 110px;
-    font-size: 9px;
+    font-size: var(--text-9);
   }
   .org-toolbar-actions > .button {
     padding: 7px 8px;
-    font-size: 9px;
+    font-size: var(--text-9);
   }
   .org-tree-panel > .panel-heading {
     padding: 18px 16px;
@@ -1066,31 +1089,31 @@
     width: 10px;
   }
   .org-person {
-    gap: 7px;
+    gap: var(--space-7);
     padding: 11px 8px;
     flex-wrap: wrap;
   }
   .org-person > .avatar {
     width: 27px !important;
     height: 27px !important;
-    font-size: 9px !important;
+    font-size: var(--text-9) !important;
   }
   .org-person-name {
     flex: 1;
     min-width: 80px;
   }
   .org-person-name strong {
-    font-size: 10px;
+    font-size: var(--text-10);
   }
   .org-person-name small {
-    font-size: 8px;
+    font-size: var(--text-8);
   }
   .org-node-actions {
     margin-left: 24px;
-    gap: 5px;
+    gap: var(--space-5);
   }
   .org-node-actions .button {
-    font-size: 8px;
+    font-size: var(--text-8);
     min-height: 25px;
     padding: 5px 7px;
   }
@@ -1102,7 +1125,7 @@
     width: 12px;
   }
   .scope-lock {
-    font-size: 7px;
+    font-size: var(--text-7);
   }
   .team-tree {
     padding: 16px;
@@ -1116,24 +1139,24 @@
     grid-template-columns: 1fr;
   }
   .team-tree-heading h3 {
-    font-size: 12px;
+    font-size: var(--text-12);
   }
   .team-tree-heading p {
-    font-size: 8px;
+    font-size: var(--text-8);
   }
   .team-tree-heading > .button {
     padding: 6px 7px;
-    font-size: 8px;
+    font-size: var(--text-8);
   }
   .team-tree-icon {
     width: 31px;
     height: 31px;
   }
   .team-tree-members small {
-    font-size: 9px;
+    font-size: var(--text-9);
   }
   .team-tree-members > button > span:nth-child(2) {
-    font-size: 11px;
+    font-size: var(--text-11);
   }
   .team-tree-members > button {
     padding: 12px;
@@ -1142,10 +1165,10 @@
     padding: 13px;
   }
   .health-explanation p {
-    font-size: 10px;
+    font-size: var(--text-10);
   }
   .health-explanation > span {
-    font-size: 9px;
+    font-size: var(--text-9);
   }
 }
 @media (max-width: 410px) {
@@ -1162,7 +1185,7 @@
     display: none;
   }
   .context-tabs button {
-    font-size: 8px;
+    font-size: var(--text-8);
   }
   .org-tree {
     padding: 9px;
@@ -1182,7 +1205,7 @@
     min-height: 31px;
     padding-top: 6px;
     padding-bottom: 6px;
-    font-size: 11px;
+    font-size: var(--text-11);
   }
   .sidebar-projects {
     margin-top: 16px;
@@ -1204,8 +1227,8 @@
 .inactive-toggle {
   display: flex;
   align-items: center;
-  gap: 5px;
-  font-size: 9px;
+  gap: var(--space-5);
+  font-size: var(--text-9);
   color: #a991b9;
   white-space: nowrap;
 }

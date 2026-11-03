@@ -10,7 +10,7 @@
 .sidebar-header {
   flex: 0 0 auto;
   padding: 26px 18px 0;
-  background: #fff;
+  background: var(--color-surface);
   position: relative;
 }
 .sidebar-header > .brand {
@@ -58,7 +58,7 @@
 .sidebar-footer {
   flex: 0 0 auto;
   padding: 11px 17px 0;
-  background: #fff;
+  background: var(--color-surface);
   border-top: 1px solid #eee8f4;
 }
 .sidebar-footer .sidebar-user {
@@ -73,27 +73,27 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 10px;
+  font-size: var(--text-10);
 }
 .sidebar-footer .sidebar-user small {
-  font-size: 8px;
+  font-size: var(--text-8);
 }
 .sidebar-footer .settings-link {
   padding: 7px 11px;
 }
 .nav-scroll-end {
   padding: 27px 9px 18px;
-  font-size: 8px;
+  font-size: var(--text-8);
   line-height: 1.8;
   color: #b6a4c4;
 }
 .sidebar-scroll nav .nav-new {
-  font-size: 7px;
+  font-size: var(--text-7);
   color: #aa8dc3;
   background: #f0e7fa;
   border: 1px solid #e8dcf3;
   padding: 2px 4px;
-  border-radius: 3px;
+  border-radius: var(--radius-3);
   margin-left: auto;
   letter-spacing: 0.4px;
 }
@@ -107,18 +107,18 @@
 .sample-workspace-note {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: var(--space-7);
   color: #ac95ba;
-  font-size: 9px;
+  font-size: var(--text-9);
   margin: -6px 0 20px;
   padding: 9px 12px;
   background: #faf6fd;
   border: 1px dashed #e8dcf2;
-  border-radius: 6px;
+  border-radius: var(--radius-6);
 }
 .sample-workspace-note > span {
   color: #9f7db7;
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
 }
 .app-main main.chat-page {
   max-width: 1700px;
@@ -140,7 +140,7 @@
 }
 ::-webkit-scrollbar-thumb {
   background: #d3c7e0;
-  border-radius: 8px;
+  border-radius: var(--radius-8);
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #bba5cc;
@@ -151,7 +151,7 @@
 .sidebar-scroll::-webkit-scrollbar-thumb {
   background: #d8cce3;
   border: 0;
-  border-radius: 8px;
+  border-radius: var(--radius-8);
 }
 .sidebar-scroll::-webkit-scrollbar-thumb:hover {
   background: #bba2ce;
@@ -205,7 +205,7 @@
     margin-bottom: 20px;
   }
   .sample-workspace-note {
-    font-size: 8px;
+    font-size: var(--text-8);
     align-items: flex-start;
     line-height: 1.7;
   }

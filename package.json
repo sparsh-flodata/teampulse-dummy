@@ -2,13 +2,13 @@
   "name": "teampulse",
   "private": true,
   "version": "0.3.0",
-  "workspaces": [
-    "frontend"
-  ],
+  "packageManager": "pnpm@11.15.1",
   "scripts": {
-    "dev": "npm --workspace @teampulse/frontend run dev",
-    "build": "npm --workspace @teampulse/frontend run build",
-    "preview": "npm --workspace @teampulse/frontend run preview",
-    "format": "npm --workspace @teampulse/frontend run format"
+    "dev": "pnpm --filter @teampulse/frontend dev",
+    "build": "pnpm --filter @teampulse/frontend build",
+    "preview": "pnpm --filter @teampulse/frontend preview",
+    "typecheck": "pnpm --filter @teampulse/frontend typecheck",
+    "lint": "pnpm --filter @teampulse/frontend lint",
+    "format": "pnpm --filter @teampulse/frontend format"
   }
 }

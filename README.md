@@ -6,14 +6,14 @@ A local-first work coordination MVP built from [original requirements](docs/requ
 
 ## Run on Windows
 
-Prerequisites: Python 3.11+, Node.js 22+, and [uv](https://docs.astral.sh/uv/).
+Prerequisites: Python 3.11+, Node.js 22+, [pnpm](https://pnpm.io/) 11 (`corepack enable`), and [uv](https://docs.astral.sh/uv/).
 
 ```powershell
 cd C:\Workspace\Codex\TeamPulse
 uv sync
-npm ci
+pnpm install
 Copy-Item .env.example .env  # only for a new checkout; preserve your existing .env
-npm run build
+pnpm build
 .\start.ps1
 ```
 
@@ -79,7 +79,7 @@ docs/              Requirements, architecture, account guide, release notes, pre
 data/              Local database and backups (ignored by Git/Docker)
 ```
 
-Root `package.json` orchestrates the frontend npm workspace; root `pyproject.toml` manages Python. `.venv` and hoisted `node_modules` stay at the repository root.
+Root `package.json` and `pnpm-workspace.yaml` orchestrate the frontend pnpm workspace; root `pyproject.toml` manages Python. The frontend is a TanStack Start app in SPA mode; its build output in `frontend/dist/client` is served by FastAPI.
 
 ## Development and tests
 
@@ -87,14 +87,16 @@ Use two terminals for hot reload:
 
 ```powershell
 .venv/Scripts/python.exe -m uvicorn backend.app.main:app --reload --host 127.0.0.1 --port 8787
-npm run dev
+pnpm dev
 ```
 
 The Vite server prints its local URL (normally port 5173) and proxies `/api` to port 8787. Add changed origins to `ALLOWED_ORIGINS` if necessary. Built assets are served by FastAPI for the one-process launch.
 
 ```powershell
 .venv/Scripts/python.exe -m pytest -q
-npm run build
+pnpm typecheck
+pnpm lint
+pnpm build
 ```
 
 Tests use isolated in-memory databases and never modify your pilot database.

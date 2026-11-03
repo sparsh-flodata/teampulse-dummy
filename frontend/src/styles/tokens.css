@@ -1,0 +1,95 @@
+/*
+ * TeamPulse design tokens.
+ *
+ * Values are extracted 1:1 from the original stylesheets so the UI renders
+ * identically. One-off shades used only once in a single rule are left as
+ * literals in the component CSS. Collapsing them onto this palette would
+ * subtly change the look, so that is a deliberate later step.
+ *
+ * Numeric scales (radius, text, space) are named after their pixel value.
+ */
+:root {
+  /* Typography */
+  --font-body:
+    "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-heading: "Manrope Variable", "Manrope", sans-serif;
+  --font-size-root: 13px;
+
+  --text-7: 7px;
+  --text-8: 8px;
+  --text-9: 9px;
+  --text-10: 10px;
+  --text-11: 11px;
+  --text-12: 12px;
+  --text-13: 13px;
+  --text-14: 14px;
+  --text-15: 15px;
+  --text-16: 16px;
+  --text-23: 23px;
+
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  --weight-extrabold: 800;
+
+  /* Core palette */
+  --color-brand: #7555db;
+  --color-brand-meta: #7256df; /* theme-color meta + favicon */
+  --color-text: #4c4356;
+  --color-muted: #8c8396;
+  --color-canvas: #f8f9fc;
+  --color-surface: #fff;
+  --color-on-brand: #fff;
+  --color-border: #ececf2;
+  --color-focus-ring: #b9a6ef;
+  --color-focus-input: #a78be9;
+
+  /* Chat workspace */
+  --chat-text-secondary: #80648f;
+
+  /* Health signals (work health: green = on track, amber = review,
+     red = intervention, gray = missing or stale confirmation) */
+  --health-green: #2e8065;
+  --health-green-border: #d7ebdf;
+  --health-green-soft: #edf7ef;
+  --health-green-wash: #f8fcf9;
+  --health-amber: #a27430;
+  --health-amber-border: #f0e2c6;
+  --health-amber-soft: #fcf4e6;
+  --health-amber-wash: #fffdf8;
+  --health-red: #b45f65;
+  --health-red-border: #f0d8dc;
+  --health-red-soft: #fceff0;
+  --health-red-wash: #fffafb;
+  --health-gray: #8d839a;
+  --health-gray-border: #e6e1eb;
+  --health-gray-soft: #f4f1f7;
+  --health-gray-wash: #fcfbfd;
+
+  /* Radius */
+  --radius-3: 3px;
+  --radius-4: 4px;
+  --radius-5: 5px;
+  --radius-6: 6px;
+  --radius-7: 7px;
+  --radius-8: 8px;
+  --radius-9: 9px;
+  --radius-10: 10px;
+  --radius-11: 11px;
+  --radius-16: 16px;
+  --radius-round: 50%;
+
+  /* Spacing (flex/grid gaps) */
+  --space-5: 5px;
+  --space-6: 6px;
+  --space-7: 7px;
+  --space-8: 8px;
+  --space-9: 9px;
+  --space-10: 10px;
+  --space-11: 11px;
+  --space-15: 15px;
+
+  /* Elevation */
+  --shadow-card: 0 3px 16px #29253f04;
+}

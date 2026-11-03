@@ -34,8 +34,8 @@
 }
 .department-branch {
   border: 1px solid #eee6f4;
-  border-radius: 9px;
-  background: #fff;
+  border-radius: var(--radius-9);
+  background: var(--color-surface);
   padding: 0 16px 14px !important;
 }
 .department-branch .team-tree-heading {
@@ -51,7 +51,7 @@
 .department-expander {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-10);
   text-align: left;
   flex: 1;
   min-width: 0;
@@ -62,13 +62,13 @@
   min-width: 0;
 }
 .department-expander strong {
-  font-size: 12px;
-  font-weight: 600;
+  font-size: var(--text-12);
+  font-weight: var(--weight-semibold);
   display: block;
   color: #795687;
 }
 .department-expander small {
-  font-size: 9px;
+  font-size: var(--text-9);
   display: block;
   margin-top: 5px;
   color: #a086ae;
@@ -79,13 +79,13 @@
   overflow-wrap: anywhere;
 }
 .department-branch .team-tree-members small {
-  font-size: 8px;
+  font-size: var(--text-8);
   line-height: 1.7;
   color: #a58db3;
 }
 .project-collaboration {
   color: #9b7cae;
-  font-size: 9px;
+  font-size: var(--text-9);
   margin: 13px 0 0;
 }
 @media (max-width: 760px) {
@@ -105,13 +105,13 @@
     grid-template-columns: 1fr;
   }
   .department-expander {
-    gap: 7px;
+    gap: var(--space-7);
   }
   .department-expander strong {
-    font-size: 11px;
+    font-size: var(--text-11);
   }
   .department-branch .team-tree-heading > .button {
-    font-size: 8px;
+    font-size: var(--text-8);
     padding: 6px;
   }
 }

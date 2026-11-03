@@ -1,18 +1,9 @@
-@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;650;700;800&display=swap");
 :root {
-  font-family:
-    "DM Sans",
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    sans-serif;
-  color: #4c4356;
-  background: #f8f9fc;
+  font-family: var(--font-body);
+  color: var(--color-text);
+  background: var(--color-canvas);
   font-synthesis: none;
-  --purple: #7555db;
-  --muted: #8c8396;
-  --border: #ececf2;
-  font-size: 13px;
+  font-size: var(--font-size-root);
 }
 * {
   box-sizing: border-box;
@@ -41,13 +32,13 @@ button:disabled {
   opacity: 0.55;
 }
 button:focus-visible {
-  outline: 3px solid #b9a6ef;
+  outline: 3px solid var(--color-focus-ring);
   outline-offset: 3px;
 }
 input:focus,
 select:focus,
 textarea:focus {
-  outline: 2px solid #a78be9;
+  outline: 2px solid var(--color-focus-input);
   outline-offset: 1px;
 }
 h1,
@@ -62,26 +53,26 @@ h2,
 h3,
 h4,
 .brand {
-  font-family: "Manrope", sans-serif;
+  font-family: var(--font-heading);
 }
 p {
   line-height: 1.65;
 }
 small {
-  font-size: 11px;
+  font-size: var(--text-11);
 }
 svg {
   flex-shrink: 0;
 }
 .muted {
-  color: var(--muted);
+  color: var(--color-muted);
 }
 .split,
 .person-inline {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: var(--space-10);
 }
 .person-inline {
   justify-content: flex-start;
@@ -91,21 +82,21 @@ svg {
 .person-inline small {
   display: block;
   margin-top: 3px;
-  color: var(--muted);
+  color: var(--color-muted);
 }
 .eyebrow {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  font-size: 10px;
-  font-weight: 700;
+  gap: var(--space-7);
+  font-size: var(--text-10);
+  font-weight: var(--weight-bold);
   letter-spacing: 0.65px;
   color: #888293;
 }
 .icon-button {
   width: 30px;
   height: 30px;
-  border-radius: 7px;
+  border-radius: var(--radius-7);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -114,19 +105,19 @@ svg {
 }
 .icon-button:hover {
   background: #efedf6;
-  color: var(--purple);
+  color: var(--color-brand);
 }
 .button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: var(--space-8);
   border: 1px solid #e3e1ec;
-  background: #fff;
-  border-radius: 7px;
+  background: var(--color-surface);
+  border-radius: var(--radius-7);
   padding: 10px 14px;
-  font-size: 11px;
-  font-weight: 600;
+  font-size: var(--text-11);
+  font-weight: var(--weight-semibold);
   min-height: 36px;
   white-space: nowrap;
 }
@@ -135,9 +126,9 @@ svg {
   background: #faf8ff;
 }
 .button.primary {
-  background: var(--purple);
-  color: #fff;
-  border-color: var(--purple);
+  background: var(--color-brand);
+  color: var(--color-on-brand);
+  border-color: var(--color-brand);
   box-shadow: 0 3px 5px #7855d815;
 }
 .button.primary:hover {
@@ -146,16 +137,16 @@ svg {
 }
 .button.small {
   padding: 7px 10px;
-  font-size: 10px;
+  font-size: var(--text-10);
   min-height: 29px;
 }
 .text-button {
-  color: var(--purple);
-  font-size: 11px;
+  color: var(--color-brand);
+  font-size: var(--text-11);
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  font-weight: 600;
+  gap: var(--space-5);
+  font-weight: var(--weight-semibold);
   padding: 4px 0;
 }
 .text-button:hover {
@@ -164,51 +155,51 @@ svg {
 .brand {
   display: flex;
   align-items: center;
-  gap: 9px;
+  gap: var(--space-9);
   font-size: 22px;
-  font-weight: 800;
+  font-weight: var(--weight-extrabold);
   letter-spacing: -0.9px;
   color: #33313e;
 }
 .brand-light {
-  font-weight: 500;
+  font-weight: var(--weight-medium);
 }
 .brand i {
   display: inline-block;
-  background: var(--purple);
+  background: var(--color-brand);
   width: 5px;
   height: 5px;
-  border-radius: 50%;
+  border-radius: var(--radius-round);
   margin-left: 2px;
 }
 .brand-mark {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: var(--purple);
-  color: #fff;
+  background: var(--color-brand);
+  color: var(--color-on-brand);
   width: 34px;
   height: 34px;
-  border-radius: 10px;
+  border-radius: var(--radius-10);
   box-shadow: 0 4px 10px #7654dc20;
 }
 .avatar {
-  --avatar-color: #7555db;
+  --avatar-color: var(--color-brand);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  border-radius: 50%;
+  border-radius: var(--radius-round);
   background: color-mix(in srgb, var(--avatar-color) 13%, white);
   color: var(--avatar-color);
-  font-weight: 700;
+  font-weight: var(--weight-bold);
   letter-spacing: -0.2px;
 }
 .project-dot {
   width: 6px;
   height: 6px;
   display: inline-block;
-  border-radius: 50%;
+  border-radius: var(--radius-round);
   flex-shrink: 0;
 }
 .tiny-dot,
@@ -216,7 +207,7 @@ svg {
   width: 6px;
   height: 6px;
   background: #72aa91;
-  border-radius: 50%;
+  border-radius: var(--radius-round);
   display: inline-block;
   flex-shrink: 0;
 }
@@ -232,20 +223,20 @@ svg {
 .badge {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: var(--space-5);
   border: 1px solid transparent;
-  border-radius: 5px;
+  border-radius: var(--radius-5);
   padding: 4px 6px;
-  font-size: 9px;
+  font-size: var(--text-9);
   line-height: 1.15;
   white-space: nowrap;
-  font-weight: 500;
+  font-weight: var(--weight-medium);
 }
 .badge i {
   width: 4px;
   height: 4px;
   flex-shrink: 0;
-  border-radius: 50%;
+  border-radius: var(--radius-round);
   background: currentColor;
 }
 .badge.green {
@@ -277,7 +268,7 @@ svg {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 5px;
+  border-radius: var(--radius-5);
   padding: 2px 6px;
   background: #f1eff8;
   color: #8b78b9;
@@ -296,8 +287,8 @@ svg {
   left: 0;
   top: 0;
   bottom: 0;
-  border-right: 1px solid var(--border);
-  background: #fff;
+  border-right: 1px solid var(--color-border);
+  background: var(--color-surface);
   padding: 28px 17px 0;
   display: flex;
   flex-direction: column;
@@ -310,11 +301,11 @@ svg {
 .workspace-switch {
   display: flex;
   align-items: center;
-  gap: 9px;
+  gap: var(--space-9);
   margin: 0 1px 28px;
   padding: 10px 8px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-8);
   background: #fdfdfe;
 }
 .workspace-switch > svg {
@@ -330,9 +321,9 @@ svg {
   height: 29px;
   background: #f1edfa;
   color: #9678d8;
-  border-radius: 7px;
-  font-size: 16px;
-  font-weight: 700;
+  border-radius: var(--radius-7);
+  font-size: var(--text-16);
+  font-weight: var(--weight-bold);
 }
 .workspace-avatar span {
   width: 6px;
@@ -341,22 +332,22 @@ svg {
   position: absolute;
   bottom: 0;
   right: 0;
-  border-radius: 50%;
+  border-radius: var(--radius-round);
   background: #75b397;
 }
 .workspace-switch strong {
-  font-size: 11px;
-  font-weight: 600;
+  font-size: var(--text-11);
+  font-weight: var(--weight-semibold);
 }
 .workspace-switch small {
   display: block;
   color: #a2a0ae;
-  font-size: 9px;
+  font-size: var(--text-9);
   margin-top: 3px;
 }
 .sidebar-label {
-  font-size: 8px;
-  font-weight: 600;
+  font-size: var(--text-8);
+  font-weight: var(--weight-semibold);
   letter-spacing: 1px;
   color: #aaa6b6;
   padding: 0 12px;
@@ -370,12 +361,12 @@ svg {
 .sidebar nav > button {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-10);
   text-align: left;
   min-height: 39px;
   padding: 10px 12px;
-  border-radius: 7px;
-  font-size: 11px;
+  border-radius: var(--radius-7);
+  font-size: var(--text-11);
   color: #827e90;
   position: relative;
 }
@@ -388,7 +379,7 @@ svg {
 .sidebar nav > button.active {
   background: #f0eafb;
   color: #7957d1;
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
 }
 .sidebar nav > button.active:before {
   position: absolute;
@@ -397,18 +388,18 @@ svg {
   width: 2px;
   left: -17px;
   border-radius: 0 3px 3px 0;
-  background: var(--purple);
+  background: var(--color-brand);
 }
 .sidebar nav b,
 .sidebar nav small {
   margin-left: auto;
-  font-size: 9px;
-  font-weight: 500;
+  font-size: var(--text-9);
+  font-weight: var(--weight-medium);
 }
 .sidebar nav b {
   color: #a389d4;
   background: #e9e0fa;
-  border-radius: 4px;
+  border-radius: var(--radius-4);
   padding: 2px 5px;
 }
 .sidebar-projects {
@@ -423,19 +414,19 @@ svg {
   width: 18px;
 }
 .sidebar-projects > button {
-  font-size: 10px;
+  font-size: var(--text-10);
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-10);
   color: #8d879b;
   width: 100%;
   padding: 9px 13px;
   text-align: left;
-  border-radius: 6px;
+  border-radius: var(--radius-6);
 }
 .sidebar-projects > button:hover {
   background: #faf8fe;
-  color: var(--purple);
+  color: var(--color-brand);
 }
 .sidebar-projects .project-dot {
   height: 5px;
@@ -448,7 +439,7 @@ svg {
 .sidebar-assistant {
   background: linear-gradient(110deg, #f7f2ff, #f6f3fc 65%, #fbf9fe);
   border: 1px solid #eee7fa;
-  border-radius: 8px;
+  border-radius: var(--radius-8);
   padding: 15px 12px 12px;
   margin-bottom: 14px;
 }
@@ -458,58 +449,58 @@ svg {
   margin-bottom: 8px;
 }
 .sidebar-assistant h4 {
-  font-size: 10px;
-  font-weight: 600;
+  font-size: var(--text-10);
+  font-weight: var(--weight-semibold);
   color: #756389;
 }
 .sidebar-assistant p {
-  font-size: 9px;
+  font-size: var(--text-9);
   color: #a496b6;
   margin: 6px 0 13px;
 }
 .sidebar-assistant button {
-  background: #fff;
+  background: var(--color-surface);
   border: 1px solid #eae1f5;
-  border-radius: 5px;
+  border-radius: var(--radius-5);
   width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 7px 9px;
   color: #8e70c6;
-  font-size: 9px;
-  font-weight: 600;
+  font-size: var(--text-9);
+  font-weight: var(--weight-semibold);
 }
 .settings-link {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-10);
   padding: 10px 13px;
   color: #938b9d;
-  font-size: 11px;
+  font-size: var(--text-11);
   width: 100%;
-  border-radius: 6px;
+  border-radius: var(--radius-6);
 }
 .settings-link:hover,
 .settings-link.active {
   background: #f7f3fc;
-  color: var(--purple);
+  color: var(--color-brand);
 }
 .sidebar-user {
   display: flex;
   align-items: center;
-  gap: 8px;
-  border-top: 1px solid var(--border);
+  gap: var(--space-8);
+  border-top: 1px solid var(--color-border);
   margin: 14px -17px 0;
   padding: 16px 18px;
 }
 .sidebar-user strong {
   display: block;
-  font-size: 10px;
-  font-weight: 600;
+  font-size: var(--text-10);
+  font-weight: var(--weight-semibold);
 }
 .sidebar-user small {
-  font-size: 8px;
+  font-size: var(--text-8);
   color: #a7a1af;
   margin-top: 3px;
   display: block;
@@ -528,7 +519,7 @@ svg {
   align-items: center;
   justify-content: space-between;
   padding: 0 34px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--color-border);
   background: #ffffffed;
   gap: 12px;
   position: sticky;
@@ -540,11 +531,11 @@ svg {
   display: flex;
   align-items: center;
   gap: 13px;
-  font-size: 10px;
+  font-size: var(--text-10);
   color: #a4a0ad;
 }
 .breadcrumb strong {
-  font-weight: 500;
+  font-weight: var(--weight-medium);
   color: #5e586a;
 }
 .breadcrumb svg {
@@ -558,7 +549,7 @@ svg {
 .global-search {
   display: flex;
   align-items: center;
-  gap: 9px;
+  gap: var(--space-9);
   color: #b1aaba;
 }
 .global-search input {
@@ -566,7 +557,7 @@ svg {
   outline: none;
   background: none;
   width: 170px;
-  font-size: 10px;
+  font-size: var(--text-10);
 }
 .global-search input::placeholder {
   color: #aaa4b4;
@@ -574,7 +565,7 @@ svg {
 .global-search kbd {
   padding: 2px 5px;
   border: 1px solid #eeeaf3;
-  border-radius: 3px;
+  border-radius: var(--radius-3);
   font:
     8px "DM Sans",
     sans-serif;
@@ -595,7 +586,7 @@ svg {
   top: 4px;
   background: #a28bd1;
   border: 2px solid white;
-  border-radius: 50%;
+  border-radius: var(--radius-round);
   height: 7px;
   width: 7px;
 }
@@ -615,13 +606,13 @@ svg {
   gap: 18px;
 }
 .heading-eyebrow {
-  font-size: 8px;
+  font-size: var(--text-8);
   color: #a7a0b4;
   letter-spacing: 1.1px;
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-weight: 600;
+  gap: var(--space-6);
+  font-weight: var(--weight-semibold);
   margin-bottom: 8px;
 }
 .heading-eyebrow svg {
@@ -632,15 +623,15 @@ svg {
   font-size: 27px;
   line-height: 1.35;
   letter-spacing: -1px;
-  font-weight: 700;
+  font-weight: var(--weight-bold);
   color: #383142;
 }
 .greeting-dot {
-  color: var(--purple);
+  color: var(--color-brand);
 }
 .page-heading p {
   color: #93879f;
-  font-size: 11px;
+  font-size: var(--text-11);
   margin-top: 5px;
 }
 .heading-actions {
@@ -652,13 +643,13 @@ svg {
 .today-label {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-6);
   color: #97899f;
-  font-size: 9px;
+  font-size: var(--text-9);
   white-space: nowrap;
 }
 .heading-actions .button {
-  font-size: 10px;
+  font-size: var(--text-10);
   padding: 9px 11px;
   min-height: 34px;
 }
@@ -668,7 +659,7 @@ svg {
   gap: 14px;
   border: 1px solid #e8e0f5;
   background: linear-gradient(105deg, #f4effc, #f6f2fc 65%, #faf7fe);
-  border-radius: 9px;
+  border-radius: var(--radius-9);
   padding: 17px 20px;
   margin-bottom: 23px;
 }
@@ -680,26 +671,26 @@ svg {
   justify-content: center;
   width: 39px;
   height: 39px;
-  border-radius: 10px;
+  border-radius: var(--radius-10);
   color: #997bce;
 }
 .pulse-banner-symbol i {
   position: absolute;
   width: 7px;
   height: 7px;
-  border-radius: 50%;
+  border-radius: var(--radius-round);
   right: 0;
   bottom: 0;
   background: #8abda4;
   border: 2px solid #f2ebfb;
 }
 .pulse-banner strong {
-  font-size: 11px;
-  font-weight: 600;
+  font-size: var(--text-11);
+  font-weight: var(--weight-semibold);
   color: #806c9f;
 }
 .pulse-banner p {
-  font-size: 10px;
+  font-size: var(--text-10);
   color: #a197ad;
   margin-top: 4px;
 }
@@ -707,13 +698,13 @@ svg {
   margin-left: auto;
   display: flex;
   align-items: center;
-  gap: 9px;
+  gap: var(--space-9);
   white-space: nowrap;
-  font-size: 10px;
-  font-weight: 600;
+  font-size: var(--text-10);
+  font-weight: var(--weight-semibold);
   color: #9377bf;
   padding: 8px;
-  border-radius: 5px;
+  border-radius: var(--radius-5);
 }
 .pulse-banner > button:hover {
   background: #e9dff7;
@@ -727,10 +718,10 @@ svg {
 .stat-card {
   text-align: left;
   padding: 18px 18px 16px;
-  border: 1px solid var(--border);
-  border-radius: 9px;
-  background: #fff;
-  box-shadow: 0 3px 16px #29253f04;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-9);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
 }
 .stat-card:hover {
   transform: translateY(-2px);
@@ -738,7 +729,7 @@ svg {
 }
 .stat-card .split > span:first-child {
   color: #82738c;
-  font-size: 10px;
+  font-size: var(--text-10);
 }
 .stat-icon {
   width: 27px;
@@ -746,7 +737,7 @@ svg {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 7px;
+  border-radius: var(--radius-7);
   background: #f5f0fd;
   color: #a18bc9;
 }
@@ -764,13 +755,13 @@ svg {
 }
 .stat-card > strong {
   font-size: 31px;
-  font-family: "Manrope", sans-serif;
-  font-weight: 600;
+  font-family: var(--font-heading);
+  font-weight: var(--weight-semibold);
   color: #51465e;
   letter-spacing: -1.2px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-8);
   line-height: 1.4;
   margin: 5px 0;
 }
@@ -780,7 +771,7 @@ svg {
   stroke-width: 1.2;
 }
 .stat-card > small {
-  font-size: 9px;
+  font-size: var(--text-9);
   color: #9e8da9;
 }
 .overview-grid {
@@ -801,10 +792,10 @@ svg {
   gap: 21px;
 }
 .panel {
-  border: 1px solid var(--border);
-  border-radius: 9px;
-  background: #fff;
-  box-shadow: 0 3px 16px #29253f04;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-9);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
   overflow: hidden;
 }
 .panel-heading {
@@ -812,17 +803,17 @@ svg {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: var(--space-10);
 }
 .panel-heading h2 {
-  font-size: 12px;
-  font-weight: 700;
+  font-size: var(--text-12);
+  font-weight: var(--weight-bold);
   letter-spacing: -0.25px;
   display: flex;
   align-items: center;
 }
 .panel-heading p {
-  font-size: 9px;
+  font-size: var(--text-9);
   color: #a28bad;
   margin-top: 5px;
 }
@@ -831,7 +822,7 @@ svg {
   align-items: center;
   justify-content: space-between;
   padding: 0 17px 13px;
-  gap: 6px;
+  gap: var(--space-6);
   flex-wrap: wrap;
 }
 .segmented {
@@ -841,45 +832,45 @@ svg {
   border: 1px solid #eeebf3;
   background: #fcfbfd;
   padding: 3px;
-  border-radius: 6px;
+  border-radius: var(--radius-6);
 }
 .segmented button {
-  font-size: 9px;
+  font-size: var(--text-9);
   color: #a28dab;
   padding: 6px 9px;
-  border-radius: 4px;
+  border-radius: var(--radius-4);
   white-space: nowrap;
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: var(--space-5);
 }
 .segmented button.active {
-  background: #fff;
+  background: var(--color-surface);
   color: #8c71b9;
   box-shadow: 0 1px 4px #473c5e0b;
 }
 .segmented button:hover {
-  color: var(--purple);
+  color: var(--color-brand);
 }
 .segmented button span {
-  border-radius: 3px;
+  border-radius: var(--radius-3);
   background: #f6effa;
   color: #b38ec1;
   padding: 1px 3px;
-  font-size: 8px;
+  font-size: var(--text-8);
 }
 .filter-selects {
   display: flex;
-  gap: 7px;
+  gap: var(--space-7);
 }
 .filter-selects select {
   border: 1px solid #efeaf4;
   color: #a08dab;
-  font-size: 9px;
+  font-size: var(--text-9);
   padding: 6px 5px;
-  border-radius: 5px;
+  border-radius: var(--radius-5);
   max-width: 125px;
-  background: #fff;
+  background: var(--color-surface);
 }
 .table-scroll {
   overflow-x: auto;
@@ -888,7 +879,7 @@ svg {
   width: 100%;
   border-collapse: collapse;
   text-align: left;
-  font-size: 10px;
+  font-size: var(--text-10);
   min-width: 610px;
 }
 .work-table th {
@@ -896,8 +887,8 @@ svg {
   border-top: 1px solid #f1edf5;
   border-bottom: 1px solid #f1edf5;
   color: #998aa5;
-  font-weight: 500;
-  font-size: 9px;
+  font-weight: var(--weight-medium);
+  font-size: var(--text-9);
   white-space: nowrap;
   padding: 10px;
 }
@@ -926,8 +917,8 @@ svg {
   border-bottom: 0;
 }
 .work-title {
-  font-weight: 500;
-  font-size: 10px;
+  font-weight: var(--weight-medium);
+  font-size: var(--text-10);
   text-align: left;
   line-height: 1.5;
   padding: 0;
@@ -936,14 +927,14 @@ svg {
   max-width: 220px;
 }
 .work-title:hover {
-  color: var(--purple);
+  color: var(--color-brand);
   text-decoration: underline;
 }
 .subline {
   display: flex;
   align-items: center;
-  gap: 5px;
-  font-size: 8px;
+  gap: var(--space-5);
+  font-size: var(--text-8);
   color: #a795b1;
   margin-top: 6px;
 }
@@ -952,12 +943,12 @@ svg {
   height: 4px;
 }
 .work-table .person-inline {
-  font-size: 9px;
+  font-size: var(--text-9);
   color: #8b7897;
-  gap: 6px;
+  gap: var(--space-6);
 }
 .work-table .badge {
-  font-size: 8px;
+  font-size: var(--text-8);
   gap: 4px;
   padding: 4px 5px;
 }
@@ -966,18 +957,18 @@ svg {
   height: 3px;
 }
 .date-cell {
-  font-size: 9px;
+  font-size: var(--text-9);
   color: #8b7897;
 }
 .work-table td > small {
   display: block;
-  font-size: 8px;
+  font-size: var(--text-8);
   color: #b29fc0;
   margin-top: 5px;
 }
 .health {
   display: block;
-  font-size: 7px;
+  font-size: var(--text-7);
   color: #b79a70;
   margin-top: 5px;
   max-width: 100px;
@@ -985,15 +976,15 @@ svg {
 .progress-cell {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-6);
 }
 .progress-cell span {
-  font-size: 8px;
+  font-size: var(--text-8);
   color: #ad94be;
 }
 .progress-track {
   height: 4px;
-  border-radius: 4px;
+  border-radius: var(--radius-4);
   background: #f0eaf5;
   overflow: hidden;
   width: 44px;
@@ -1001,7 +992,7 @@ svg {
 .progress-track i {
   display: block;
   height: 100%;
-  border-radius: 4px;
+  border-radius: var(--radius-4);
   opacity: 0.65;
 }
 .panel-footer {
@@ -1010,13 +1001,13 @@ svg {
   justify-content: space-between;
   border-top: 1px solid #f1edf5;
   padding: 13px 19px;
-  font-size: 8px;
+  font-size: var(--text-8);
   color: #b3a4c0;
 }
 .panel-footer > span {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-6);
 }
 .panel-footer .live-dot {
   width: 4px;
@@ -1025,28 +1016,28 @@ svg {
 .panel-footer button {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 9px;
+  gap: var(--space-6);
+  font-size: var(--text-9);
   color: #a38ab7;
 }
 .briefing-card {
   background: linear-gradient(150deg, #f6f2fc, #f3effa 70%, #f6f2fb);
   border: 1px solid #e9e0f4;
-  border-radius: 9px;
+  border-radius: var(--radius-9);
   padding: 21px 19px 14px;
 }
 .briefing-card .eyebrow {
-  font-size: 8px;
+  font-size: var(--text-8);
   letter-spacing: 0.55px;
   color: #a28bb9;
 }
 .briefing-date {
-  font-size: 8px;
+  font-size: var(--text-8);
   color: #b8a5c7;
 }
 .briefing-card h2 {
-  font-size: 23px;
-  font-weight: 600;
+  font-size: var(--text-23);
+  font-weight: var(--weight-semibold);
   letter-spacing: -0.8px;
   color: #795b90;
   line-height: 1.4;
@@ -1054,20 +1045,20 @@ svg {
 }
 .briefing-intro {
   color: #a58cb5;
-  font-size: 9px;
+  font-size: var(--text-9);
   line-height: 1.7;
 }
 .brief-item {
   display: flex;
-  gap: 11px;
+  gap: var(--space-11);
   margin-top: 23px;
 }
 .brief-number {
-  font-size: 8px;
+  font-size: var(--text-8);
   color: #b7a0c8;
   background: #ebe3f4;
   border: 1px solid #e7dcf1;
-  border-radius: 5px;
+  border-radius: var(--radius-5);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1076,13 +1067,13 @@ svg {
   flex-shrink: 0;
 }
 .brief-item h4 {
-  font-size: 10px;
+  font-size: var(--text-10);
   color: #846399;
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
   margin: 3px 0 6px;
 }
 .brief-item p {
-  font-size: 9px;
+  font-size: var(--text-9);
   line-height: 1.8;
   color: #9c85aa;
 }
@@ -1092,7 +1083,7 @@ svg {
   padding: 0;
   font-size: inherit;
   color: #9278aa;
-  font-weight: 500;
+  font-weight: var(--weight-medium);
 }
 .brief-item p button:hover {
   text-decoration: underline;
@@ -1103,13 +1094,13 @@ svg {
   justify-content: space-between;
   background: #fff8;
   border: 1px solid #e5d9f0;
-  border-radius: 5px;
+  border-radius: var(--radius-5);
   width: 100%;
   margin-top: 23px;
   padding: 9px 10px;
   color: #a086b7;
-  font-size: 9px;
-  font-weight: 500;
+  font-size: var(--text-9);
+  font-weight: var(--weight-medium);
 }
 .briefing-button:hover {
   background: white;
@@ -1119,7 +1110,7 @@ svg {
   align-items: center;
   justify-content: center;
   gap: 4px;
-  font-size: 7px;
+  font-size: var(--text-7);
   color: #b6a3c3;
   margin-top: 12px;
 }
@@ -1127,7 +1118,7 @@ svg {
   padding: 16px 17px 11px;
 }
 .team-snapshot .panel-heading h2 {
-  font-size: 11px;
+  font-size: var(--text-11);
 }
 .plan-coverage {
   padding: 0 18px;
@@ -1139,32 +1130,33 @@ svg {
 }
 .plan-coverage strong {
   font:
-    600 29px "Manrope",
+    600 29px "Manrope Variable",
+    "Manrope",
     sans-serif;
   letter-spacing: -0.8px;
   color: #887298;
 }
 .plan-coverage strong span {
-  font-size: 15px;
-  font-weight: 400;
+  font-size: var(--text-15);
+  font-weight: var(--weight-regular);
   color: #c4b3d0;
   letter-spacing: 0;
   margin-left: 1px;
 }
 .plan-coverage div > span {
-  font-size: 9px;
+  font-size: var(--text-9);
   color: #b3a4bf;
   line-height: 1.6;
 }
 .coverage-track {
   height: 4px;
   background: #f2edf7;
-  border-radius: 4px;
+  border-radius: var(--radius-4);
   margin: 13px 0 15px;
 }
 .coverage-track i {
   display: block;
-  border-radius: 4px;
+  border-radius: var(--radius-4);
   height: 100%;
   background: #b69cd7;
 }
@@ -1174,7 +1166,7 @@ svg {
 }
 .avatar-stack > button {
   padding: 0;
-  border-radius: 50%;
+  border-radius: var(--radius-round);
   display: flex;
   margin-left: -6px;
   border: 2px solid white;
@@ -1191,11 +1183,11 @@ svg {
 }
 .snapshot-footer {
   border-top: 1px solid #f2edf6;
-  font-size: 8px;
+  font-size: var(--text-8);
   color: #b2a3bc;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-6);
   padding: 12px 18px;
 }
 .snapshot-footer .tiny-dot {
@@ -1206,10 +1198,10 @@ svg {
   padding: 19px 19px 17px;
 }
 .dependencies-preview .panel-heading h2 {
-  font-size: 11px;
+  font-size: var(--text-11);
 }
 .dependencies-preview .text-button {
-  font-size: 9px;
+  font-size: var(--text-9);
 }
 .dependency-preview-grid {
   display: grid;
@@ -1219,13 +1211,13 @@ svg {
 }
 .dependency-card {
   border: 1px solid #eae5f0;
-  border-radius: 8px;
+  border-radius: var(--radius-8);
   padding: 18px;
-  background: #fff;
+  background: var(--color-surface);
   min-width: 0;
 }
 .dependency-card .eyebrow {
-  font-size: 8px;
+  font-size: var(--text-8);
   color: #b09ab6;
   letter-spacing: 0.1px;
 }
@@ -1235,10 +1227,10 @@ svg {
   align-items: center;
   text-align: left;
   justify-content: space-between;
-  gap: 10px;
+  gap: var(--space-10);
   width: 100%;
-  font-weight: 600;
-  font-size: 11px;
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-11);
   color: #756281;
   margin: 14px 0 8px;
 }
@@ -1247,10 +1239,10 @@ svg {
   width: 13px;
 }
 .dependency-title:hover {
-  color: var(--purple);
+  color: var(--color-brand);
 }
 .dependency-card > p {
-  font-size: 10px;
+  font-size: var(--text-10);
   color: #9c85aa;
   min-height: 29px;
   line-height: 1.7;
@@ -1264,15 +1256,15 @@ svg {
 .dependency-people > div {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-6);
 }
 .dependency-people span {
-  font-size: 9px;
+  font-size: var(--text-9);
   color: #a58caf;
 }
 .dependency-people small {
   display: block;
-  font-size: 7px;
+  font-size: var(--text-7);
   color: #b69dc4;
   margin-top: 3px;
 }
@@ -1282,7 +1274,7 @@ svg {
 }
 .dependency-people .dependency-date {
   margin-left: auto;
-  font-size: 8px;
+  font-size: var(--text-8);
   color: #ba9cc7;
   white-space: nowrap;
 }
@@ -1292,53 +1284,53 @@ svg {
   padding: 13px;
 }
 .dependency-card.compact .eyebrow {
-  font-size: 7px;
+  font-size: var(--text-7);
 }
 .dependency-card.compact .badge {
-  font-size: 7px;
+  font-size: var(--text-7);
   padding: 3px 5px;
 }
 .dependency-card.compact .dependency-title {
-  font-size: 10px;
+  font-size: var(--text-10);
   margin: 12px 0 5px;
 }
 .dependency-card.compact > p {
-  font-size: 9px;
+  font-size: var(--text-9);
 }
 .dependency-card.compact .dependency-people {
-  gap: 7px;
+  gap: var(--space-7);
   margin-top: 14px;
 }
 .dependency-card.compact .dependency-people span {
-  font-size: 8px;
+  font-size: var(--text-8);
 }
 .dependency-card.compact .dependency-people small {
-  font-size: 7px;
+  font-size: var(--text-7);
 }
 .dependency-card.compact .avatar {
   width: 23px !important;
   height: 23px !important;
-  font-size: 8px !important;
+  font-size: var(--text-8) !important;
 }
 .dep-impact {
   border-top: 1px solid #f0eaf4;
   display: flex;
   justify-content: space-between;
-  gap: 8px;
+  gap: var(--space-8);
   padding-top: 12px;
   margin-top: 15px;
-  font-size: 8px;
+  font-size: var(--text-8);
   color: #ae9bbb;
 }
 .dep-actions {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: var(--space-7);
   flex-wrap: wrap;
   margin-top: 17px;
 }
 .dep-actions .text-button {
-  font-size: 9px;
+  font-size: var(--text-9);
   margin-left: auto;
   color: #b3a1bd;
 }
@@ -1347,14 +1339,14 @@ svg {
   justify-content: space-between;
   align-items: center;
   color: #bcb1c7;
-  font-size: 8px;
+  font-size: var(--text-8);
   padding: 25px 0 20px;
   margin-top: 9px;
 }
 .page-footer > span:first-child {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: var(--space-7);
 }
 .page-footer .live-dot {
   width: 4px;
@@ -1365,9 +1357,9 @@ svg {
   padding: 7px 17px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-8);
   color: #9a7bbc;
-  font-size: 9px;
+  font-size: var(--text-9);
 }
 .active-filter button {
   padding: 0;
@@ -1385,17 +1377,17 @@ svg {
   background: #f6f2fb;
   width: 52px;
   height: 52px;
-  border-radius: 50%;
+  border-radius: var(--radius-round);
   color: #aa94c6;
   margin-bottom: 14px;
 }
 .empty h3 {
-  font-size: 14px;
-  font-weight: 600;
+  font-size: var(--text-14);
+  font-weight: var(--weight-semibold);
   color: #8d789d;
 }
 .empty p {
-  font-size: 11px;
+  font-size: var(--text-11);
   margin: 7px auto 0;
   max-width: 330px;
 }
@@ -1410,8 +1402,8 @@ svg {
 .project-card,
 .add-project-card {
   background: white;
-  border: 1px solid var(--border);
-  border-radius: 10px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-10);
   padding: 24px;
   text-align: left;
 }
@@ -1426,19 +1418,19 @@ svg {
 .project-symbol {
   width: 45px;
   height: 45px;
-  border-radius: 10px;
+  border-radius: var(--radius-10);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 .project-card h2 {
-  font-size: 16px;
+  font-size: var(--text-16);
   margin: 24px 0 9px;
   letter-spacing: -0.3px;
   color: #7d5c92;
 }
 .project-card p {
-  font-size: 11px;
+  font-size: var(--text-11);
   color: #9c83ad;
   line-height: 1.8;
   min-height: 38px;
@@ -1447,19 +1439,19 @@ svg {
   display: flex;
   justify-content: space-between;
   color: #b39ec2;
-  font-size: 9px;
+  font-size: var(--text-9);
   margin: 22px 0 10px;
 }
 .project-progress {
   display: flex;
   align-items: center;
-  gap: 11px;
+  gap: var(--space-11);
 }
 .project-progress .progress-track {
   flex: 1;
 }
 .project-progress > span {
-  font-size: 8px;
+  font-size: var(--text-8);
   color: #b29ac1;
 }
 .project-card-footer {
@@ -1478,7 +1470,7 @@ svg {
   margin-left: 0;
 }
 .project-card-footer small {
-  font-size: 9px;
+  font-size: var(--text-9);
   color: #b69dc6;
 }
 .add-project-card {
@@ -1503,16 +1495,16 @@ svg {
   border: 1px solid #e6daef;
   width: 47px;
   height: 47px;
-  border-radius: 50%;
+  border-radius: var(--radius-round);
   color: #b39bc8;
   margin-bottom: 17px;
 }
 .add-project-card h3 {
-  font-size: 13px;
-  font-weight: 500;
+  font-size: var(--text-13);
+  font-weight: var(--weight-medium);
 }
 .add-project-card p {
-  font-size: 10px;
+  font-size: var(--text-10);
   color: #bcabc8;
   margin-top: 10px;
 }
@@ -1521,13 +1513,13 @@ svg {
   align-items: center;
   justify-content: space-between;
   margin: 0 0 24px;
-  gap: 15px;
+  gap: var(--space-15);
 }
 .section-toolbar .muted {
-  font-size: 9px;
+  font-size: var(--text-9);
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-6);
 }
 .dependency-grid {
   display: grid;
@@ -1536,17 +1528,17 @@ svg {
 }
 .info-strip {
   display: flex;
-  gap: 10px;
+  gap: var(--space-10);
   align-items: center;
   margin-top: 25px;
   border: 1px solid #eae3f4;
   padding: 16px 20px;
-  border-radius: 8px;
+  border-radius: var(--radius-8);
   background: #f7f3fc;
   color: #ae94c1;
 }
 .info-strip p {
-  font-size: 10px;
+  font-size: var(--text-10);
   color: #ad9abf;
 }
 .capacity-explainer {
@@ -1558,30 +1550,30 @@ svg {
   padding: 25px 27px;
   background: linear-gradient(105deg, #f2f6f3, #f7f9f8);
   border: 1px solid #e4eee7;
-  border-radius: 10px;
+  border-radius: var(--radius-10);
 }
 .capacity-explainer .eyebrow {
-  font-size: 8px;
+  font-size: var(--text-8);
   color: #99b1a0;
 }
 .capacity-explainer h2 {
   font-size: 18px;
-  font-weight: 500;
+  font-weight: var(--weight-medium);
   color: #70987f;
   margin-top: 9px;
   letter-spacing: -0.4px;
 }
 .capacity-explainer p {
-  font-size: 11px;
+  font-size: var(--text-11);
   color: #94aa9c;
   margin-top: 9px;
 }
 .capacity-explainer > span {
-  font-size: 9px;
+  font-size: var(--text-9);
   color: #a1b6a8;
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: var(--space-7);
 }
 .team-grid {
   display: grid;
@@ -1590,9 +1582,9 @@ svg {
 }
 .person-card {
   background: white;
-  border: 1px solid var(--border);
+  border: 1px solid var(--color-border);
   padding: 23px;
-  border-radius: 10px;
+  border-radius: var(--radius-10);
   text-align: left;
 }
 .person-card:hover {
@@ -1603,23 +1595,23 @@ svg {
   color: #baabc7;
 }
 .person-card h3 {
-  font-size: 15px;
+  font-size: var(--text-15);
   color: #7d5c92;
   margin: 17px 0 5px;
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
 }
 .person-card > p {
-  font-size: 10px;
+  font-size: var(--text-10);
   color: #9c83ad;
   margin-bottom: 12px;
 }
 .person-card .badge {
-  font-size: 8px;
+  font-size: var(--text-8);
 }
 .capacity-bar {
   height: 7px;
   background: #f0f5f1;
-  border-radius: 5px;
+  border-radius: var(--radius-5);
   display: flex;
   overflow: hidden;
   margin: 21px 0 13px;
@@ -1638,7 +1630,7 @@ svg {
   display: flex;
   justify-content: space-between;
   color: #b8a4c4;
-  font-size: 9px;
+  font-size: var(--text-9);
 }
 .capacity-numbers span {
   display: flex;
@@ -1646,23 +1638,23 @@ svg {
   gap: 4px;
 }
 .capacity-numbers strong {
-  font-size: 16px;
-  font-weight: 500;
+  font-size: var(--text-16);
+  font-weight: var(--weight-medium);
   color: #9e87ad;
 }
 .skill-tags {
   display: flex;
-  gap: 5px;
+  gap: var(--space-5);
   margin-top: 19px;
   flex-wrap: wrap;
   min-height: 22px;
 }
 .skill-tags span {
   color: #b3a0bf;
-  border-radius: 4px;
+  border-radius: var(--radius-4);
   background: #faf7fc;
   padding: 4px 6px;
-  font-size: 8px;
+  font-size: var(--text-8);
 }
 .capacity-confirmation {
   margin-top: 18px;
@@ -1671,11 +1663,11 @@ svg {
   color: #b3a2bf;
   display: flex;
   align-items: center;
-  gap: 5px;
-  font-size: 8px;
+  gap: var(--space-5);
+  font-size: var(--text-8);
 }
 .activity-panel .panel-heading {
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--color-border);
 }
 .activity-event {
   display: flex;
@@ -1692,27 +1684,27 @@ svg {
 }
 .activity-event strong {
   color: #8f789e;
-  font-size: 11px;
-  font-weight: 600;
+  font-size: var(--text-11);
+  font-weight: var(--weight-semibold);
 }
 .activity-event p {
-  font-size: 11px;
+  font-size: var(--text-11);
   color: #997caa;
   margin: 6px 0;
 }
 .activity-event > small {
   color: #baa6c8;
-  font-size: 9px;
+  font-size: var(--text-9);
   padding-top: 3px;
   white-space: nowrap;
 }
 .activity-event .text-button {
-  font-size: 9px;
+  font-size: var(--text-9);
 }
 .my-capacity {
   padding: 22px 25px;
   border: 1px solid #e7dff2;
-  border-radius: 9px;
+  border-radius: var(--radius-9);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1720,16 +1712,16 @@ svg {
 }
 .my-capacity h3 {
   font-size: 17px;
-  font-weight: 500;
+  font-weight: var(--weight-medium);
   color: #8f75a3;
   margin: 8px 0;
 }
 .my-capacity p {
-  font-size: 11px;
+  font-size: var(--text-11);
   color: #ac97bb;
 }
 .my-capacity .eyebrow {
-  font-size: 8px;
+  font-size: var(--text-8);
   color: #b39cc5;
 }
 .settings-grid {
@@ -1739,7 +1731,7 @@ svg {
   align-items: start;
 }
 .settings-grid > .panel > .panel-heading {
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--color-border);
 }
 .settings-grid > .panel > .panel-heading > svg {
   color: #b69ec9;
@@ -1756,13 +1748,13 @@ svg {
   color: #b39ac7;
 }
 .settings-trust h3 {
-  font-size: 15px;
-  font-weight: 600;
+  font-size: var(--text-15);
+  font-weight: var(--weight-semibold);
   margin: 17px 0 12px;
 }
 .settings-trust p,
 .settings-trust li {
-  font-size: 11px;
+  font-size: var(--text-11);
   line-height: 1.9;
   color: #9981a9;
 }
@@ -1781,12 +1773,12 @@ svg {
   color: #a387b7;
 }
 .assistant-status h3 {
-  font-size: 12px;
-  font-weight: 500;
+  font-size: var(--text-12);
+  font-weight: var(--weight-medium);
   margin-bottom: 8px;
 }
 .assistant-status p {
-  font-size: 11px;
+  font-size: var(--text-11);
   color: #9981a9;
   overflow-wrap: anywhere;
 }
@@ -1805,7 +1797,7 @@ svg {
   width: 530px;
   max-width: 100%;
   max-height: calc(100dvh - 70px);
-  background: #fff;
+  background: var(--color-surface);
   border-radius: 14px;
   box-shadow: 0 25px 100px #21153626;
   overflow: auto;
@@ -1821,21 +1813,21 @@ svg {
   justify-content: space-between;
   gap: 20px;
   padding: 26px 27px 21px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--color-border);
   position: sticky;
   top: 0;
-  background: #fff;
+  background: var(--color-surface);
   z-index: 2;
 }
 .modal-head h2 {
   font-size: 19px;
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
   letter-spacing: -0.5px;
   line-height: 1.5;
   color: #695576;
 }
 .modal-head p {
-  font-size: 10px;
+  font-size: var(--text-10);
   color: #ab96b8;
   margin-top: 7px;
 }
@@ -1848,9 +1840,9 @@ svg {
 .form label {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  font-size: 11px;
-  font-weight: 500;
+  gap: var(--space-8);
+  font-size: var(--text-11);
+  font-weight: var(--weight-medium);
   color: #8b6a9e;
 }
 .form input,
@@ -1858,12 +1850,12 @@ svg {
 .form textarea,
 .assistant-context select {
   border: 1px solid #e9e0f0;
-  border-radius: 6px;
+  border-radius: var(--radius-6);
   padding: 10px 11px;
   min-width: 0;
   max-width: 100%;
-  font-size: 12px;
-  background: #fff;
+  font-size: var(--text-12);
+  background: var(--color-surface);
   color: #735483;
 }
 .form input::placeholder,
@@ -1880,10 +1872,10 @@ svg {
   color: #b2a3be;
 }
 .form label > small {
-  font-size: 10px;
+  font-size: var(--text-10);
   color: #b7a6c3;
   line-height: 1.6;
-  font-weight: 400;
+  font-weight: var(--weight-regular);
 }
 .form-grid {
   display: grid;
@@ -1893,14 +1885,14 @@ svg {
 .form-note {
   display: flex;
   align-items: flex-start;
-  gap: 7px;
-  font-size: 10px;
+  gap: var(--space-7);
+  font-size: var(--text-10);
   color: #a58ab6;
   line-height: 1.8;
   padding: 11px 12px;
   background: #faf7fd;
-  border-radius: 6px;
-  font-weight: 400;
+  border-radius: var(--radius-6);
+  font-weight: var(--weight-regular);
 }
 .form-note svg {
   margin-top: 2px;
@@ -1910,29 +1902,29 @@ svg {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-10);
   border-top: 1px solid #f0e9f5;
   padding-top: 18px;
   margin-top: 2px;
 }
 .form-actions > .muted {
   margin-right: auto;
-  font-size: 9px;
+  font-size: var(--text-9);
   line-height: 1.8;
   color: #b8a5c6;
   max-width: 230px;
 }
 .error {
   color: #b06a7b;
-  font-size: 11px;
+  font-size: var(--text-11);
   line-height: 1.7;
   padding: 10px 12px;
   background: #fff4f5;
-  border-radius: 6px;
+  border-radius: var(--radius-6);
   border: 1px solid #f5e0e6;
   display: flex;
   align-items: flex-start;
-  gap: 7px;
+  gap: var(--space-7);
 }
 .error svg {
   margin-top: 2px;
@@ -1949,11 +1941,11 @@ svg {
   align-items: flex-start !important;
   gap: 9px !important;
   line-height: 1.8 !important;
-  font-size: 10px !important;
-  font-weight: 400 !important;
+  font-size: var(--text-10) !important;
+  font-weight: var(--weight-regular) !important;
 }
 .checkbox input {
-  accent-color: var(--purple);
+  accent-color: var(--color-brand);
   margin-top: 2px;
 }
 .detail-body {
@@ -1962,16 +1954,16 @@ svg {
 .detail-summary {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-10);
   flex-wrap: wrap;
 }
 .detail-summary > .person-inline {
   margin-right: auto;
-  font-size: 12px;
+  font-size: var(--text-12);
   color: #8b709b;
 }
 .detail-description {
-  font-size: 12px;
+  font-size: var(--text-12);
   line-height: 1.8;
   color: #a38ab4;
   margin: 24px 0;
@@ -1982,13 +1974,13 @@ svg {
   background: #fbf9fd;
   border: 1px solid #f0e9f5;
   padding: 15px;
-  border-radius: 7px;
-  gap: 15px;
+  border-radius: var(--radius-7);
+  gap: var(--space-15);
 }
 .detail-metrics > div {
   display: flex;
   flex-direction: column;
-  gap: 7px;
+  gap: var(--space-7);
   padding: 1px 8px;
   border-right: 1px solid #eee5f4;
 }
@@ -2001,12 +1993,12 @@ svg {
   height: 15px;
 }
 .detail-metrics small {
-  font-size: 9px;
+  font-size: var(--text-9);
   color: #b8a1c8;
 }
 .detail-metrics strong {
-  font-size: 13px;
-  font-weight: 500;
+  font-size: var(--text-13);
+  font-weight: var(--weight-medium);
   color: #9b7fae;
 }
 .tabs {
@@ -2019,9 +2011,9 @@ svg {
   padding: 10px 0 12px;
   border-bottom: 2px solid transparent;
   color: #baa3ca;
-  font-size: 11px;
+  font-size: var(--text-11);
   display: flex;
-  gap: 7px;
+  gap: var(--space-7);
   align-items: center;
 }
 .tabs > button.active {
@@ -2030,10 +2022,10 @@ svg {
 }
 .tabs > button > span {
   padding: 2px 5px;
-  border-radius: 3px;
+  border-radius: var(--radius-3);
   background: #f6f1fa;
   color: #b79acb;
-  font-size: 8px;
+  font-size: var(--text-8);
 }
 .detail-body > .form {
   padding: 0;
@@ -2041,21 +2033,21 @@ svg {
 .detail-dependencies {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: var(--space-15);
 }
 .detail-dependencies > .button {
   align-self: flex-start;
   margin-bottom: 5px;
 }
 .history-list h4 {
-  font-size: 11px;
+  font-size: var(--text-11);
   color: #ae93c0;
   margin: 23px 0 20px;
-  font-weight: 500;
+  font-weight: var(--weight-medium);
 }
 .history-event {
   display: flex;
-  gap: 11px;
+  gap: var(--space-11);
   align-items: flex-start;
   border-left: 1px solid #eae0f1;
   padding-left: 0;
@@ -2068,53 +2060,53 @@ svg {
   background: #c3abd7;
   border: 2px solid white;
   outline: 1px solid #dbcce7;
-  border-radius: 50%;
+  border-radius: var(--radius-round);
   margin-left: -4px;
   margin-top: 5px;
   flex-shrink: 0;
 }
 .history-event strong {
-  font-size: 11px;
+  font-size: var(--text-11);
   color: #a187b3;
-  font-weight: 500;
+  font-weight: var(--weight-medium);
 }
 .history-event p {
-  font-size: 11px;
+  font-size: var(--text-11);
   line-height: 1.7;
   color: #b79ec8;
   margin-top: 3px;
 }
 .history-event small {
-  font-size: 9px;
+  font-size: var(--text-9);
   color: #bfa7d1;
 }
 .person-profile {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: var(--space-15);
   margin-bottom: 25px;
 }
 .person-profile p {
-  font-size: 11px;
+  font-size: var(--text-11);
   color: #b09ac0;
   margin-top: 10px;
 }
 .detail-body > h3 {
-  font-size: 12px;
+  font-size: var(--text-12);
   color: #a38ab5;
   margin: 25px 0 14px;
-  font-weight: 500;
+  font-weight: var(--weight-medium);
 }
 .profile-work > button {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-10);
   justify-content: space-between;
   text-align: left;
   width: 100%;
   padding: 14px 0;
   border-bottom: 1px solid #f1eaf6;
-  font-size: 11px;
+  font-size: var(--text-11);
   color: #9672ac;
 }
 .profile-work > button > span:first-child {
@@ -2122,15 +2114,15 @@ svg {
 }
 .profile-work small {
   display: block;
-  font-size: 9px;
+  font-size: var(--text-9);
   color: #bda6ce;
   margin-top: 6px;
 }
 .profile-dep {
   display: flex;
   align-items: center;
-  gap: 9px;
-  font-size: 11px;
+  gap: var(--space-9);
+  font-size: var(--text-11);
   line-height: 1.7;
   color: #b299c4;
   padding: 7px 0;
@@ -2150,7 +2142,7 @@ svg {
   justify-content: flex-end;
 }
 .assistant-panel {
-  background: #fff;
+  background: var(--color-surface);
   width: 435px;
   max-width: 100%;
   display: flex;
@@ -2162,27 +2154,27 @@ svg {
 .assistant-head {
   display: flex;
   align-items: center;
-  gap: 11px;
+  gap: var(--space-11);
   padding: 24px 20px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--color-border);
 }
 .assistant-icon {
   display: flex;
   align-items: center;
   justify-content: center;
   background: #f0e6fa;
-  border-radius: 10px;
+  border-radius: var(--radius-10);
   width: 37px;
   height: 37px;
   color: #aa87c9;
 }
 .assistant-head h3 {
-  font-size: 13px;
-  font-weight: 500;
+  font-size: var(--text-13);
+  font-weight: var(--weight-medium);
   color: #987aac;
 }
 .assistant-head p {
-  font-size: 9px;
+  font-size: var(--text-9);
   color: #bda4cc;
   margin-top: 5px;
 }
@@ -2191,7 +2183,7 @@ svg {
 }
 .assistant-context {
   background: #fcfafd;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--color-border);
   padding: 13px 20px;
   display: flex;
   align-items: center;
@@ -2199,11 +2191,11 @@ svg {
 }
 .assistant-context label {
   color: #b29bc2;
-  font-size: 10px;
+  font-size: var(--text-10);
   white-space: nowrap;
 }
 .assistant-context select {
-  font-size: 10px;
+  font-size: var(--text-10);
   flex: 1;
   max-width: 270px;
   padding: 7px;
@@ -2220,7 +2212,7 @@ svg {
 .sparkle-orbit {
   width: 75px;
   height: 75px;
-  border-radius: 50%;
+  border-radius: var(--radius-round);
   background: radial-gradient(circle, #f6effc, #faf6fe);
   color: #c2a4db;
   border: 1px solid #f0e5fa;
@@ -2233,12 +2225,12 @@ svg {
 .chat-welcome h2 {
   font-size: 27px;
   color: #b191c6;
-  font-weight: 500;
+  font-weight: var(--weight-medium);
   letter-spacing: -0.8px;
   line-height: 1.35;
 }
 .chat-welcome p {
-  font-size: 12px;
+  font-size: var(--text-12);
   color: #bfa6cf;
   margin: 14px 0 30px;
 }
@@ -2248,9 +2240,9 @@ svg {
   align-items: center;
   justify-content: space-between;
   border: 1px solid #eee4f5;
-  border-radius: 7px;
+  border-radius: var(--radius-7);
   padding: 12px 11px;
-  font-size: 11px;
+  font-size: var(--text-11);
   color: #b197c4;
   margin-top: 8px;
   text-align: left;
@@ -2261,10 +2253,10 @@ svg {
 .chat-message {
   max-width: 100%;
   margin: 14px 0;
-  font-size: 12px;
+  font-size: var(--text-12);
   line-height: 1.8;
   padding: 14px;
-  border-radius: 10px;
+  border-radius: var(--radius-10);
 }
 .chat-message p {
   white-space: pre-wrap;
@@ -2286,21 +2278,21 @@ svg {
 .chat-author {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 9px;
+  gap: var(--space-6);
+  font-size: var(--text-9);
   color: #bea3d0;
   margin-bottom: 7px;
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
 }
 .proposal {
   border: 1px solid #e5d5f2;
   padding: 16px;
-  border-radius: 9px;
+  border-radius: var(--radius-9);
   margin: 15px 0;
   background: #fdfaff;
 }
 .proposal > .eyebrow {
-  font-size: 9px;
+  font-size: var(--text-9);
   margin-bottom: 15px;
   color: #b49acc;
 }
@@ -2308,22 +2300,22 @@ svg {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 15px;
+  gap: var(--space-15);
   border-bottom: 1px solid #f0e7f7;
   padding: 7px 0;
-  font-size: 11px;
+  font-size: var(--text-11);
   color: #c0a9d0;
 }
 .proposal-field span {
   text-transform: capitalize;
 }
 .proposal-field strong {
-  font-weight: 500;
+  font-weight: var(--weight-medium);
   color: #ad8dc2;
   text-align: right;
 }
 .proposal > p {
-  font-size: 10px;
+  font-size: var(--text-10);
   color: #c0a6d1;
   margin: 13px 0 15px;
 }
@@ -2331,14 +2323,14 @@ svg {
   position: relative;
   margin: 10px 20px 0;
   border: 1px solid #e8dbf2;
-  border-radius: 10px;
+  border-radius: var(--radius-10);
   display: flex;
   align-items: flex-end;
   padding: 11px;
-  background: #fff;
+  background: var(--color-surface);
 }
 .chat-input textarea {
-  font-size: 12px;
+  font-size: var(--text-12);
   line-height: 1.6;
   border: 0;
   outline: none;
@@ -2356,13 +2348,13 @@ svg {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 7px;
+  border-radius: var(--radius-7);
   background: #ae89cc;
   color: white;
   margin-left: 7px;
 }
 .assistant-footer {
-  font-size: 8px;
+  font-size: var(--text-8);
   color: #c1a7d1;
   display: flex;
   align-items: center;
@@ -2372,14 +2364,14 @@ svg {
 }
 .chat-loading {
   display: flex;
-  gap: 5px;
+  gap: var(--space-5);
   padding: 17px;
 }
 .chat-loading span {
   width: 5px;
   height: 5px;
   background: #c1a3d5;
-  border-radius: 50%;
+  border-radius: var(--radius-round);
   animation: blink 1s infinite alternate;
 }
 .chat-loading span:nth-child(2) {
@@ -2397,29 +2389,29 @@ svg {
   max-height: 75vh;
   overflow: auto;
   border: 1px solid #e8dcf2;
-  background: #fff;
-  border-radius: 11px;
+  background: var(--color-surface);
+  border-radius: var(--radius-11);
   box-shadow: 0 15px 70px #42265018;
   z-index: 80;
 }
 .notification-popover > .split {
   padding: 17px 19px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--color-border);
 }
 .notification-popover h3 {
-  font-size: 12px;
+  font-size: var(--text-12);
   color: #9a7aad;
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
 }
 .notice {
   display: flex;
   align-items: flex-start;
-  gap: 11px;
+  gap: var(--space-11);
   padding: 17px;
   text-align: left;
   width: 100%;
   border-bottom: 1px solid #f1e8f6;
-  font-size: 11px;
+  font-size: var(--text-11);
   color: #ba9dca;
   line-height: 1.8;
 }
@@ -2436,7 +2428,7 @@ svg {
 }
 .notice small {
   display: block;
-  font-size: 9px;
+  font-size: var(--text-9);
   color: #c5aed3;
   margin-top: 6px;
 }
@@ -2444,7 +2436,7 @@ svg {
   width: 5px;
   height: 5px;
   background: #c2a1d8;
-  border-radius: 50%;
+  border-radius: var(--radius-round);
   flex-shrink: 0;
   margin-top: 7px;
 }
@@ -2453,15 +2445,15 @@ svg {
   left: calc(50% + 80px);
   bottom: 26px;
   transform: translateX(-50%);
-  background: #fff;
+  background: var(--color-surface);
   border: 1px solid #e6ddef;
-  border-radius: 9px;
+  border-radius: var(--radius-9);
   box-shadow: 0 5px 30px #4b365f17;
   padding: 12px 14px;
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 11px;
+  gap: var(--space-10);
+  font-size: var(--text-11);
   color: #987eaa;
   max-width: calc(100% - 40px);
   z-index: 150;
@@ -2472,7 +2464,7 @@ svg {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
+  border-radius: var(--radius-round);
   background: #eff6f1;
   color: #89b297;
 }
@@ -2487,7 +2479,7 @@ svg {
   color: #b397c7;
 }
 .boot p {
-  font-size: 12px;
+  font-size: var(--text-12);
 }
 .spin {
   animation: spin 1s linear infinite;
@@ -2496,7 +2488,7 @@ svg {
   min-height: 100vh;
   display: grid;
   grid-template-columns: 1.05fr 1fr;
-  background: #fff;
+  background: var(--color-surface);
 }
 .login-story {
   padding: 44px 60px;
@@ -2510,7 +2502,7 @@ svg {
   font-size: 25px;
 }
 .login-kicker {
-  font-size: 9px;
+  font-size: var(--text-9);
   letter-spacing: 1px;
   text-transform: uppercase;
   color: #ab93c1;
@@ -2519,13 +2511,13 @@ svg {
 .login-story > h1 {
   font-size: 42px;
   line-height: 1.3;
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
   letter-spacing: -1.5px;
   color: #805b9c;
   margin-top: 18px;
 }
 .login-story > p {
-  font-size: 13px;
+  font-size: var(--text-13);
   color: #a485b9;
   margin-top: 20px;
   line-height: 1.9;
@@ -2541,7 +2533,7 @@ svg {
 }
 .orbit {
   border: 1px solid #e1d4ef;
-  border-radius: 50%;
+  border-radius: var(--radius-round);
   position: absolute;
   transform: rotate(-22deg);
 }
@@ -2573,19 +2565,19 @@ svg {
   background: #ffffffc9;
   backdrop-filter: blur(10px);
   border: 1px solid white;
-  border-radius: 10px;
+  border-radius: var(--radius-10);
   padding: 14px;
   box-shadow: 0 7px 35px #9c7eb815;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-10);
   position: absolute;
-  font-size: 10px;
+  font-size: var(--text-10);
   color: #a387b8;
 }
 .floating-card small {
   display: block;
-  font-size: 8px;
+  font-size: var(--text-8);
   color: #bea9ce;
   margin-top: 5px;
 }
@@ -2594,11 +2586,11 @@ svg {
   height: 30px;
   background: #f4eaf9;
   color: #b58fcd;
-  border-radius: 50%;
+  border-radius: var(--radius-round);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 8px;
+  font-size: var(--text-8);
 }
 .float-one {
   top: 20%;
@@ -2614,12 +2606,12 @@ svg {
   top: 20%;
   right: 4%;
   transform: rotate(8deg);
-  font-size: 8px;
+  font-size: var(--text-8);
   padding: 11px;
-  gap: 7px;
+  gap: var(--space-7);
 }
 .login-bottom {
-  font-size: 9px;
+  font-size: var(--text-9);
   color: #c0aacf;
   margin-top: 20px;
 }
@@ -2634,19 +2626,19 @@ svg {
 }
 .login-form > .eyebrow {
   color: #bd9bd4;
-  font-size: 8px;
-  font-weight: 600;
+  font-size: var(--text-8);
+  font-weight: var(--weight-semibold);
   letter-spacing: 1.2px;
 }
 .login-form h2 {
   font-size: 30px;
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
   letter-spacing: -1px;
   color: #805b9c;
   margin-top: 14px;
 }
 .login-form > p {
-  font-size: 12px;
+  font-size: var(--text-12);
   color: #a485b9;
   margin-top: 9px;
 }
@@ -2661,16 +2653,16 @@ svg {
   padding: 13px;
   background: #8661b0;
   border-color: #8661b0;
-  font-size: 11px;
+  font-size: var(--text-11);
   justify-content: space-between;
 }
 .login-demo {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
+  gap: var(--space-10);
   padding: 16px;
   border: 1px solid #eee3f6;
-  border-radius: 8px;
+  border-radius: var(--radius-8);
   background: #fcf9ff;
 }
 .login-demo > svg {
@@ -2678,12 +2670,12 @@ svg {
   margin-top: 2px;
 }
 .login-demo strong {
-  font-size: 11px;
+  font-size: var(--text-11);
   color: #9670ad;
-  font-weight: 500;
+  font-weight: var(--weight-medium);
 }
 .login-demo p {
-  font-size: 10px;
+  font-size: var(--text-10);
   color: #ac8ebf;
   line-height: 1.9;
   margin-top: 6px;
@@ -2691,7 +2683,7 @@ svg {
 .login-privacy {
   display: block;
   text-align: center;
-  font-size: 9px;
+  font-size: var(--text-9);
   color: #b096c3;
   margin-top: 25px;
 }
@@ -2714,29 +2706,29 @@ svg {
     grid-template-columns: minmax(0, 1fr) 310px;
   }
   .work-table th {
-    font-size: 10px;
+    font-size: var(--text-10);
   }
   .work-table td {
     padding-top: 18px;
     padding-bottom: 18px;
   }
   .work-title {
-    font-size: 12px;
+    font-size: var(--text-12);
   }
   .subline {
-    font-size: 10px;
+    font-size: var(--text-10);
   }
   .work-table .badge {
-    font-size: 10px;
+    font-size: var(--text-10);
   }
   .work-table .person-inline {
-    font-size: 11px;
+    font-size: var(--text-11);
   }
   .panel-heading h2 {
-    font-size: 14px;
+    font-size: var(--text-14);
   }
   .panel-heading p {
-    font-size: 11px;
+    font-size: var(--text-11);
   }
   .briefing-card {
     padding: 25px 23px 20px;
@@ -2745,11 +2737,11 @@ svg {
     font-size: 25px;
   }
   .brief-item h4 {
-    font-size: 12px;
+    font-size: var(--text-12);
   }
   .brief-item p,
   .briefing-intro {
-    font-size: 11px;
+    font-size: var(--text-11);
   }
   .brief-item {
     margin-top: 25px;
@@ -2758,10 +2750,10 @@ svg {
     padding: 23px;
   }
   .stat-card .split > span:first-child {
-    font-size: 12px;
+    font-size: var(--text-12);
   }
   .stat-card > small {
-    font-size: 11px;
+    font-size: var(--text-11);
   }
   .stat-card > strong {
     font-size: 36px;
@@ -2770,29 +2762,29 @@ svg {
     font-size: 31px;
   }
   .page-heading p {
-    font-size: 13px;
+    font-size: var(--text-13);
   }
   .pulse-banner p {
-    font-size: 12px;
+    font-size: var(--text-12);
   }
   .pulse-banner strong {
-    font-size: 13px;
+    font-size: var(--text-13);
   }
   .pulse-banner {
     padding: 20px 23px;
   }
   .dependency-card.compact .dependency-title {
-    font-size: 12px;
+    font-size: var(--text-12);
   }
   .dependency-card.compact > p {
-    font-size: 10px;
+    font-size: var(--text-10);
   }
   .sidebar nav > button {
-    font-size: 13px;
+    font-size: var(--text-13);
     min-height: 43px;
   }
   .sidebar-projects > button {
-    font-size: 12px;
+    font-size: var(--text-12);
   }
   .sidebar-projects {
     margin-top: 33px;
@@ -2801,17 +2793,17 @@ svg {
     padding: 18px 14px;
   }
   .sidebar-assistant h4 {
-    font-size: 11px;
+    font-size: var(--text-11);
   }
   .sidebar-assistant p,
   .sidebar-assistant button {
-    font-size: 10px;
+    font-size: var(--text-10);
   }
   .sidebar-user strong {
-    font-size: 11px;
+    font-size: var(--text-11);
   }
   .sidebar-user small {
-    font-size: 9px;
+    font-size: var(--text-9);
   }
 }
 @media (max-width: 1200px) {
@@ -2843,14 +2835,14 @@ svg {
   }
   .overview-grid {
     grid-template-columns: minmax(0, 1fr) 249px;
-    gap: 15px;
+    gap: var(--space-15);
   }
   .overview-primary,
   .overview-aside {
-    gap: 15px;
+    gap: var(--space-15);
   }
   .stat-grid {
-    gap: 11px;
+    gap: var(--space-11);
   }
   .stat-card {
     padding: 14px;
@@ -2859,16 +2851,16 @@ svg {
     display: none;
   }
   .heading-actions {
-    gap: 8px;
+    gap: var(--space-8);
   }
   .pulse-banner {
     padding: 14px;
   }
   .pulse-banner p {
-    font-size: 10px;
+    font-size: var(--text-10);
   }
   .pulse-banner > button {
-    font-size: 9px;
+    font-size: var(--text-9);
   }
   .dependency-preview-grid {
     grid-template-columns: 1fr;
@@ -2880,7 +2872,7 @@ svg {
     padding: 19px 15px 14px;
   }
   .brief-item p {
-    font-size: 9px;
+    font-size: var(--text-9);
   }
   .panel-heading {
     padding: 17px 15px 14px;
@@ -2944,7 +2936,7 @@ svg {
   }
   .brief-item p,
   .briefing-intro {
-    font-size: 10px;
+    font-size: var(--text-10);
   }
   .briefing-card {
     padding: 19px;
@@ -2966,13 +2958,13 @@ svg {
     display: block;
   }
   .stat-grid {
-    gap: 10px;
+    gap: var(--space-10);
   }
   .stat-card .split > span:first-child {
-    font-size: 9px;
+    font-size: var(--text-9);
   }
   .stat-card > small {
-    font-size: 8px;
+    font-size: var(--text-8);
   }
   .stat-card .stat-icon {
     width: 23px;
@@ -3002,7 +2994,7 @@ svg {
   }
   .floating-card {
     padding: 10px;
-    font-size: 8px;
+    font-size: var(--text-8);
   }
   .login-form-wrap {
     padding: 30px;
@@ -3011,7 +3003,7 @@ svg {
     width: 280px;
   }
   .topbar-actions {
-    gap: 10px;
+    gap: var(--space-10);
   }
   .topbar {
     height: 60px;
@@ -3048,8 +3040,8 @@ svg {
     padding: 0 17px;
   }
   .breadcrumb {
-    gap: 8px;
-    font-size: 9px;
+    gap: var(--space-8);
+    font-size: var(--text-9);
   }
   .breadcrumb > span,
   .breadcrumb > svg {
@@ -3057,10 +3049,10 @@ svg {
   }
   .global-search input {
     width: 120px;
-    font-size: 10px;
+    font-size: var(--text-10);
   }
   .topbar-actions {
-    gap: 9px;
+    gap: var(--space-9);
   }
   .topbar-divider {
     margin-left: 0;
@@ -3068,35 +3060,35 @@ svg {
   .topbar-actions > .avatar {
     width: 27px !important;
     height: 27px !important;
-    font-size: 9px !important;
+    font-size: var(--text-9) !important;
   }
   .app-main main {
     padding: 24px 17px 0;
   }
   .page-heading {
-    gap: 9px;
+    gap: var(--space-9);
     margin-bottom: 22px;
     align-items: center;
   }
   .page-heading h1 {
-    font-size: 23px;
+    font-size: var(--text-23);
   }
   .page-heading p {
-    font-size: 10px;
+    font-size: var(--text-10);
   }
   .heading-eyebrow {
-    font-size: 8px;
+    font-size: var(--text-8);
   }
   .heading-actions {
     margin: 7px 0 0;
   }
   .heading-actions .button {
-    font-size: 10px;
+    font-size: var(--text-10);
     padding: 8px;
-    gap: 5px;
+    gap: var(--space-5);
   }
   .pulse-banner {
-    gap: 10px;
+    gap: var(--space-10);
     padding: 13px;
   }
   .pulse-banner-symbol {
@@ -3105,10 +3097,10 @@ svg {
     flex-shrink: 0;
   }
   .pulse-banner strong {
-    font-size: 11px;
+    font-size: var(--text-11);
   }
   .pulse-banner p {
-    font-size: 9px;
+    font-size: var(--text-9);
     line-height: 1.8;
   }
   .pulse-banner > button {
@@ -3116,17 +3108,17 @@ svg {
   }
   .stat-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 11px;
+    gap: var(--space-11);
     margin-bottom: 20px;
   }
   .stat-card {
     padding: 15px 16px;
   }
   .stat-card .split > span:first-child {
-    font-size: 10px;
+    font-size: var(--text-10);
   }
   .stat-card > small {
-    font-size: 9px;
+    font-size: var(--text-9);
   }
   .stat-card > strong {
     font-size: 29px;
@@ -3142,7 +3134,7 @@ svg {
     gap: 17px;
   }
   .overview-aside {
-    gap: 15px;
+    gap: var(--space-15);
   }
   .briefing-card {
     padding: 18px 16px;
@@ -3151,16 +3143,16 @@ svg {
     font-size: 19px;
   }
   .brief-item {
-    gap: 9px;
+    gap: var(--space-9);
   }
   .brief-item p {
-    font-size: 9px;
+    font-size: var(--text-9);
   }
   .brief-item h4 {
-    font-size: 10px;
+    font-size: var(--text-10);
   }
   .briefing-disclosure {
-    font-size: 7px;
+    font-size: var(--text-7);
   }
   .briefing-date {
     display: none;
@@ -3169,20 +3161,20 @@ svg {
     padding: 17px 13px 10px;
   }
   .team-snapshot .panel-heading h2 {
-    font-size: 10px;
+    font-size: var(--text-10);
   }
   .plan-coverage {
     padding: 4px 14px 0;
   }
   .plan-coverage > div:first-child {
-    gap: 8px;
+    gap: var(--space-8);
     flex-wrap: wrap;
   }
   .plan-coverage strong {
     font-size: 27px;
   }
   .plan-coverage div > span {
-    font-size: 9px;
+    font-size: var(--text-9);
   }
   .team-snapshot .avatar-stack {
     margin: 15px 13px 20px;
@@ -3191,11 +3183,11 @@ svg {
   .team-snapshot .avatar {
     height: 27px !important;
     width: 27px !important;
-    font-size: 9px !important;
+    font-size: var(--text-9) !important;
   }
   .snapshot-footer {
     padding: 12px;
-    font-size: 8px;
+    font-size: var(--text-8);
     line-height: 1.7;
     align-items: flex-start;
   }
@@ -3206,26 +3198,26 @@ svg {
     padding: 16px 14px 14px;
   }
   .dependencies-preview .panel-heading h2 {
-    font-size: 11px;
+    font-size: var(--text-11);
   }
   .dependencies-preview .panel-heading p {
-    font-size: 9px;
+    font-size: var(--text-9);
   }
   .dependency-preview-grid {
     padding: 0 13px 13px;
-    gap: 10px;
+    gap: var(--space-10);
   }
   .dependency-card.compact {
     padding: 11px;
   }
   .dependency-card.compact .dependency-people {
-    gap: 6px;
+    gap: var(--space-6);
   }
   .dependency-card.compact .dependency-people .dependency-date {
     display: none;
   }
   .dependency-card.compact .dependency-people span {
-    font-size: 8px;
+    font-size: var(--text-8);
   }
   .project-grid,
   .team-grid,
@@ -3237,19 +3229,19 @@ svg {
     padding: 18px;
   }
   .project-card h2 {
-    font-size: 15px;
+    font-size: var(--text-15);
   }
   .project-card p {
-    font-size: 10px;
+    font-size: var(--text-10);
   }
   .capacity-explainer {
     padding: 20px;
   }
   .capacity-explainer h2 {
-    font-size: 16px;
+    font-size: var(--text-16);
   }
   .capacity-explainer p {
-    font-size: 10px;
+    font-size: var(--text-10);
   }
   .capacity-explainer > span {
     display: none;
@@ -3265,36 +3257,36 @@ svg {
     padding: 18px;
   }
   .dep-impact {
-    font-size: 9px;
+    font-size: var(--text-9);
   }
   .dependency-card > p {
-    font-size: 11px;
+    font-size: var(--text-11);
   }
   .dependency-people span {
-    font-size: 10px;
+    font-size: var(--text-10);
   }
   .person-card h3 {
-    font-size: 14px;
+    font-size: var(--text-14);
   }
   .person-card > p {
-    font-size: 10px;
+    font-size: var(--text-10);
   }
   .skill-tags span {
-    font-size: 8px;
+    font-size: var(--text-8);
   }
   .capacity-confirmation {
-    font-size: 8px;
+    font-size: var(--text-8);
   }
   .capacity-numbers {
-    font-size: 8px;
+    font-size: var(--text-8);
   }
   .person-card .badge {
-    font-size: 8px;
+    font-size: var(--text-8);
   }
   .page-footer {
-    font-size: 7px;
+    font-size: var(--text-7);
     line-height: 1.7;
-    gap: 15px;
+    gap: var(--space-15);
   }
   .page-footer > span:last-child {
     text-align: right;
@@ -3304,7 +3296,7 @@ svg {
   }
   .modal {
     max-height: calc(100dvh - 30px);
-    border-radius: 10px;
+    border-radius: var(--radius-10);
   }
   .modal-head {
     padding: 21px 20px 17px;
@@ -3313,45 +3305,45 @@ svg {
     font-size: 17px;
   }
   .modal-head p {
-    font-size: 10px;
+    font-size: var(--text-10);
   }
   .form,
   .detail-body {
     padding: 20px;
   }
   .detail-metrics {
-    gap: 8px;
+    gap: var(--space-8);
     padding: 12px 7px;
   }
   .detail-metrics strong {
-    font-size: 12px;
+    font-size: var(--text-12);
   }
   .detail-metrics small {
-    font-size: 8px;
+    font-size: var(--text-8);
     line-height: 1.7;
   }
   .detail-summary .badge {
-    font-size: 9px;
+    font-size: var(--text-9);
   }
   .detail-summary .person-inline {
-    font-size: 12px;
+    font-size: var(--text-12);
   }
   .detail-summary .person-inline small {
-    font-size: 9px;
+    font-size: var(--text-9);
   }
   .detail-description {
-    font-size: 11px;
+    font-size: var(--text-11);
   }
   .form-actions {
     flex-wrap: wrap;
   }
   .form-actions > .muted {
-    font-size: 8px;
+    font-size: var(--text-8);
     max-width: 155px;
   }
   .toast {
     left: 50%;
-    font-size: 10px;
+    font-size: var(--text-10);
     width: max-content;
   }
   .notification-popover {
@@ -3376,20 +3368,20 @@ svg {
     font-size: 32px;
   }
   .login-form > p {
-    font-size: 13px;
+    font-size: var(--text-13);
   }
   .login-form .form label {
-    font-size: 12px;
+    font-size: var(--text-12);
   }
   .login-form .form input {
-    font-size: 13px;
+    font-size: var(--text-13);
     padding: 13px;
   }
   .login-demo p {
-    font-size: 10px;
+    font-size: var(--text-10);
   }
   .login-demo strong {
-    font-size: 11px;
+    font-size: var(--text-11);
   }
   .login-form .form > .button {
     padding: 14px;
@@ -3403,25 +3395,25 @@ svg {
     gap: 17px;
   }
   .my-capacity h3 {
-    font-size: 16px;
+    font-size: var(--text-16);
   }
   .my-capacity p {
-    font-size: 10px;
+    font-size: var(--text-10);
   }
   .activity-event {
     padding: 17px 15px;
-    gap: 10px;
+    gap: var(--space-10);
   }
   .activity-event p {
-    font-size: 11px;
+    font-size: var(--text-11);
   }
   .activity-event > small {
-    font-size: 8px;
+    font-size: var(--text-8);
   }
   .activity-event > .avatar {
     width: 29px !important;
     height: 29px !important;
-    font-size: 9px !important;
+    font-size: var(--text-9) !important;
   }
   .settings-grid {
     gap: 17px;
@@ -3430,7 +3422,7 @@ svg {
     margin-bottom: 17px;
   }
   .active-filter {
-    font-size: 9px;
+    font-size: var(--text-9);
   }
 }
 @media (max-width: 410px) {
@@ -3438,16 +3430,16 @@ svg {
     width: 95px;
   }
   .topbar-actions {
-    gap: 5px;
+    gap: var(--space-5);
   }
   .breadcrumb strong {
-    font-size: 9px;
+    font-size: var(--text-9);
   }
   .page-heading h1 {
     font-size: 21px;
   }
   .heading-actions .button {
-    font-size: 9px;
+    font-size: var(--text-9);
     min-height: 31px;
   }
   .heading-actions .button svg {
@@ -3466,7 +3458,7 @@ svg {
     display: none;
   }
   .brief-item p {
-    font-size: 10px;
+    font-size: var(--text-10);
   }
   .project-grid,
   .team-grid {
@@ -3476,28 +3468,28 @@ svg {
     gap: 13px;
   }
   .form-grid label {
-    font-size: 10px;
+    font-size: var(--text-10);
   }
   .form input,
   .form select {
     padding: 9px 8px;
-    font-size: 11px;
+    font-size: var(--text-11);
   }
   .form-actions > .muted {
     max-width: 130px;
   }
   .form-actions .button {
-    font-size: 10px;
+    font-size: var(--text-10);
   }
   .detail-summary {
-    gap: 7px;
+    gap: var(--space-7);
   }
   .detail-metrics {
     padding: 12px 4px;
     gap: 2px;
   }
   .profile-work .badge {
-    font-size: 8px;
+    font-size: var(--text-8);
   }
   .page-footer > span:last-child {
     display: none;
@@ -3506,7 +3498,7 @@ svg {
     padding: 13px;
   }
   .info-strip p {
-    font-size: 10px;
+    font-size: var(--text-10);
   }
 }
 @keyframes spin {
@@ -3549,113 +3541,113 @@ svg {
 }
 /* Readable type and contrast across the workspace. */
 .sidebar nav > button {
-  font-size: 12px;
+  font-size: var(--text-12);
 }
 .sidebar-projects > button {
-  font-size: 11px;
+  font-size: var(--text-11);
 }
 .sidebar-label {
-  font-size: 9px;
+  font-size: var(--text-9);
   color: #8d849b;
 }
 .workspace-switch strong {
-  font-size: 11px;
+  font-size: var(--text-11);
 }
 .sidebar-user strong {
-  font-size: 11px;
+  font-size: var(--text-11);
 }
 .sidebar-user small {
-  font-size: 9px;
+  font-size: var(--text-9);
   color: #93849f;
 }
 .sidebar-assistant h4 {
-  font-size: 11px;
+  font-size: var(--text-11);
 }
 .sidebar-assistant p,
 .sidebar-assistant button {
-  font-size: 10px;
+  font-size: var(--text-10);
 }
 .breadcrumb,
 .global-search input {
-  font-size: 11px;
+  font-size: var(--text-11);
 }
 .heading-eyebrow {
-  font-size: 9px;
+  font-size: var(--text-9);
   color: #8f829b;
 }
 .page-heading p {
-  font-size: 12px;
+  font-size: var(--text-12);
   color: #8a7d98;
 }
 .today-label {
-  font-size: 11px;
+  font-size: var(--text-11);
 }
 .heading-actions .button {
-  font-size: 11px;
+  font-size: var(--text-11);
 }
 .pulse-banner strong {
-  font-size: 12px;
+  font-size: var(--text-12);
   color: #7c5a9a;
 }
 .pulse-banner p {
-  font-size: 11px;
+  font-size: var(--text-11);
   color: #94809f;
 }
 .pulse-banner > button {
-  font-size: 11px;
+  font-size: var(--text-11);
   color: #8663ae;
 }
 .stat-card .split > span:first-child {
-  font-size: 11px;
+  font-size: var(--text-11);
   color: #7d7089;
 }
 .stat-card > small {
-  font-size: 10px;
+  font-size: var(--text-10);
   color: #8e809c;
 }
 .panel-heading h2 {
-  font-size: 14px;
+  font-size: var(--text-14);
   color: #574363;
 }
 .panel-heading p {
-  font-size: 10px;
+  font-size: var(--text-10);
   color: #90809c;
 }
 .segmented button,
 .filter-selects select {
-  font-size: 10px;
+  font-size: var(--text-10);
   color: #8d789c;
 }
 .work-table th {
-  font-size: 10px;
+  font-size: var(--text-10);
   color: #8d7c9b;
 }
 .work-title {
-  font-size: 12px;
+  font-size: var(--text-12);
   color: #5b4468;
 }
 .subline {
-  font-size: 9px;
+  font-size: var(--text-9);
   color: #9783a5;
 }
 .work-table .person-inline,
 .date-cell {
-  font-size: 11px;
+  font-size: var(--text-11);
   color: #82698f;
 }
 .work-table .badge {
-  font-size: 9px;
+  font-size: var(--text-9);
 }
 .work-table td > small {
-  font-size: 9px;
+  font-size: var(--text-9);
   color: #9c87ab;
 }
 .health {
-  font-size: 8px;
+  font-size: var(--text-8);
   color: #a3875c;
 }
 .progress-cell span {
-  font-size: 10px;
+  font-size: var(--text-10);
   color: #9d84ae;
 }
 .progress-track {
@@ -3667,92 +3659,92 @@ svg {
   padding-bottom: 17px;
 }
 .panel-footer {
-  font-size: 9px;
+  font-size: var(--text-9);
   color: #9f8caf;
 }
 .panel-footer button {
-  font-size: 10px;
+  font-size: var(--text-10);
   color: #9270ab;
 }
 .briefing-card .eyebrow {
-  font-size: 9px;
+  font-size: var(--text-9);
   color: #9675af;
 }
 .briefing-card h2 {
   color: #735087;
 }
 .briefing-intro {
-  font-size: 10px;
+  font-size: var(--text-10);
   color: #9a7cac;
 }
 .brief-item h4 {
-  font-size: 11px;
+  font-size: var(--text-11);
   color: #846098;
 }
 .brief-item p {
-  font-size: 10px;
+  font-size: var(--text-10);
   color: #9876aa;
 }
 .brief-number {
-  font-size: 9px;
+  font-size: var(--text-9);
 }
 .briefing-button {
-  font-size: 10px;
+  font-size: var(--text-10);
   color: #9167ac;
 }
 .briefing-disclosure {
-  font-size: 8px;
+  font-size: var(--text-8);
   color: #a78fba;
 }
 .team-snapshot .panel-heading h2 {
-  font-size: 12px;
+  font-size: var(--text-12);
 }
 .plan-coverage div > span {
-  font-size: 10px;
+  font-size: var(--text-10);
   color: #a086b2;
 }
 .snapshot-footer {
-  font-size: 9px;
+  font-size: var(--text-9);
   color: #9f86b0;
 }
 .dependencies-preview .panel-heading h2 {
-  font-size: 12px;
+  font-size: var(--text-12);
 }
 .dependency-card.compact .dependency-title {
-  font-size: 11px;
+  font-size: var(--text-11);
   color: #806090;
 }
 .dependency-card.compact > p {
-  font-size: 10px;
+  font-size: var(--text-10);
   color: #9b7faa;
 }
 .dependency-card.compact .dependency-people span {
-  font-size: 9px;
+  font-size: var(--text-9);
   color: #9b7cab;
 }
 .dependency-card.compact .dependency-people small {
-  font-size: 8px;
+  font-size: var(--text-8);
 }
 .dependency-card.compact .eyebrow {
-  font-size: 8px;
+  font-size: var(--text-8);
 }
 .dependency-title {
-  font-size: 13px;
+  font-size: var(--text-13);
   color: #806090;
 }
 .dependency-card > p {
-  font-size: 11px;
+  font-size: var(--text-11);
   color: #9677a6;
 }
 .dependency-people span {
-  font-size: 11px;
+  font-size: var(--text-11);
   color: #9b7cab;
 }
 .dependency-people small {
-  font-size: 9px;
+  font-size: var(--text-9);
 }
 .dep-impact {
-  font-size: 10px;
+  font-size: var(--text-10);
 }
 .project-card h2 {
   color: #705084;
@@ -3763,17 +3755,17 @@ svg {
 }
 .capacity-numbers {
   color: #987aaa;
-  font-size: 10px;
+  font-size: var(--text-10);
 }
 .capacity-numbers strong {
   color: #876498;
 }
 .capacity-confirmation {
-  font-size: 9px;
+  font-size: var(--text-9);
   color: #9e81ae;
 }
 .skill-tags span {
-  font-size: 9px;
+  font-size: var(--text-9);
   color: #9876aa;
 }
 .settings-trust p,
@@ -3788,7 +3780,7 @@ svg {
   color: #9b7bad;
 }
 .form label {
-  font-size: 12px;
+  font-size: var(--text-12);
   color: #846190;
 }
 .form-actions > .muted {
@@ -3842,59 +3834,59 @@ svg {
 }
 @media (max-width: 760px) {
   .panel-heading h2 {
-    font-size: 12px;
+    font-size: var(--text-12);
   }
   .panel-heading p {
-    font-size: 10px;
+    font-size: var(--text-10);
   }
   .stat-card .split > span:first-child {
-    font-size: 10px;
+    font-size: var(--text-10);
   }
   .stat-card > small {
-    font-size: 9px;
+    font-size: var(--text-9);
   }
   .heading-actions .button {
-    font-size: 9px;
+    font-size: var(--text-9);
   }
   .page-heading p {
-    font-size: 10px;
+    font-size: var(--text-10);
   }
   .pulse-banner p {
-    font-size: 10px;
+    font-size: var(--text-10);
   }
   .work-title {
-    font-size: 11px;
+    font-size: var(--text-11);
   }
   .work-table .person-inline,
   .date-cell {
-    font-size: 10px;
+    font-size: var(--text-10);
   }
   .work-table .badge {
-    font-size: 8px;
+    font-size: var(--text-8);
   }
   .dependency-card.compact .dependency-title {
-    font-size: 10px;
+    font-size: var(--text-10);
   }
   .dependency-card.compact > p {
-    font-size: 9px;
+    font-size: var(--text-9);
   }
   .brief-item p {
-    font-size: 10px;
+    font-size: var(--text-10);
   }
   .brief-item h4 {
-    font-size: 11px;
+    font-size: var(--text-11);
   }
   .team-snapshot .panel-heading h2 {
-    font-size: 11px;
+    font-size: var(--text-11);
   }
   .plan-coverage div > span {
-    font-size: 9px;
+    font-size: var(--text-9);
   }
   .global-search input {
-    font-size: 10px;
+    font-size: var(--text-10);
   }
   .breadcrumb {
-    font-size: 10px;
+    font-size: var(--text-10);
   }
 }
 @media (max-height: 850px) and (min-width: 761px) {
