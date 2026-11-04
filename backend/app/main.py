@@ -11,7 +11,7 @@ from backend.app.services.work import run_workflows
 from backend.app.seed.pilot import seed
 from backend.app.db.migrations import migrate
 from backend.app.api.router import router
-from backend.app.core.config import FRONTEND_DIST
+from backend.app.core.config import FRONTEND_DIST, PUBLIC_HOST, PUBLIC_HOST_RESTRICTED, PUBLIC_PATHS
 from backend.app.channels.google_chat import process_outbox
 
 async def workflow_loop():
@@ -53,6 +53,9 @@ CSRF_EXEMPT = ('/api/integrations/google-chat/events',)
 
 @app.middleware('http')
 async def request_guard(request: Request, call_next):
+    # Through the public tunnel only the Google Chat endpoint exists; everything else is a 404.
+    if PUBLIC_HOST_RESTRICTED and request.headers.get('host', '').split(':')[0].lower() == PUBLIC_HOST and request.url.path not in PUBLIC_PATHS:
+        return JSONResponse(status_code=404, content={'detail': 'Not found.'})
     if request.url.path.startswith('/api') and request.method not in ('GET', 'HEAD', 'OPTIONS') and request.url.path not in CSRF_EXEMPT:
         if request.headers.get('X-TeamPulse-Request') != '1' or (request.headers.get('Origin') and request.headers['Origin'] not in origins):
             return JSONResponse(status_code=403, content={'detail': 'This request did not originate from TeamPulse.'})

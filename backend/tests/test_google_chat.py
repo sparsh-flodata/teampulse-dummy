@@ -122,3 +122,33 @@ def test_workflow_nudges_also_reach_connected_people(chat):
         db.commit()
         queued = list(db.scalars(select(OutboxMessage)))
         assert [m.employee_id for m in queued] == [2] and queued[0].text.startswith('Ship the report')
+
+
+def test_public_host_exposes_only_the_chat_endpoint(chat, monkeypatch):
+    import backend.app.main as main
+    c, _, _ = chat
+    monkeypatch.setattr(main, 'PUBLIC_HOST_RESTRICTED', True)
+    monkeypatch.setattr(main, 'PUBLIC_HOST', 'teampulse.example.com')
+    public = {'Host': 'teampulse.example.com'}
+    for path in ('/', '/login', '/api/state', '/api/auth/login', '/api/auth/register'):
+        assert c.get(path, headers=public).status_code == 404, path
+    assert c.post('/api/auth/login', json={'email': 'a@b.co', 'password': 'x'}, headers=public).status_code == 404
+    assert c.post(EVENTS, json={}, headers=public | {'Authorization': 'Bearer google'}).status_code != 404
+    assert c.get('/api/health', headers=public).status_code == 200
+    assert c.get('/api/state').status_code == 401  # local host unaffected
+
+
+def test_verify_event_accepts_workspace_addon_tokens(monkeypatch):
+    key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+    class Keys:
+        def get_signing_key_from_jwt(self, token):
+            return type('K', (), {'key': key.public_key()})()
+    monkeypatch.setattr(google_chat, '_jwk_client', lambda url: Keys())
+    monkeypatch.setattr(google_chat, 'GOOGLE_CHAT_AUDIENCE', '857554294422')
+    monkeypatch.setattr(google_chat, 'GOOGLE_CHAT_ENDPOINT', 'https://tp.example.com/api/integrations/google-chat/events')
+    addon = 'service-857554294422@gcp-sa-gsuiteaddons.iam.gserviceaccount.com'
+    sign = lambda **c: 'Bearer ' + jwt.encode({'iss': 'https://accounts.google.com', 'aud': 'https://tp.example.com/api/integrations/google-chat/events', 'email_verified': True, 'exp': int(time.time()) + 60} | c, key, algorithm='RS256')
+    assert google_chat.verify_event(sign(email=addon))['email'] == addon
+    for bad in (sign(email='service-999@gcp-sa-gsuiteaddons.iam.gserviceaccount.com'), sign(email=addon, aud='https://evil.example/x'), sign(email=addon, email_verified=False), sign(email='someone@gmail.com')):
+        with pytest.raises(jwt.PyJWTError):
+            google_chat.verify_event(bad)

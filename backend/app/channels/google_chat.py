@@ -17,7 +17,7 @@ from pathlib import Path
 import httpx
 import jwt
 from sqlalchemy import select
-from backend.app.core.config import GOOGLE_CHAT_AUDIENCE, GOOGLE_CHAT_SERVICE_ACCOUNT_FILE
+from backend.app.core.config import GOOGLE_CHAT_AUDIENCE, GOOGLE_CHAT_ENDPOINT, GOOGLE_CHAT_SERVICE_ACCOUNT_FILE
 from backend.app.models import ChatLink, OutboxMessage, UpdateRequest, now
 
 log = logging.getLogger('teampulse.google_chat')
@@ -53,20 +53,32 @@ def _jwk_client(url: str) -> jwt.PyJWKClient:
 
 
 def verify_event(authorization: str) -> dict:
-    """Verify the bearer token Google Chat sends with every event. Raises jwt.PyJWTError."""
+    """Verify the bearer token Google sends with every event. Raises jwt.PyJWTError.
+
+    Two styles exist, told apart by the (not yet trusted) issuer, then fully verified:
+      classic Chat app, project-number auth: self-signed by chat@system.gserviceaccount.com,
+          audience = the project number;
+      Workspace add-on style: a Google ID token for service-<project number>@gcp-sa-gsuiteaddons...,
+          audience = the endpoint URL set in the Chat API configuration.
+    """
     scheme, _, token = (authorization or '').partition(' ')
     if scheme.lower() != 'bearer' or not token:
         raise jwt.InvalidTokenError('missing bearer token')
-    if GOOGLE_CHAT_AUDIENCE.isdigit():
-        # "Project number" authentication: a self-signed JWT from the Chat service account.
+    issuer = jwt.decode(token, options={'verify_signature': False}).get('iss')
+    if issuer == CHAT_ISSUER:
+        if not GOOGLE_CHAT_AUDIENCE.isdigit():
+            raise jwt.InvalidTokenError('project-number tokens are not enabled')
         key = _jwk_client(CHAT_JWKS).get_signing_key_from_jwt(token)
         return jwt.decode(token, key.key, algorithms=['RS256'], audience=GOOGLE_CHAT_AUDIENCE, issuer=CHAT_ISSUER)
-    # "HTTP endpoint URL" authentication: a Google ID token for the Chat service account.
+    audience = GOOGLE_CHAT_ENDPOINT if GOOGLE_CHAT_AUDIENCE.isdigit() else GOOGLE_CHAT_AUDIENCE
+    senders = {CHAT_ISSUER}
+    if GOOGLE_CHAT_AUDIENCE.isdigit():
+        senders.add(f'service-{GOOGLE_CHAT_AUDIENCE}@gcp-sa-gsuiteaddons.iam.gserviceaccount.com')
     key = _jwk_client(GOOGLE_JWKS).get_signing_key_from_jwt(token)
-    claims = jwt.decode(token, key.key, algorithms=['RS256'], audience=GOOGLE_CHAT_AUDIENCE,
+    claims = jwt.decode(token, key.key, algorithms=['RS256'], audience=audience,
                         issuer=['https://accounts.google.com', 'accounts.google.com'])
-    if claims.get('email') != CHAT_ISSUER or not claims.get('email_verified'):
-        raise jwt.InvalidTokenError('token was not issued to Google Chat')
+    if claims.get('email') not in senders or not claims.get('email_verified'):
+        raise jwt.InvalidTokenError('token was not issued to this Chat app')
     return claims
 
 

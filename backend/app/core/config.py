@@ -1,5 +1,6 @@
 import os
 import secrets
+from urllib.parse import urlparse
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -11,6 +12,12 @@ FRONTEND_DIST = ROOT / 'frontend' / 'dist' / 'client'  # TanStack Start SPA buil
 
 # Public URL people open TeamPulse at; used in links sent through Google Chat.
 APP_URL = os.getenv('APP_URL', 'http://127.0.0.1:8787').rstrip('/')
+# When APP_URL is a public address (a tunnel or a real host), requests that arrive on
+# that host may only reach the paths below, so the app itself is not exposed to the internet
+# through a tunnel. Set PUBLIC_HOST_OPEN=true on a real deployment that should serve the app.
+PUBLIC_HOST = (urlparse(APP_URL).hostname or '').lower()
+PUBLIC_HOST_RESTRICTED = PUBLIC_HOST not in ('', 'localhost', '127.0.0.1') and os.getenv('PUBLIC_HOST_OPEN', 'false').lower() != 'true'
+PUBLIC_PATHS = ('/api/integrations/google-chat/events', '/api/health')
 
 # ---- Identity ---------------------------------------------------------------
 # Only these email domains may register or be added as employees.
@@ -48,5 +55,7 @@ JWT_SECRET = _jwt_secret()
 # project number ("Project number" authentication) or the endpoint URL
 # ("HTTP endpoint URL" authentication) chosen in the Chat API configuration.
 GOOGLE_CHAT_AUDIENCE = os.getenv('GOOGLE_CHAT_AUDIENCE', '').strip()
+# The URL entered in the Chat API configuration. Workspace add-on style apps put it in the token as the audience.
+GOOGLE_CHAT_ENDPOINT = os.getenv('GOOGLE_CHAT_ENDPOINT', APP_URL + '/api/integrations/google-chat/events').strip()
 # Service-account key (JSON) the app uses to send messages on its own.
 GOOGLE_CHAT_SERVICE_ACCOUNT_FILE = os.getenv('GOOGLE_CHAT_SERVICE_ACCOUNT_FILE', '').strip()
