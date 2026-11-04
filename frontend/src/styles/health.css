@@ -54,13 +54,25 @@
   color: var(--signal);
 }
 .work-row.tone-green {
-  background: linear-gradient(90deg, oklch(98.2% 0.004 55), var(--color-surface) 52%);
+  background: linear-gradient(
+    90deg,
+    oklch(98.2% 0.004 55),
+    var(--color-surface) 52%
+  );
 }
 .work-row.tone-amber {
-  background: linear-gradient(90deg, oklch(98.9% 0.004 55), var(--color-surface) 52%);
+  background: linear-gradient(
+    90deg,
+    oklch(98.9% 0.004 55),
+    var(--color-surface) 52%
+  );
 }
 .work-row.tone-red {
-  background: linear-gradient(90deg, oklch(97.4% 0.004 55), var(--color-surface) 55%);
+  background: linear-gradient(
+    90deg,
+    oklch(97.4% 0.004 55),
+    var(--color-surface) 55%
+  );
 }
 .work-row.tone-neutral {
   background: var(--color-surface);
@@ -85,13 +97,13 @@
   flex-shrink: 0;
 }
 .health-label.green {
-  color: oklch(47.0% 0.085 150);
+  color: oklch(47% 0.085 150);
 }
 .health-label.amber {
-  color: oklch(47.0% 0.097 72);
+  color: oklch(47% 0.097 72);
 }
 .health-label.red {
-  color: oklch(47.0% 0.100 25);
+  color: oklch(47% 0.1 25);
 }
 .health-label.neutral {
   color: oklch(47.9% 0.012 40);
@@ -178,7 +190,7 @@
   padding: 8px 11px;
 }
 .context-tabs button.active {
-  color: oklch(30.0% 0.012 40);
+  color: oklch(30% 0.012 40);
   background: oklch(94.7% 0.007 55);
 }
 .context-tabs button:hover {
@@ -231,7 +243,7 @@
 .profile-identity > .eyebrow {
   font-size: var(--text-8);
   letter-spacing: 0.8px;
-  color: oklch(49.0% 0.012 40);
+  color: oklch(49% 0.012 40);
 }
 .profile-identity h2 {
   font-size: 26px;
@@ -250,8 +262,7 @@
 }
 .you-tag {
   display: inline-block;
-  font:
-    500 8px var(--font-body);
+  font: 500 8px var(--font-body);
   padding: 2px 6px;
   background: oklch(93.9% 0.007 55);
   border: 1px solid oklch(89.9% 0.009 55);
@@ -272,7 +283,7 @@
 }
 .reporting-line button {
   font-size: inherit;
-  color: oklch(30.0% 0.012 40);
+  color: oklch(30% 0.012 40);
   padding: 0;
 }
 .reporting-line button:disabled {
@@ -346,8 +357,7 @@
   color: oklch(52.1% 0.009 55);
 }
 .profile-stat > strong {
-  font:
-    600 28px var(--font-heading);
+  font: 600 28px var(--font-heading);
   color: oklch(44.2% 0.012 40);
   letter-spacing: -0.7px;
 }
@@ -390,7 +400,7 @@
 .profile-capacity h3,
 .profile-reports h3 {
   font-size: var(--text-13);
-  color: oklch(30.0% 0.012 40);
+  color: oklch(30% 0.012 40);
   font-weight: var(--weight-semibold);
 }
 .profile-capacity > p {
@@ -422,12 +432,12 @@
   line-height: 1.8;
   padding: 10px;
   border-radius: var(--radius-5);
-  background: oklch(98.0% 0.004 55);
+  background: oklch(98% 0.004 55);
   color: oklch(48.9% 0.012 40);
 }
 .profile-capacity h4 {
   font-size: var(--text-10);
-  color: oklch(49.0% 0.012 40);
+  color: oklch(49% 0.012 40);
   margin-top: 12px;
   font-weight: var(--weight-medium);
 }
@@ -456,7 +466,7 @@
 }
 .profile-reports > p {
   font-size: var(--text-10);
-  color: oklch(50.0% 0.012 40);
+  color: oklch(50% 0.012 40);
   padding: 17px 0;
 }
 .privacy-note {
@@ -490,8 +500,7 @@
   background: var(--color-surface);
 }
 .team-summary-number strong {
-  font:
-    600 31px var(--font-heading);
+  font: 600 31px var(--font-heading);
   color: oklch(45.7% 0.012 40);
 }
 .team-summary-number span {
@@ -564,7 +573,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-5);
-  color: oklch(30.0% 0.012 40);
+  color: oklch(30% 0.012 40);
 }
 .organization-intro {
   display: flex;
@@ -573,7 +582,11 @@
   border: 1px solid oklch(91.8% 0.007 55);
   border-radius: var(--radius-10);
   padding: 25px;
-  background: linear-gradient(110deg, oklch(96.0% 0.005 55), oklch(97.7% 0.004 55));
+  background: linear-gradient(
+    110deg,
+    oklch(96% 0.005 55),
+    oklch(97.7% 0.004 55)
+  );
   margin-bottom: 15px;
 }
 .organization-symbol {
@@ -591,11 +604,11 @@
   font-size: 19px;
   font-weight: var(--weight-semibold);
   letter-spacing: -0.5px;
-  color: oklch(30.0% 0.012 40);
+  color: oklch(30% 0.012 40);
 }
 .organization-intro p {
   font-size: var(--text-10);
-  color: oklch(49.0% 0.012 40);
+  color: oklch(49% 0.012 40);
   margin-top: 8px;
 }
 .org-count {
@@ -607,8 +620,7 @@
   color: oklch(50.1% 0.009 55);
 }
 .org-count strong {
-  font:
-    600 18px var(--font-heading);
+  font: 600 18px var(--font-heading);
   color: oklch(48.5% 0.012 40);
 }
 .org-count span {
@@ -677,7 +689,11 @@
   border-top: 1px solid oklch(91.5% 0.007 55);
 }
 .org-person.is-you {
-  background: linear-gradient(110deg, oklch(96.8% 0.004 55), var(--color-surface));
+  background: linear-gradient(
+    110deg,
+    oklch(96.8% 0.004 55),
+    var(--color-surface)
+  );
   border-color: oklch(90.2% 0.009 55);
 }
 .tree-expander {
@@ -762,7 +778,7 @@
 }
 .team-tree-heading h3 {
   font-size: var(--text-14);
-  color: oklch(30.0% 0.012 40);
+  color: oklch(30% 0.012 40);
   font-weight: var(--weight-semibold);
 }
 .team-tree-heading p {
@@ -1228,7 +1244,7 @@
 .org-toolbar-actions .inactive-toggle input {
   width: 12px;
   min-width: 12px;
-  accent-color: oklch(24.0% 0.012 40);
+  accent-color: oklch(24% 0.012 40);
 }
 
 .close-navigation {

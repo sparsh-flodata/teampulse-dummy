@@ -1,7 +1,7 @@
 import json
 from sqlalchemy import select,func
 from test_workflows import ctx,login,HEADERS
-from backend.app.models import Employee,WorkItem,Notification,UpdateRequest,AuditEvent
+from backend.app.models import Employee,WorkItem,Notification,UpdateRequest,AuditEvent,OutboxMessage
 from backend.app.seed.company import seed_company,DATA_PATH
 from backend.app.core.security import verify_password
 from backend.app.api.routes.auth import attempts
@@ -16,7 +16,7 @@ def test_chat_request_reaches_inbox_and_reply_updates_work(ctx):
     approved=c.post('/api/assistant/actions/'+str(draft['action']['id'])+'/decide',json={'approve':True})
     assert approved.status_code==200,approved.text
     request=approved.json()['requests'][0]
-    assert request['channel']=='in_app' and request['status']=='Delivered'
+    assert request['channel']=='google_chat' and request['status']=='Delivered'
     login(c,'rahul')
     inbox=c.get('/api/update-requests').json()
     assert inbox[0]['can_reply'] and inbox[0]['id']==request['id']
@@ -56,19 +56,17 @@ def test_pending_requests_are_reused_without_duplicate_notifications(ctx):
     assert third['id']!=first['id']
 
 
-def test_unconfigured_whatsapp_never_claims_delivery(ctx):
+def test_google_chat_without_a_connection_still_reaches_the_inbox(ctx):
     c,sessions=ctx
     login(c)
-    result=c.post('/api/update-requests',json={'recipient_ids':[2],'channel':'whatsapp'})
+    result=c.post('/api/update-requests',json={'recipient_ids':[2],'channel':'google_chat'})
     assert result.status_code==201,result.text
     request=result.json()[0]
-    assert request['status']=='Queued' and 'No external message' in request['delivery_detail']
+    assert request['status']=='Delivered' and 'Google Chat' in request['delivery_detail']
     with sessions() as db:
-        assert db.get(UpdateRequest,request['id']).delivered_at is None
-        assert not db.scalar(select(Notification.id).where(Notification.key==f'update-request:{request["id"]}'))
-    login(c,'rahul')
-    assert c.post('/api/update-requests/'+str(request['id'])+'/reply',json={'message':'Not delivered'}).status_code==409
-
+        assert db.scalar(select(Notification.id).where(Notification.key==f'update-request:{request["id"]}'))
+        assert not db.scalar(select(func.count(OutboxMessage.id)))
+    assert c.post('/api/update-requests',json={'recipient_ids':[2],'channel':'whatsapp'}).status_code==422
 
 def test_request_conversations_are_private_to_participants(ctx):
     c,_=ctx
@@ -149,8 +147,10 @@ def test_all_58_company_accounts_hierarchy_and_samples_are_idempotent(ctx):
         worker=people['kapil.sharma@flodataanalytics.com'].id
     for email in ('ujjwal@flodataanalytics.com','nitish.kumar@flodataanalytics.com','swati.kashyap@flodataanalytics.com','kapil.sharma@flodataanalytics.com'):
         attempts.clear()
+        c.headers.pop('Authorization',None)
         response=c.post('/api/auth/login',json={'email':email,'password':'test-password-2026!'})
         assert response.status_code==200,response.text
+        c.headers['Authorization']='Bearer '+response.json()['access_token']
         state=c.get('/api/state').json()
         assert len(state['teams'])==8 and len([p for p in state['directory'] if p['active']])==58
         assert state['organization_source']=='org-tree.json'
@@ -165,7 +165,7 @@ def test_all_58_company_accounts_hierarchy_and_samples_are_idempotent(ctx):
             assert state['profile_ids']==[worker]
             assert c.get('/api/people/'+str(Management)+'/profile').status_code==403
     attempts.clear()
-    c.post('/api/auth/login',json={'email':'nitish.kumar@flodataanalytics.com','password':'test-password-2026!'})
+    c.headers['Authorization']='Bearer '+c.post('/api/auth/login',json={'email':'nitish.kumar@flodataanalytics.com','password':'test-password-2026!'}).json()['access_token']
     ambiguity=c.post('/api/assistant/chat',json={'message':'Ask Piyush for a status update'}).json()
     assert ambiguity['action'] is None and 'several teammates' in ambiguity['reply']
     draft=c.post('/api/assistant/chat',json={'message':'Ask Kapil Sharma for an update about planning'}).json()

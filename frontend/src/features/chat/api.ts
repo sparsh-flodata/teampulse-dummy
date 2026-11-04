@@ -28,6 +28,9 @@ export type ChatResult = {
   reply: string;
   action: AgentAction | null;
   auto_applied?: boolean;
+  /** The graph agent that handled the message, e.g. "Dependency agent". */
+  agent?: string;
+  steps?: string[];
 };
 
 export const sendChat = (body: {

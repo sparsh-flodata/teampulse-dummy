@@ -193,4 +193,9 @@ export type AgentAction = {
   status: string;
 };
 
-export type ChatMessage = { role: string; message: string };
+export type ChatMessage = {
+  role: string;
+  message: string;
+  /** Which assistant agent answered (assistant messages only). */
+  agent?: string | null;
+};

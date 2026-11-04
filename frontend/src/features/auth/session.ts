@@ -142,7 +142,15 @@ function expireAccount(failedToken: string) {
 // ------------------------------------------------------------ account actions
 
 export async function signIn(email: string, password: string) {
-  const result = await authApi.login(email, password);
+  return remember(await authApi.login(email, password));
+}
+
+/** Creates the account, then keeps it signed in like signIn does. */
+export async function signUp(name: string, email: string, password: string) {
+  return remember(await authApi.register(name, email, password));
+}
+
+function remember(result: Awaited<ReturnType<typeof authApi.login>>) {
   addAccount({
     userId: result.user.id,
     email: result.user.email,

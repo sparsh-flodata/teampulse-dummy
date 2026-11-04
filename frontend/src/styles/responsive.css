@@ -35,7 +35,7 @@
   gap: var(--space-8);
   font-size: var(--text-13);
   font-weight: var(--weight-semibold);
-  color: oklch(30.0% 0.012 40);
+  color: oklch(30% 0.012 40);
 }
 .reporting-team-heading h3 > span {
   font-size: var(--text-10);
@@ -78,12 +78,12 @@
 }
 .report-avatar-button:hover,
 .report-avatar-more:hover {
-  background: oklch(96.0% 0.005 55);
+  background: oklch(96% 0.005 55);
   border-color: oklch(80.3% 0.009 55);
 }
 .report-avatar-button:focus-visible,
 .report-avatar-more:focus-visible {
-  outline: 2px solid oklch(24.0% 0.012 40);
+  outline: 2px solid oklch(24% 0.012 40);
   outline-offset: 3px;
 }
 .report-avatar-button .avatar {
@@ -92,7 +92,7 @@
 .report-avatar-more {
   font-size: var(--text-12);
   font-weight: var(--weight-semibold);
-  color: oklch(30.0% 0.012 40);
+  color: oklch(30% 0.012 40);
   background: oklch(95.5% 0.005 55);
 }
 .report-avatar-tooltip {
@@ -180,7 +180,7 @@
   font-size: var(--text-10);
   margin-top: 5px;
   line-height: 1.6;
-  color: oklch(47.0% 0.012 40);
+  color: oklch(47% 0.012 40);
 }
 
 @media (max-width: 900px) {
@@ -209,7 +209,7 @@
     font-size: var(--text-23);
   }
   .login-mobile-brand > span {
-    color: oklch(46.0% 0.012 40);
+    color: oklch(46% 0.012 40);
     font-size: var(--text-12);
     padding-left: 1px;
   }
@@ -225,7 +225,7 @@
     background: var(--color-surface);
     border: 1px solid oklch(92.4% 0.009 55);
     border-radius: var(--radius-16);
-    box-shadow: 0 10px 40px oklch(24.0% 0.012 40 / 0.031);
+    box-shadow: 0 10px 40px oklch(24% 0.012 40 / 0.031);
   }
   .login-form h2 {
     font-size: 28px;

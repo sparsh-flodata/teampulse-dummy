@@ -12,6 +12,7 @@ from backend.app.seed.pilot import seed
 from backend.app.db.migrations import migrate
 from backend.app.api.router import router
 from backend.app.core.config import FRONTEND_DIST
+from backend.app.channels.google_chat import process_outbox
 
 async def workflow_loop():
     while True:
@@ -25,6 +26,7 @@ async def workflow_loop():
 def workflow_tick():
     with SessionLocal() as db:
         run_workflows(db)
+        process_outbox(db)
 
 @asynccontextmanager
 async def lifespan(app):
@@ -42,13 +44,16 @@ async def lifespan(app):
     with suppress(asyncio.CancelledError):
         await task
 
-app = FastAPI(title='TeamPulse API', version='0.3.0', lifespan=lifespan)
+app = FastAPI(title='TeamPulse API', version='0.4.0', lifespan=lifespan)
 origins = os.getenv('ALLOWED_ORIGINS', 'http://127.0.0.1:5173,http://localhost:5173,http://127.0.0.1:8787,http://localhost:8787').split(',')
-app.add_middleware(CORSMiddleware, allow_origins=origins, allow_credentials=True, allow_methods=['GET', 'POST', 'PATCH'], allow_headers=['Content-Type', 'X-TeamPulse-Request'])
+app.add_middleware(CORSMiddleware, allow_origins=origins, allow_credentials=True, allow_methods=['GET', 'POST', 'PATCH', 'DELETE'], allow_headers=['Authorization', 'Content-Type', 'X-TeamPulse-Request'])
+
+# Called by Google, authenticated by Google's signed token instead of the app header.
+CSRF_EXEMPT = ('/api/integrations/google-chat/events',)
 
 @app.middleware('http')
 async def request_guard(request: Request, call_next):
-    if request.url.path.startswith('/api') and request.method not in ('GET', 'HEAD', 'OPTIONS'):
+    if request.url.path.startswith('/api') and request.method not in ('GET', 'HEAD', 'OPTIONS') and request.url.path not in CSRF_EXEMPT:
         if request.headers.get('X-TeamPulse-Request') != '1' or (request.headers.get('Origin') and request.headers['Origin'] not in origins):
             return JSONResponse(status_code=403, content={'detail': 'This request did not originate from TeamPulse.'})
     response = await call_next(request)

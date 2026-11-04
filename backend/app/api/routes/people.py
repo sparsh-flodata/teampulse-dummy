@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from backend.app.db.session import get_db
 from backend.app.models import Team, Employee
 from backend.app.schemas import Availability, EmployeeCreate
-from backend.app.core.security import current_user, hash_password, require_manager
+from backend.app.core.security import current_user, find_employee_by_email, hash_password, require_allowed_email, require_manager
 from backend.app.core.access import validate_manager
 from backend.app.services.work import today, serialize_person, audit
 
@@ -27,6 +27,9 @@ def add_employee(body: EmployeeCreate, user: Employee = Depends(current_user), d
         raise HTTPException(422, 'Team not found.')
     if user.role != 'admin' and (body.role != 'employee' or body.team_id != user.team_id or body.manager_id not in (None, user.id)):
         raise HTTPException(403, 'Managers can add employees to their own team and reporting line. Administrators manage other roles.')
+    require_allowed_email(body.email)
+    if find_employee_by_email(db, body.email):
+        raise HTTPException(409, 'An account with this email already exists.')
     data = body.model_dump(exclude={'password', 'manager_id'})
     manager_id = body.manager_id if user.role == 'admin' and body.manager_id is not None else user.id
     validate_manager(db, -1, manager_id)

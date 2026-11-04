@@ -7,4 +7,5 @@ export const queryKeys = {
   profile: (personId: number) => ["people", personId, "profile"] as const,
   updateRequests: ["update-requests"] as const,
   assistantHistory: ["assistant", "history"] as const,
+  googleChat: ["integrations", "google-chat"] as const,
 };

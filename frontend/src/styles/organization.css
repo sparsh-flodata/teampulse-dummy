@@ -81,10 +81,10 @@
 .department-branch .team-tree-members small {
   font-size: var(--text-8);
   line-height: 1.7;
-  color: oklch(48.0% 0.012 40);
+  color: oklch(48% 0.012 40);
 }
 .project-collaboration {
-  color: oklch(46.0% 0.012 40);
+  color: oklch(46% 0.012 40);
   font-size: var(--text-9);
   margin: 13px 0 0;
 }

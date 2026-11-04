@@ -7,7 +7,7 @@ from backend.app.models import Employee, UpdateRequest, now
 from backend.app.schemas import WorkPatch
 from backend.app.core.access import profile_ids
 from backend.app.services.work import audit, patch_work, get_work, serialize_work, visible_work
-from backend.app.channels.delivery import CHANNELS
+from backend.app.channels.delivery import CHANNELS, CHANNEL_LABELS
 
 
 def allowed_recipients(db,user):
@@ -35,7 +35,7 @@ def create_requests(db,user,ids,prompt,channel='in_app'):
         db.add(request);db.flush()
         result=CHANNELS[channel].prepare(db,request,user,person)
         request.status=result.state;request.delivery_detail=result.detail
-        audit(db,user,f'Requested a work update from {person.name} through {"TeamPulse inbox" if channel=="in_app" else "an unconfigured WhatsApp channel"}.')
+        audit(db,user,f'Requested a work update from {person.name} through {CHANNEL_LABELS[channel]}.')
         records.append(request)
     db.flush()
     return records
@@ -100,7 +100,7 @@ def coordination_intent(db,user,message,selected_ids=None):
         focus=re.search(r'\b(?:about|regarding)\s+(.+)',message,re.I)
         prompt=('Please share an update about '+focus.group(1).strip()+', including progress, expected completion, and any blockers.') if focus else 'Please share a brief update on your current work, expected completion, and any blockers.'
         names=', '.join(p.name for p in people[:4])+(' and '+str(len(people)-4)+' more' if len(people)>4 else '')
-        return {'reply':f'I can request updates from {names}. Confirm below to deliver the request to their TeamPulse inbox. WhatsApp is not connected yet.','proposal':{'kind':'request_updates','recipient_ids':[p.id for p in people],'request_prompt':prompt,'channel':'in_app'}}
+        return {'reply':f'I can request updates from {names}. Confirm below to deliver the request to their TeamPulse inbox and, where they have connected it, Google Chat.','proposal':{'kind':'request_updates','recipient_ids':[p.id for p in people],'request_prompt':prompt,'channel':'google_chat'}}
     if re.search(r'\b(who is blocked|who.s blocked|team summary|team overview|summarize my team)\b',text):
         works=[serialize_work(db,w) for w in visible_work(db,user) if w.owner_id in profile_ids(db,user) and w.status!='Completed']
         if 'blocked' in text:works=[w for w in works if w['status'] in ('Blocked','Partially Blocked')]

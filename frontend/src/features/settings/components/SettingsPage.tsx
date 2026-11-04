@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useForm } from "@tanstack/react-form";
 import { Settings, Sparkles, ShieldCheck } from "lucide-react";
 import { SubmitButton } from "@/components/ui";
+import { GoogleChatPanel } from "./GoogleChatPanel";
 import { bind, errorMessage } from "@/lib/forms";
 import { useWorkspace, useWorkspaceMutation } from "@/features/workspace/hooks";
 import {
@@ -164,6 +165,7 @@ export function SettingsPage() {
             <li>Delivery dates retain their revision history.</li>
           </ul>
         </section>
+        <GoogleChatPanel />
         <section className="panel assistant-status">
           <Sparkles size={20} />
           <div>

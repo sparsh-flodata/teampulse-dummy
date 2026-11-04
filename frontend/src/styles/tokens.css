@@ -44,7 +44,8 @@
   --shade: 32% 0.03 50;
   --lit: 100% 0.005 80;
   --edge-stock:
-    inset 0 1px 0 oklch(var(--lit) / 0.9), inset 0 -1px 0 oklch(var(--shade) / 0.07),
+    inset 0 1px 0 oklch(var(--lit) / 0.9),
+    inset 0 -1px 0 oklch(var(--shade) / 0.07),
     0 0 0 0.5px oklch(var(--shade) / 0.22), 0 1px 0 oklch(var(--shade) / 0.12);
   --cast-stock: 6px 5px 10px -6px oklch(var(--shade) / 0.3);
 
@@ -135,6 +136,8 @@
 
   /* Elevation */
   --shadow-card: var(--edge-stock), var(--cast-stock);
-  --shadow-popover: 0 14px 40px -12px oklch(var(--shade) / 0.35), 0 0 0 0.5px oklch(var(--shade) / 0.22);
+  --shadow-popover:
+    0 14px 40px -12px oklch(var(--shade) / 0.35),
+    0 0 0 0.5px oklch(var(--shade) / 0.22);
   --color-popover-border: var(--color-rule);
 }

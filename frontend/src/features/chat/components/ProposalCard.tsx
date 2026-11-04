@@ -11,8 +11,16 @@ const FIELD_LABELS: Record<string, string> = {
   effort_hours: "Estimated effort",
   remaining_hours: "Remaining effort",
   status: "Status",
+  owner_id: "Waiting on",
+  deliverable: "Needs",
+  partial: "Blocking",
 };
 const HIDDEN = ["kind", "note", "recipient_ids", "request_prompt", "channel"];
+const TITLES: Record<string, string> = {
+  create: "New commitment",
+  update: "Update your work",
+  dependency: "Record a dependency",
+};
 
 export function ProposalCard({
   action,
@@ -57,31 +65,41 @@ export function ProposalCard({
           </p>
           <small>
             <Link2 size={12} />
-            {payload.channel === "whatsapp"
-              ? "WhatsApp is not configured. This will queue without sending."
+            {payload.channel === "google_chat"
+              ? "Delivery: TeamPulse inbox, plus Google Chat for people who connected it"
               : "Delivery: TeamPulse in-app inbox"}
           </small>
         </>
       ) : (
         <>
-          <h3>
-            {payload.kind === "create" ? "New commitment" : "Update your work"}
-          </h3>
+          <h3>{TITLES[String(payload.kind)] ?? "Proposed change"}</h3>
           {Object.entries(payload)
-            .filter(([k, v]) => v !== null && v !== "" && !HIDDEN.includes(k))
+            .filter(
+              ([k, v]) =>
+                v !== null &&
+                v !== "" &&
+                !HIDDEN.includes(k) &&
+                (k !== "partial" || payload.kind === "dependency"),
+            )
             .map(([k, v]) => (
               <div className="proposal-field" key={k}>
                 <span>{FIELD_LABELS[k] || k}</span>
                 <strong>
                   {k === "work_item_id"
                     ? state.work.find((w) => w.id === Number(v))?.title
-                    : k === "project_id"
-                      ? state.projects.find((p) => p.id === Number(v))?.name
-                      : k === "progress"
-                        ? v + "%"
-                        : k.endsWith("hours")
-                          ? v + "h"
-                          : String(v)}
+                    : k === "owner_id"
+                      ? state.directory.find((p) => p.id === Number(v))?.name
+                      : k === "partial"
+                        ? v
+                          ? "Partly, other work can continue"
+                          : "Fully"
+                        : k === "project_id"
+                          ? state.projects.find((p) => p.id === Number(v))?.name
+                          : k === "progress"
+                            ? v + "%"
+                            : k.endsWith("hours")
+                              ? v + "h"
+                              : String(v)}
                 </strong>
               </div>
             ))}

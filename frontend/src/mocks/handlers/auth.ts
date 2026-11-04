@@ -51,6 +51,22 @@ export const authHandlers = [
     return HttpResponse.json(saved({ ...issue(user.id), user }));
   }),
 
+  // Sign-up needs the real backend: mock accounts come from the captured seed.
+  http.post(`${API}/auth/register`, () =>
+    fail(501, "Registration needs the real backend. Set VITE_API_MOCKS=false."),
+  ),
+
+  http.get(`${API}/integrations/google-chat`, ({ request }) =>
+    authUser(request) === null
+      ? unauthorized()
+      : HttpResponse.json({
+          inbound: false,
+          outbound: false,
+          connected: false,
+          connected_at: null,
+        }),
+  ),
+
   http.post(`${API}/auth/refresh`, async ({ request }) => {
     const { refresh_token = "" } = (await request.json()) as {
       refresh_token?: string;

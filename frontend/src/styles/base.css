@@ -104,7 +104,7 @@ svg {
   padding: 0;
 }
 .icon-button:hover {
-  background: oklch(95.0% 0.004 55);
+  background: oklch(95% 0.004 55);
   color: var(--color-brand);
 }
 .button {
@@ -129,10 +129,10 @@ svg {
   background: var(--color-brand);
   color: var(--color-on-brand);
   border-color: var(--color-brand);
-  box-shadow: 0 3px 5px oklch(24.0% 0.012 40 / 0.082);
+  box-shadow: 0 3px 5px oklch(24% 0.012 40 / 0.082);
 }
 .button.primary:hover {
-  background: oklch(24.0% 0.012 40);
+  background: oklch(24% 0.012 40);
   transform: translateY(-1px);
 }
 .button.small {
@@ -159,7 +159,7 @@ svg {
   font-size: 22px;
   font-weight: var(--weight-extrabold);
   letter-spacing: -0.9px;
-  color: oklch(24.0% 0.012 40);
+  color: oklch(24% 0.012 40);
 }
 .brand-light {
   font-weight: var(--weight-medium);
@@ -181,7 +181,7 @@ svg {
   width: 34px;
   height: 34px;
   border-radius: var(--radius-10);
-  box-shadow: 0 4px 10px oklch(24.0% 0.012 40 / 0.125);
+  box-shadow: 0 4px 10px oklch(24% 0.012 40 / 0.125);
 }
 .avatar {
   --avatar-color: var(--color-brand);
@@ -206,7 +206,7 @@ svg {
 .live-dot {
   width: 6px;
   height: 6px;
-  background: oklch(69.2% 0.080 150);
+  background: oklch(69.2% 0.08 150);
   border-radius: var(--radius-round);
   display: inline-block;
   flex-shrink: 0;
@@ -215,10 +215,10 @@ svg {
   box-shadow: 0 0 0 3px oklch(64.5% 0.085 150 / 0.055);
 }
 .red-text {
-  color: oklch(47.0% 0.117 25) !important;
+  color: oklch(47% 0.117 25) !important;
 }
 .green-text {
-  color: oklch(47.0% 0.083 150);
+  color: oklch(47% 0.083 150);
 }
 .badge {
   display: inline-flex;
@@ -240,22 +240,22 @@ svg {
   background: currentColor;
 }
 .badge.green {
-  color: oklch(47.0% 0.080 150);
+  color: oklch(47% 0.08 150);
   background: oklch(96.5% 0.004 55);
   border-color: oklch(93.8% 0.005 55);
 }
 .badge.purple {
-  color: oklch(30.0% 0.012 40);
+  color: oklch(30% 0.012 40);
   background: oklch(95.8% 0.005 55);
   border-color: oklch(92.5% 0.008 55);
 }
 .badge.red {
-  color: oklch(47.0% 0.121 25);
+  color: oklch(47% 0.121 25);
   background: oklch(96.2% 0.004 55);
   border-color: oklch(92.7% 0.006 55);
 }
 .badge.amber {
-  color: oklch(47.0% 0.092 72);
+  color: oklch(47% 0.092 72);
   background: oklch(97.2% 0.005 55);
   border-color: oklch(94.2% 0.026 72);
 }
@@ -271,9 +271,8 @@ svg {
   border-radius: var(--radius-5);
   padding: 2px 6px;
   background: oklch(95.6% 0.004 55);
-  color: oklch(30.0% 0.012 40);
-  font:
-    500 10px var(--font-body);
+  color: oklch(30% 0.012 40);
+  font: 500 10px var(--font-body);
   margin-left: 8px;
 }
 .app-shell {
@@ -319,7 +318,7 @@ svg {
   width: 29px;
   height: 29px;
   background: oklch(95.3% 0.005 55);
-  color: oklch(30.0% 0.012 40);
+  color: oklch(30% 0.012 40);
   border-radius: var(--radius-7);
   font-size: var(--text-16);
   font-weight: var(--weight-bold);
@@ -332,7 +331,7 @@ svg {
   bottom: 0;
   right: 0;
   border-radius: var(--radius-round);
-  background: oklch(71.6% 0.080 150);
+  background: oklch(71.6% 0.08 150);
 }
 .workspace-switch strong {
   font-size: var(--text-11);
@@ -377,7 +376,7 @@ svg {
 }
 .sidebar nav > button.active {
   background: oklch(94.7% 0.007 55);
-  color: oklch(30.0% 0.012 40);
+  color: oklch(30% 0.012 40);
   font-weight: var(--weight-semibold);
 }
 .sidebar nav > button.active:before {
@@ -396,7 +395,7 @@ svg {
   font-weight: var(--weight-medium);
 }
 .sidebar nav b {
-  color: oklch(30.0% 0.012 40);
+  color: oklch(30% 0.012 40);
   background: oklch(92.2% 0.009 55);
   border-radius: var(--radius-4);
   padding: 2px 5px;
@@ -436,14 +435,19 @@ svg {
   padding-top: 30px;
 }
 .sidebar-assistant {
-  background: linear-gradient(110deg, oklch(96.9% 0.005 55), oklch(96.9% 0.004 55) 65%, oklch(98.5% 0.004 55));
+  background: linear-gradient(
+    110deg,
+    oklch(96.9% 0.005 55),
+    oklch(96.9% 0.004 55) 65%,
+    oklch(98.5% 0.004 55)
+  );
   border: 1px solid oklch(93.9% 0.008 55);
   border-radius: var(--radius-8);
   padding: 15px 12px 12px;
   margin-bottom: 14px;
 }
 .assistant-stars {
-  color: oklch(30.0% 0.012 40);
+  color: oklch(30% 0.012 40);
   display: block;
   margin-bottom: 8px;
 }
@@ -466,7 +470,7 @@ svg {
   justify-content: space-between;
   align-items: center;
   padding: 7px 9px;
-  color: oklch(30.0% 0.012 40);
+  color: oklch(30% 0.012 40);
   font-size: var(--text-9);
   font-weight: var(--weight-semibold);
 }
@@ -482,7 +486,7 @@ svg {
 }
 .settings-link:hover,
 .settings-link.active {
-  background: oklch(97.0% 0.004 55);
+  background: oklch(97% 0.004 55);
   color: var(--color-brand);
 }
 .sidebar-user {
@@ -565,8 +569,7 @@ svg {
   padding: 2px 5px;
   border: 1px solid oklch(94.3% 0.004 55);
   border-radius: var(--radius-3);
-  font:
-    8px var(--font-body);
+  font: 8px var(--font-body);
   color: oklch(51.8% 0.007 55);
 }
 .topbar-divider {
@@ -582,7 +585,7 @@ svg {
   position: absolute;
   right: 6px;
   top: 4px;
-  background: oklch(24.0% 0.012 40);
+  background: oklch(24% 0.012 40);
   border: 2px solid var(--color-surface);
   border-radius: var(--radius-round);
   height: 7px;
@@ -656,7 +659,12 @@ svg {
   align-items: center;
   gap: 14px;
   border: 1px solid oklch(91.9% 0.009 55);
-  background: linear-gradient(105deg, oklch(96.0% 0.005 55), oklch(96.7% 0.004 55) 65%, oklch(98.0% 0.004 55));
+  background: linear-gradient(
+    105deg,
+    oklch(96% 0.005 55),
+    oklch(96.7% 0.004 55) 65%,
+    oklch(98% 0.004 55)
+  );
   border-radius: var(--radius-9);
   padding: 17px 20px;
   margin-bottom: 14px;
@@ -670,7 +678,7 @@ svg {
   width: 39px;
   height: 39px;
   border-radius: var(--radius-10);
-  color: oklch(30.0% 0.012 40);
+  color: oklch(30% 0.012 40);
 }
 .pulse-banner-symbol i {
   position: absolute;
@@ -679,8 +687,8 @@ svg {
   border-radius: var(--radius-round);
   right: 0;
   bottom: 0;
-  background: oklch(75.5% 0.080 150);
-  border: 2px solid oklch(95.0% 0.007 55);
+  background: oklch(75.5% 0.08 150);
+  border: 2px solid oklch(95% 0.007 55);
 }
 .pulse-banner strong {
   font-size: var(--text-11);
@@ -700,7 +708,7 @@ svg {
   white-space: nowrap;
   font-size: var(--text-10);
   font-weight: var(--weight-semibold);
-  color: oklch(30.0% 0.012 40);
+  color: oklch(30% 0.012 40);
   padding: 8px;
   border-radius: var(--radius-5);
 }
@@ -737,18 +745,18 @@ svg {
   justify-content: center;
   border-radius: var(--radius-7);
   background: oklch(96.3% 0.005 55);
-  color: oklch(30.0% 0.012 40);
+  color: oklch(30% 0.012 40);
 }
 .stat-card.amber .stat-icon {
-  color: oklch(47.0% 0.082 72);
+  color: oklch(47% 0.082 72);
   background: oklch(97.5% 0.005 55);
 }
 .stat-card.rose .stat-icon {
-  color: oklch(47.0% 0.080 25);
+  color: oklch(47% 0.08 25);
   background: oklch(96.5% 0.004 55);
 }
 .stat-card.sage .stat-icon {
-  color: oklch(47.0% 0.080 150);
+  color: oklch(47% 0.08 150);
   background: oklch(96.5% 0.004 55);
 }
 .stat-card > strong {
@@ -844,7 +852,7 @@ svg {
 }
 .segmented button.active {
   background: var(--color-surface);
-  color: oklch(30.0% 0.012 40);
+  color: oklch(30% 0.012 40);
   box-shadow: 0 1px 4px oklch(38.3% 0.012 40 / 0.043);
 }
 .segmented button:hover {
@@ -884,7 +892,7 @@ svg {
   background: oklch(98.4% 0.004 55);
   border-top: 1px solid oklch(95.1% 0.004 55);
   border-bottom: 1px solid oklch(95.1% 0.004 55);
-  color: oklch(47.0% 0.012 40);
+  color: oklch(47% 0.012 40);
   font-weight: var(--weight-medium);
   font-size: var(--text-9);
   white-space: nowrap;
@@ -897,7 +905,7 @@ svg {
 }
 .work-table td {
   padding: 15px 10px;
-  border-bottom: 1px solid oklch(96.0% 0.004 55);
+  border-bottom: 1px solid oklch(96% 0.004 55);
   vertical-align: middle;
 }
 .work-table td:first-child {
@@ -967,7 +975,7 @@ svg {
 .health {
   display: block;
   font-size: var(--text-7);
-  color: oklch(47.0% 0.080 72);
+  color: oklch(47% 0.08 72);
   margin-top: 5px;
   max-width: 100px;
 }
@@ -1019,8 +1027,13 @@ svg {
   color: oklch(47.7% 0.012 40);
 }
 .briefing-card {
-  background: linear-gradient(150deg, oklch(96.7% 0.004 55), oklch(95.8% 0.005 55) 70%, oklch(96.7% 0.004 55));
-  border: 1px solid oklch(92.0% 0.009 55);
+  background: linear-gradient(
+    150deg,
+    oklch(96.7% 0.004 55),
+    oklch(95.8% 0.005 55) 70%,
+    oklch(96.7% 0.004 55)
+  );
+  border: 1px solid oklch(92% 0.009 55);
   border-radius: var(--radius-9);
   padding: 21px 19px 14px;
 }
@@ -1037,12 +1050,12 @@ svg {
   font-size: var(--text-23);
   font-weight: var(--weight-semibold);
   letter-spacing: -0.8px;
-  color: oklch(41.0% 0.012 40);
+  color: oklch(41% 0.012 40);
   line-height: 1.4;
   margin: 12px 0 8px;
 }
 .briefing-intro {
-  color: oklch(48.0% 0.012 40);
+  color: oklch(48% 0.012 40);
   font-size: var(--text-9);
   line-height: 1.7;
 }
@@ -1127,8 +1140,7 @@ svg {
   gap: 14px;
 }
 .plan-coverage strong {
-  font:
-    600 29px var(--font-heading);
+  font: 600 29px var(--font-heading);
   letter-spacing: -0.8px;
   color: oklch(43.9% 0.012 40);
 }
@@ -1354,7 +1366,7 @@ svg {
   display: flex;
   align-items: center;
   gap: var(--space-8);
-  color: oklch(30.0% 0.012 40);
+  color: oklch(30% 0.012 40);
   font-size: var(--text-9);
 }
 .active-filter button {
@@ -1423,7 +1435,7 @@ svg {
   font-size: var(--text-16);
   margin: 15px 0 9px;
   letter-spacing: -0.3px;
-  color: oklch(30.0% 0.012 40);
+  color: oklch(30% 0.012 40);
 }
 .project-card p {
   font-size: var(--text-11);
@@ -1530,7 +1542,7 @@ svg {
   border: 1px solid oklch(92.6% 0.007 55);
   padding: 16px 20px;
   border-radius: var(--radius-8);
-  background: oklch(97.0% 0.004 55);
+  background: oklch(97% 0.004 55);
   color: oklch(49.2% 0.012 40);
 }
 .info-strip p {
@@ -1544,29 +1556,33 @@ svg {
   gap: 12px;
   margin-bottom: 16px;
   padding: 25px 27px;
-  background: linear-gradient(105deg, oklch(96.9% 0.004 55), oklch(98.0% 0.004 55));
-  border: 1px solid oklch(94.0% 0.004 55);
+  background: linear-gradient(
+    105deg,
+    oklch(96.9% 0.004 55),
+    oklch(98% 0.004 55)
+  );
+  border: 1px solid oklch(94% 0.004 55);
   border-radius: var(--radius-10);
 }
 .capacity-explainer .eyebrow {
   font-size: var(--text-8);
-  color: oklch(47.0% 0.080 150);
+  color: oklch(47% 0.08 150);
 }
 .capacity-explainer h2 {
   font-size: 18px;
   font-weight: var(--weight-medium);
-  color: oklch(47.0% 0.080 150);
+  color: oklch(47% 0.08 150);
   margin-top: 9px;
   letter-spacing: -0.4px;
 }
 .capacity-explainer p {
   font-size: var(--text-11);
-  color: oklch(47.0% 0.080 150);
+  color: oklch(47% 0.08 150);
   margin-top: 9px;
 }
 .capacity-explainer > span {
   font-size: var(--text-9);
-  color: oklch(47.0% 0.080 150);
+  color: oklch(47% 0.08 150);
   display: flex;
   align-items: center;
   gap: var(--space-7);
@@ -1592,7 +1608,7 @@ svg {
 }
 .person-card h3 {
   font-size: var(--text-15);
-  color: oklch(30.0% 0.012 40);
+  color: oklch(30% 0.012 40);
   margin: 12px 0 5px;
   font-weight: var(--weight-semibold);
 }
@@ -1648,7 +1664,7 @@ svg {
 .skill-tags span {
   color: oklch(50.5% 0.009 55);
   border-radius: var(--radius-4);
-  background: oklch(98.0% 0.004 55);
+  background: oklch(98% 0.004 55);
   padding: 4px 6px;
   font-size: var(--text-8);
 }
@@ -1704,7 +1720,7 @@ svg {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: oklch(97.0% 0.004 55);
+  background: oklch(97% 0.004 55);
 }
 .my-capacity h3 {
   font-size: 17px;
@@ -1795,7 +1811,7 @@ svg {
   max-height: calc(100dvh - 70px);
   background: var(--color-surface);
   border-radius: 14px;
-  box-shadow: 0 25px 100px oklch(23.0% 0.012 40 / 0.149);
+  box-shadow: 0 25px 100px oklch(23% 0.012 40 / 0.149);
   overflow: auto;
   outline: none;
   animation: appear 0.15s ease;
@@ -1886,7 +1902,7 @@ svg {
   color: oklch(47.8% 0.012 40);
   line-height: 1.8;
   padding: 11px 12px;
-  background: oklch(98.0% 0.004 55);
+  background: oklch(98% 0.004 55);
   border-radius: var(--radius-6);
   font-weight: var(--weight-regular);
 }
@@ -1911,7 +1927,7 @@ svg {
   max-width: 230px;
 }
 .error {
-  color: oklch(47.0% 0.092 25);
+  color: oklch(47% 0.092 25);
   font-size: var(--text-11);
   line-height: 1.7;
   padding: 10px 12px;
@@ -1930,7 +1946,7 @@ svg {
 }
 .connection-error .text-button {
   margin-left: auto;
-  color: oklch(47.0% 0.092 25);
+  color: oklch(47% 0.092 25);
 }
 .checkbox {
   flex-direction: row !important;
@@ -2013,7 +2029,7 @@ svg {
   align-items: center;
 }
 .tabs > button.active {
-  color: oklch(30.0% 0.012 40);
+  color: oklch(30% 0.012 40);
   border-color: oklch(69.7% 0.009 55);
 }
 .tabs > button > span {
@@ -2045,7 +2061,7 @@ svg {
   display: flex;
   gap: var(--space-11);
   align-items: flex-start;
-  border-left: 1px solid oklch(92.0% 0.008 55);
+  border-left: 1px solid oklch(92% 0.008 55);
   padding-left: 0;
   margin-left: 6px;
   padding-bottom: 20px;
@@ -2103,7 +2119,7 @@ svg {
   padding: 14px 0;
   border-bottom: 1px solid oklch(94.6% 0.005 55);
   font-size: var(--text-11);
-  color: oklch(30.0% 0.012 40);
+  color: oklch(30% 0.012 40);
 }
 .profile-work > button > span:first-child {
   flex: 1;
@@ -2132,7 +2148,7 @@ svg {
 .assistant-backdrop {
   position: fixed;
   inset: 0;
-  background: oklch(23.0% 0.012 40 / 0.145);
+  background: oklch(23% 0.012 40 / 0.145);
   z-index: 110;
   display: flex;
   justify-content: flex-end;
@@ -2162,7 +2178,7 @@ svg {
   border-radius: var(--radius-10);
   width: 37px;
   height: 37px;
-  color: oklch(30.0% 0.012 40);
+  color: oklch(30% 0.012 40);
 }
 .assistant-head h3 {
   font-size: var(--text-13);
@@ -2186,7 +2202,7 @@ svg {
   gap: 12px;
 }
 .assistant-context label {
-  color: oklch(50.0% 0.009 55);
+  color: oklch(50% 0.009 55);
   font-size: var(--text-10);
   white-space: nowrap;
 }
@@ -2209,7 +2225,11 @@ svg {
   width: 75px;
   height: 75px;
   border-radius: var(--radius-round);
-  background: radial-gradient(circle, oklch(96.1% 0.006 55), oklch(97.8% 0.004 55));
+  background: radial-gradient(
+    circle,
+    oklch(96.1% 0.006 55),
+    oklch(97.8% 0.004 55)
+  );
   color: oklch(51.9% 0.009 55);
   border: 1px solid oklch(93.7% 0.009 55);
   margin: 0 auto 14px;
@@ -2261,14 +2281,14 @@ svg {
 }
 .chat-message.assistant {
   background: oklch(97.5% 0.004 55);
-  color: oklch(30.0% 0.012 40);
+  color: oklch(30% 0.012 40);
   border: 1px solid oklch(94.2% 0.007 55);
   border-top-left-radius: 2px;
 }
 .chat-message.user {
   margin-left: 35px;
   background: oklch(93.5% 0.008 55);
-  color: oklch(30.0% 0.012 40);
+  color: oklch(30% 0.012 40);
   border-bottom-right-radius: 2px;
 }
 .chat-author {
@@ -2297,10 +2317,10 @@ svg {
   align-items: flex-start;
   justify-content: space-between;
   gap: var(--space-15);
-  border-bottom: 1px solid oklch(94.0% 0.007 55);
+  border-bottom: 1px solid oklch(94% 0.007 55);
   padding: 7px 0;
   font-size: var(--text-11);
-  color: oklch(52.0% 0.009 55);
+  color: oklch(52% 0.009 55);
 }
 .proposal-field span {
   text-transform: capitalize;
@@ -2332,7 +2352,7 @@ svg {
   outline: none;
   resize: none;
   flex: 1;
-  color: oklch(30.0% 0.012 40);
+  color: oklch(30% 0.012 40);
   min-width: 0;
 }
 .chat-input textarea::placeholder {
@@ -2345,7 +2365,7 @@ svg {
   align-items: center;
   justify-content: center;
   border-radius: var(--radius-7);
-  background: oklch(24.0% 0.012 40);
+  background: oklch(24% 0.012 40);
   color: var(--color-surface);
   margin-left: 7px;
 }
@@ -2442,7 +2462,7 @@ svg {
   bottom: 26px;
   transform: translateX(-50%);
   background: var(--color-surface);
-  border: 1px solid oklch(91.0% 0.008 55);
+  border: 1px solid oklch(91% 0.008 55);
   border-radius: var(--radius-9);
   box-shadow: 0 5px 30px oklch(37.5% 0.012 40 / 0.09);
   padding: 12px 14px;
@@ -2450,7 +2470,7 @@ svg {
   align-items: center;
   gap: var(--space-10);
   font-size: var(--text-11);
-  color: oklch(46.0% 0.012 40);
+  color: oklch(46% 0.012 40);
   max-width: calc(100% - 40px);
   z-index: 150;
 }
@@ -2462,7 +2482,7 @@ svg {
   justify-content: center;
   border-radius: var(--radius-round);
   background: oklch(96.6% 0.004 55);
-  color: oklch(47.0% 0.080 150);
+  color: oklch(47% 0.08 150);
 }
 .boot {
   height: 100vh;
@@ -2488,7 +2508,12 @@ svg {
 }
 .login-story {
   padding: 44px 60px;
-  background: linear-gradient(145deg, oklch(96.3% 0.005 55), oklch(94.3% 0.006 55) 60%, oklch(96.3% 0.005 55));
+  background: linear-gradient(
+    145deg,
+    oklch(96.3% 0.005 55),
+    oklch(94.3% 0.006 55) 60%,
+    oklch(96.3% 0.005 55)
+  );
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -2501,7 +2526,7 @@ svg {
   font-size: var(--text-9);
   letter-spacing: 1px;
   text-transform: uppercase;
-  color: oklch(49.0% 0.012 40);
+  color: oklch(49% 0.012 40);
   margin-top: 47px;
 }
 .login-story > h1 {
@@ -2509,7 +2534,7 @@ svg {
   line-height: 1.3;
   font-weight: var(--weight-semibold);
   letter-spacing: -1.5px;
-  color: oklch(30.0% 0.012 40);
+  color: oklch(30% 0.012 40);
   margin-top: 12px;
 }
 .login-story > p {
@@ -2549,12 +2574,16 @@ svg {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(145deg, oklch(77.5% 0.009 55), oklch(24.0% 0.012 40));
+  background: linear-gradient(
+    145deg,
+    oklch(77.5% 0.009 55),
+    oklch(24% 0.012 40)
+  );
   color: var(--color-surface);
   width: 99px;
   height: 99px;
   border-radius: 29px;
-  box-shadow: 0 15px 50px oklch(24.0% 0.012 40 / 0.133);
+  box-shadow: 0 15px 50px oklch(24% 0.012 40 / 0.133);
   transform: rotate(-8deg);
 }
 .floating-card {
@@ -2563,7 +2592,7 @@ svg {
   border: 1px solid var(--color-surface);
   border-radius: var(--radius-10);
   padding: 14px;
-  box-shadow: 0 7px 35px oklch(24.0% 0.012 40 / 0.082);
+  box-shadow: 0 7px 35px oklch(24% 0.012 40 / 0.082);
   display: flex;
   align-items: center;
   gap: var(--space-10);
@@ -2581,7 +2610,7 @@ svg {
   width: 30px;
   height: 30px;
   background: oklch(94.9% 0.007 55);
-  color: oklch(30.0% 0.012 40);
+  color: oklch(30% 0.012 40);
   border-radius: var(--radius-round);
   display: flex;
   align-items: center;
@@ -2630,7 +2659,7 @@ svg {
   font-size: 30px;
   font-weight: var(--weight-semibold);
   letter-spacing: -1px;
-  color: oklch(30.0% 0.012 40);
+  color: oklch(30% 0.012 40);
   margin-top: 14px;
 }
 .login-form > p {
@@ -2647,8 +2676,8 @@ svg {
 }
 .login-form .form > .button {
   padding: 13px;
-  background: oklch(24.0% 0.012 40);
-  border-color: oklch(24.0% 0.012 40);
+  background: oklch(24% 0.012 40);
+  border-color: oklch(24% 0.012 40);
   font-size: var(--text-11);
   justify-content: space-between;
 }
@@ -2657,17 +2686,17 @@ svg {
   align-items: flex-start;
   gap: var(--space-10);
   padding: 16px;
-  border: 1px solid oklch(93.0% 0.008 55);
+  border: 1px solid oklch(93% 0.008 55);
   border-radius: var(--radius-8);
   background: oklch(98.6% 0.004 55);
 }
 .login-demo > svg {
-  color: oklch(52.0% 0.009 55);
+  color: oklch(52% 0.009 55);
   margin-top: 2px;
 }
 .login-demo strong {
   font-size: var(--text-11);
-  color: oklch(30.0% 0.012 40);
+  color: oklch(30% 0.012 40);
   font-weight: var(--weight-medium);
 }
 .login-demo p {
@@ -3573,7 +3602,7 @@ svg {
 }
 .page-heading p {
   font-size: var(--text-12);
-  color: oklch(45.0% 0.012 40);
+  color: oklch(45% 0.012 40);
 }
 .today-label {
   font-size: var(--text-11);
@@ -3583,7 +3612,7 @@ svg {
 }
 .pulse-banner strong {
   font-size: var(--text-12);
-  color: oklch(30.0% 0.012 40);
+  color: oklch(30% 0.012 40);
 }
 .pulse-banner p {
   font-size: var(--text-11);
@@ -3591,11 +3620,11 @@ svg {
 }
 .pulse-banner > button {
   font-size: var(--text-11);
-  color: oklch(30.0% 0.012 40);
+  color: oklch(30% 0.012 40);
 }
 .stat-card .split > span:first-child {
   font-size: var(--text-11);
-  color: oklch(43.0% 0.012 40);
+  color: oklch(43% 0.012 40);
 }
 .stat-card > small {
   font-size: var(--text-10);
@@ -3636,11 +3665,11 @@ svg {
 }
 .work-table td > small {
   font-size: var(--text-9);
-  color: oklch(47.0% 0.012 40);
+  color: oklch(47% 0.012 40);
 }
 .health {
   font-size: var(--text-8);
-  color: oklch(47.0% 0.080 72);
+  color: oklch(47% 0.08 72);
 }
 .progress-cell span {
   font-size: var(--text-10);
@@ -3660,14 +3689,14 @@ svg {
 }
 .panel-footer button {
   font-size: var(--text-10);
-  color: oklch(30.0% 0.012 40);
+  color: oklch(30% 0.012 40);
 }
 .briefing-card .eyebrow {
   font-size: var(--text-9);
-  color: oklch(30.0% 0.012 40);
+  color: oklch(30% 0.012 40);
 }
 .briefing-card h2 {
-  color: oklch(30.0% 0.012 40);
+  color: oklch(30% 0.012 40);
 }
 .briefing-intro {
   font-size: var(--text-10);
@@ -3675,7 +3704,7 @@ svg {
 }
 .brief-item h4 {
   font-size: var(--text-11);
-  color: oklch(30.0% 0.012 40);
+  color: oklch(30% 0.012 40);
 }
 .brief-item p {
   font-size: var(--text-10);
@@ -3686,7 +3715,7 @@ svg {
 }
 .briefing-button {
   font-size: var(--text-10);
-  color: oklch(30.0% 0.012 40);
+  color: oklch(30% 0.012 40);
 }
 .briefing-disclosure {
   font-size: var(--text-8);
@@ -3716,7 +3745,7 @@ svg {
 }
 .dependency-card.compact .dependency-people span {
   font-size: var(--text-9);
-  color: oklch(46.0% 0.012 40);
+  color: oklch(46% 0.012 40);
 }
 .dependency-card.compact .dependency-people small {
   font-size: var(--text-8);
@@ -3734,7 +3763,7 @@ svg {
 }
 .dependency-people span {
   font-size: var(--text-11);
-  color: oklch(46.0% 0.012 40);
+  color: oklch(46% 0.012 40);
 }
 .dependency-people small {
   font-size: var(--text-9);
@@ -3747,7 +3776,7 @@ svg {
 }
 .project-card p,
 .person-card > p {
-  color: oklch(45.0% 0.012 40);
+  color: oklch(45% 0.012 40);
 }
 .capacity-numbers {
   color: oklch(45.6% 0.012 40);
@@ -3783,19 +3812,19 @@ svg {
   color: oklch(47.1% 0.012 40);
 }
 .chat-welcome h2 {
-  color: oklch(30.0% 0.012 40);
+  color: oklch(30% 0.012 40);
 }
 .chat-welcome p {
   color: oklch(48.4% 0.012 40);
 }
 .chat-welcome button {
-  color: oklch(30.0% 0.012 40);
+  color: oklch(30% 0.012 40);
 }
 .chat-message.assistant {
-  color: oklch(30.0% 0.012 40);
+  color: oklch(30% 0.012 40);
 }
 .chat-message.user {
-  color: oklch(30.0% 0.012 40);
+  color: oklch(30% 0.012 40);
 }
 .assistant-context label {
   color: oklch(46.8% 0.012 40);
@@ -3804,14 +3833,14 @@ svg {
   color: oklch(47.6% 0.012 40);
 }
 .proposal-field strong {
-  color: oklch(30.0% 0.012 40);
+  color: oklch(30% 0.012 40);
 }
 .proposal > p,
 .assistant-footer {
   color: oklch(48.7% 0.012 40);
 }
 .chat-input textarea {
-  color: oklch(30.0% 0.012 40);
+  color: oklch(30% 0.012 40);
 }
 .notice {
   color: oklch(46.1% 0.012 40);
@@ -3823,10 +3852,10 @@ svg {
   color: oklch(45.6% 0.012 40);
 }
 .activity-event strong {
-  color: oklch(30.0% 0.012 40);
+  color: oklch(30% 0.012 40);
 }
 .page-footer {
-  color: oklch(49.0% 0.012 40);
+  color: oklch(49% 0.012 40);
 }
 @media (max-width: 760px) {
   .panel-heading h2 {

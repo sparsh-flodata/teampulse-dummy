@@ -29,10 +29,15 @@ class Employee(Base):
     capacity_confirmed: Mapped[bool] = mapped_column(Boolean, default=False)
     capacity_confirmed_on: Mapped[date | None] = mapped_column(Date, nullable=True)
     planning: Mapped[str] = mapped_column(String(20), default='Hybrid')
-    color: Mapped[str] = mapped_column(String(20), default='#7256df')
+    color: Mapped[str] = mapped_column(String(20), default='#5b6f8f')
 
-class AuthSession(Base):
-    __tablename__ = 'sessions'
+class RefreshToken(Base):
+    """One rotating refresh token. Tokens of one sign-in share a family_id;
+    presenting a token that was already rotated revokes the whole family."""
+    __tablename__ = 'refresh_tokens'
     token_hash: Mapped[str] = mapped_column(String(64), primary_key=True)
-    employee_id: Mapped[int] = mapped_column(ForeignKey('employees.id'))
+    employee_id: Mapped[int] = mapped_column(ForeignKey('employees.id'), index=True)
+    family_id: Mapped[str] = mapped_column(String(64), index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime)
     expires_at: Mapped[datetime] = mapped_column(DateTime)
+    revoked_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)

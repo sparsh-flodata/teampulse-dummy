@@ -65,7 +65,7 @@ function plan(
           note: "",
         },
       };
-      reply = `I can request updates from ${names(ids)}. Confirm below to deliver the request to their TeamPulse inbox. WhatsApp is not connected yet.`;
+      reply = `I can request updates from ${names(ids)}. Confirm below to deliver the request to their TeamPulse inbox and, where they have connected it, Google Chat.`;
     }
   } else if (text.includes("summar")) {
     const own = db.work.filter(

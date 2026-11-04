@@ -30,13 +30,17 @@
   width: 38px;
   height: 38px;
   border-radius: var(--radius-11);
-  background: linear-gradient(140deg, oklch(91.6% 0.009 55), oklch(96.6% 0.005 55));
+  background: linear-gradient(
+    140deg,
+    oklch(91.6% 0.009 55),
+    oklch(96.6% 0.005 55)
+  );
   color: var(--chat-text-secondary);
 }
 .coord-chat-header h2 {
   font-size: var(--text-13);
   font-weight: 650;
-  color: oklch(30.0% 0.012 40);
+  color: oklch(30% 0.012 40);
   letter-spacing: -0.2px;
 }
 .coord-chat-header p {
@@ -54,7 +58,7 @@
   background: oklch(79.2% 0.009 55);
 }
 .coord-chat-header p i.connected {
-  background: oklch(70.9% 0.080 150);
+  background: oklch(70.9% 0.08 150);
 }
 .chat-channel {
   margin-left: auto;
@@ -64,7 +68,7 @@
   align-items: center;
   gap: var(--space-5);
   padding: 6px 8px;
-  background: oklch(98.0% 0.004 55);
+  background: oklch(98% 0.004 55);
   border: 1px solid oklch(93.3% 0.007 55);
   border-radius: var(--radius-5);
 }
@@ -90,7 +94,7 @@
   max-width: 300px;
   background: var(--color-surface);
   color: var(--chat-text-secondary);
-  border: 1px solid oklch(92.0% 0.008 55);
+  border: 1px solid oklch(92% 0.008 55);
   border-radius: var(--radius-5);
   padding: 7px 8px;
   font-size: var(--text-9);
@@ -122,9 +126,9 @@
   max-width: calc(100vw - 50px);
   padding: 13px;
   background: var(--color-surface);
-  border: 1px solid oklch(90.0% 0.009 55);
+  border: 1px solid oklch(90% 0.009 55);
   border-radius: var(--radius-8);
-  box-shadow: 0 12px 40px oklch(24.0% 0.012 40 / 0.102);
+  box-shadow: 0 12px 40px oklch(24% 0.012 40 / 0.102);
 }
 .people-picker .split > strong {
   font-size: var(--text-10);
@@ -215,7 +219,11 @@
   overflow-y: auto;
   overscroll-behavior: contain;
   padding: 21px 24px;
-  background: linear-gradient(160deg, var(--color-surface) 50%, oklch(99.3% 0.004 55));
+  background: linear-gradient(
+    160deg,
+    var(--color-surface) 50%,
+    oklch(99.3% 0.004 55)
+  );
 }
 .coord-welcome {
   padding: 30px 12px;
@@ -230,7 +238,11 @@
   width: 70px;
   height: 70px;
   border-radius: 22px;
-  background: linear-gradient(145deg, oklch(94.4% 0.008 55), oklch(98.0% 0.004 55));
+  background: linear-gradient(
+    145deg,
+    oklch(94.4% 0.008 55),
+    oklch(98% 0.004 55)
+  );
   color: var(--chat-text-secondary);
   margin: 0 auto 17px;
   box-shadow: 0 0 0 9px oklch(98.6% 0.004 55);
@@ -317,7 +329,7 @@
   border-bottom-right-radius: 2px;
   margin-left: auto;
   color: var(--chat-text-secondary);
-  border-color: oklch(91.0% 0.009 55);
+  border-color: oklch(91% 0.009 55);
 }
 .coord-message p {
   white-space: pre-wrap;
@@ -337,9 +349,13 @@
   margin: 12px 0 12px;
   padding: 18px;
   border: 1px solid oklch(86.9% 0.009 55);
-  background: linear-gradient(140deg, oklch(98.4% 0.004 55), var(--color-surface));
+  background: linear-gradient(
+    140deg,
+    oklch(98.4% 0.004 55),
+    var(--color-surface)
+  );
   border-radius: var(--radius-9);
-  box-shadow: 0 3px 12px oklch(24.0% 0.012 40 / 0.02);
+  box-shadow: 0 3px 12px oklch(24% 0.012 40 / 0.02);
 }
 .coord-proposal > .eyebrow {
   font-size: var(--text-8);
@@ -349,7 +365,7 @@
 .coord-proposal h3 {
   font-size: var(--text-13);
   font-weight: 550;
-  color: oklch(30.0% 0.012 40);
+  color: oklch(30% 0.012 40);
   margin: 13px 0;
 }
 .proposal-people {
@@ -366,7 +382,7 @@
   gap: var(--space-5);
   font-size: var(--text-9);
   color: var(--chat-text-secondary);
-  border: 1px solid oklch(92.0% 0.009 55);
+  border: 1px solid oklch(92% 0.009 55);
   background: oklch(97.9% 0.004 55);
   padding: 4px 7px 4px 4px;
   border-radius: var(--radius-5);
@@ -408,7 +424,7 @@
   background: var(--color-surface);
   border-radius: var(--radius-10);
   padding: 13px 13px 9px;
-  box-shadow: 0 2px 8px oklch(24.0% 0.012 40 / 0.024);
+  box-shadow: 0 2px 8px oklch(24% 0.012 40 / 0.024);
 }
 .coord-composer:focus-within {
   border-color: oklch(73.4% 0.009 55);
@@ -443,14 +459,14 @@
   width: 32px;
   height: 32px;
   border-radius: var(--radius-8);
-  background: oklch(24.0% 0.012 40);
+  background: oklch(24% 0.012 40);
   color: var(--color-on-brand);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 .coord-composer button:hover {
-  background: oklch(24.0% 0.012 40);
+  background: oklch(24% 0.012 40);
 }
 .coord-composer-note {
   display: flex;
@@ -525,7 +541,7 @@
 .updates-tabs span {
   font-size: var(--text-7);
   padding: 1px 4px;
-  background: oklch(93.0% 0.008 55);
+  background: oklch(93% 0.008 55);
   border-radius: var(--radius-3);
   color: var(--chat-text-secondary);
 }
@@ -554,7 +570,11 @@
 }
 .update-request-card.answered {
   border-color: oklch(93.1% 0.005 55);
-  background: linear-gradient(135deg, var(--color-surface), oklch(98.3% 0.004 55));
+  background: linear-gradient(
+    135deg,
+    var(--color-surface),
+    oklch(98.3% 0.004 55)
+  );
 }
 .request-status {
   display: inline-flex;
@@ -570,7 +590,7 @@
   background: oklch(96.4% 0.004 55);
 }
 .request-status.queued {
-  color: oklch(47.0% 0.080 72);
+  color: oklch(47% 0.08 72);
   background: oklch(97.4% 0.005 55);
 }
 .request-status.cancelled {
@@ -606,7 +626,7 @@
   padding: 9px;
   background: oklch(97.7% 0.004 55);
   border-radius: var(--radius-4);
-  color: oklch(47.0% 0.080 72);
+  color: oklch(47% 0.08 72);
   font-size: var(--text-8);
   margin-top: 10px;
 }

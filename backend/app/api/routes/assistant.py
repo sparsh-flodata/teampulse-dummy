@@ -15,7 +15,7 @@ router = APIRouter()
 def chat_history(user: Employee = Depends(current_user), db: Session = Depends(get_db)):
     rows = list(db.scalars(select(Conversation).where(Conversation.employee_id == user.id).order_by(Conversation.id.desc()).limit(40)))[::-1]
     actions = db.scalars(select(AgentAction).where(AgentAction.employee_id == user.id).order_by(AgentAction.id.desc()).limit(20))
-    return {'messages': [{'role': r.role, 'message': r.message} for r in rows], 'actions': [{'id': a.id, 'payload': json.loads(a.payload), 'status': a.status} for a in actions]}
+    return {'messages': [{'role': r.role, 'message': r.message, 'agent': r.agent or None} for r in rows], 'actions': [{'id': a.id, 'payload': json.loads(a.payload), 'status': a.status} for a in actions]}
 
 @router.post('/api/assistant/chat')
 async def chat(body: ChatInput, user: Employee = Depends(current_user), db: Session = Depends(get_db)):
@@ -39,7 +39,7 @@ def decide(action_id: int, body: Decision, user: Employee = Depends(current_user
             from backend.app.services.coordination import serialize_request
             delivered=[serialize_request(db,r,user) for r in result]
             count=sum(r['status']=='Delivered' for r in delivered)
-            text=f'{count} update request(s) delivered to TeamPulse inboxes.' if count else 'Requests are queued. No external message was sent because the selected channel is not configured.'
+            text=f'{count} update request(s) delivered to TeamPulse inboxes.' if count else 'Those people already have an open request from you.'
             db.add(Conversation(employee_id=user.id,role='assistant',message=text))
     action.status = 'Approved' if body.approve else 'Rejected'
     audit(db, user, f'{action.status} an assistant proposal.')

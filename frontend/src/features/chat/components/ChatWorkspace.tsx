@@ -98,7 +98,7 @@ export function ChatWorkspace() {
     r.requests?.length
       ? r.requests.some((x) => x.status === "Delivered")
         ? "Update requests delivered to TeamPulse inboxes."
-        : "Requests queued. The external channel is not configured."
+        : "Those people already have an open request from you."
       : vars.approve
         ? "Confirmed and saved."
         : "Proposal dismissed.",
@@ -402,6 +402,7 @@ export function ChatWorkspace() {
                 <span className="coord-author">
                   <Sparkles size={13} />
                   Pulse assistant
+                  {m.agent && <span className="coord-agent">{m.agent}</span>}
                 </span>
               ) : (
                 <span className="coord-author">
@@ -475,8 +476,8 @@ export function ChatWorkspace() {
           </form>
           <p className="coord-composer-note">
             <CheckCircle2 size={12} />
-            Requests respect your reporting permissions. WhatsApp can be
-            connected later.
+            Requests respect your reporting permissions and reach people in
+            TeamPulse and, once they connect it, Google Chat.
           </p>
         </div>
       </section>
@@ -552,9 +553,9 @@ export function ChatWorkspace() {
                 <div className="request-meta">
                   <span>
                     <Link2 size={10} />
-                    {r.channel === "in_app"
-                      ? "TeamPulse inbox"
-                      : "WhatsApp · not configured"}
+                    {r.channel === "google_chat"
+                      ? "Google Chat and TeamPulse inbox"
+                      : "TeamPulse inbox"}
                   </span>
                   <span>{ago(r.created_at, now)}</span>
                 </div>
@@ -624,8 +625,8 @@ export function ChatWorkspace() {
         <div className="updates-channel-note">
           <Link2 size={13} />
           <p>
-            In-app delivery is active. The delivery adapter is ready for your
-            future WhatsApp integration.
+            Requests arrive in the TeamPulse inbox. People who connect Google
+            Chat in Settings also get them there, and can reply in a message.
           </p>
         </div>
       </aside>

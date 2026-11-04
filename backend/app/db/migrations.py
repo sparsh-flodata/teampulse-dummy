@@ -17,6 +17,7 @@ def migrate(engine):
             'teams': [('parent_id', 'INTEGER REFERENCES teams(id)'), ('lead_id', 'INTEGER REFERENCES employees(id)')],
             'employees': [('active', 'BOOLEAN NOT NULL DEFAULT true'), ('agent_auto_updates', 'BOOLEAN NOT NULL DEFAULT false')],
             'agent_actions': [('base_snapshot', "TEXT NOT NULL DEFAULT '{}'")],
+            'conversations': [('agent', "VARCHAR(40) NOT NULL DEFAULT ''")],
         }
         for table, columns in additions.items():
             existing = {c['name'] for c in inspect(conn).get_columns(table)}
@@ -44,3 +45,8 @@ def migrate(engine):
                 conn.execute(text(f'ALTER TABLE {table} ADD COLUMN archived BOOLEAN NOT NULL DEFAULT false'))
         if 4 not in applied:
             conn.execute(text("INSERT INTO schema_migrations(version, description) VALUES(4, 'Department import and cross-department project participation')"))
+        if 5 not in applied:
+            # Cookie sessions are replaced by JWT access tokens and rotating refresh tokens.
+            # New tables (refresh_tokens, chat_links, channel_outbox) come from create_all above.
+            conn.execute(text('DROP TABLE IF EXISTS sessions'))
+            conn.execute(text("INSERT INTO schema_migrations(version, description) VALUES(5, 'JWT refresh tokens and the Google Chat channel')"))

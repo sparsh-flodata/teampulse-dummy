@@ -19,6 +19,7 @@ class Conversation(Base):
     employee_id: Mapped[int] = mapped_column(ForeignKey('employees.id'))
     role: Mapped[str] = mapped_column(String(20))
     message: Mapped[str] = mapped_column(Text)
+    agent: Mapped[str] = mapped_column(String(40), default='')  # which graph agent answered
     created_at: Mapped[datetime] = mapped_column(DateTime, default=now)
 
 class MessageReceipt(Base):

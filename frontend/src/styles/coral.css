@@ -114,7 +114,11 @@ a:hover {
   letter-spacing: 0;
   color: var(--color-info-ink);
   background: var(--color-info-soft);
-  border-color: color-mix(in oklab, var(--color-info-ink) 18%, var(--color-info-soft));
+  border-color: color-mix(
+    in oklab,
+    var(--color-info-ink) 18%,
+    var(--color-info-soft)
+  );
 }
 .sidebar-scroll .sidebar-projects {
   margin-top: 14px;
@@ -216,10 +220,18 @@ a:hover {
   border-bottom-color: var(--color-rule);
 }
 .work-row.tone-red td {
-  background: color-mix(in oklab, var(--color-late-soft) 70%, var(--color-cotton));
+  background: color-mix(
+    in oklab,
+    var(--color-late-soft) 70%,
+    var(--color-cotton)
+  );
 }
 .work-row.tone-amber td {
-  background: color-mix(in oklab, var(--color-warn-soft) 70%, var(--color-cotton));
+  background: color-mix(
+    in oklab,
+    var(--color-warn-soft) 70%,
+    var(--color-cotton)
+  );
 }
 .work-table tbody tr:hover td {
   background: var(--color-paper);
@@ -334,4 +346,62 @@ textarea:focus {
 .work-table .health-badge {
   display: flex;
   margin-top: 4px;
+}
+
+/* Google Chat connection in Settings, tinted by state */
+.google-chat-panel {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-top: var(--space-block);
+}
+.google-chat-panel > div {
+  flex: 1;
+  display: grid;
+  gap: 8px;
+  justify-items: start;
+}
+.google-chat-panel .split {
+  width: 100%;
+}
+.google-chat-panel p {
+  color: var(--color-ink-2);
+}
+.google-chat-panel.tone-done {
+  background: var(--color-done-soft);
+}
+.google-chat-panel.tone-warn {
+  background: var(--color-warn-soft);
+}
+.google-chat-panel.tone-wait {
+  background: var(--color-wait-soft);
+}
+
+/* Sign-in / create-account switch */
+.login-switch {
+  margin-top: 14px;
+  color: var(--color-muted);
+  font-size: var(--text-11);
+}
+.login-switch .text-button {
+  color: var(--color-ink);
+  font-weight: var(--weight-semibold);
+  text-decoration: underline;
+  text-decoration-color: var(--color-rule-2);
+  text-underline-offset: 3px;
+}
+.login-switch .text-button:hover {
+  text-decoration-color: var(--color-accent-2);
+}
+
+/* Which assistant agent answered a message */
+.coord-author .coord-agent {
+  margin-left: 6px;
+  padding: 1px 6px;
+  border: 1px solid color-mix(in oklab, var(--color-info-ink) 18%, var(--color-info-soft));
+  border-radius: var(--radius-6);
+  background: var(--color-info-soft);
+  color: var(--color-info-ink);
+  font-size: var(--text-8);
+  font-weight: var(--weight-semibold);
 }

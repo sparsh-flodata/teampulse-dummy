@@ -16,6 +16,7 @@ import { useSelector } from "@tanstack/react-store";
 import { Link } from "@tanstack/react-router";
 import { signIn } from "../session";
 import { authStore } from "../store";
+import { COMPANY_DOMAIN, RegisterForm } from "./RegisterForm";
 
 const loginSchema = z.object({
   email: z.email("Enter your work email."),
@@ -37,6 +38,7 @@ export function LoginPage({
 }) {
   const navigate = useNavigate();
   const [error, setError] = useState("");
+  const [creating, setCreating] = useState(false);
   const signedIn = useSelector(
     authStore,
     (s) => Object.keys(s.accounts).length > 0,
@@ -109,78 +111,103 @@ export function LoginPage({
       <div className="login-form-wrap">
         <div className="login-form">
           <span className="eyebrow">Welcome to TeamPulse</span>
-          <h2>Good to see you.</h2>
-          <p>{intro[mode]}</p>
-          <form
-            className="form"
-            onSubmit={(e) => {
-              e.preventDefault();
-              void form.handleSubmit();
-            }}
-          >
-            <label>
-              Work email
-              <form.Field name="email">
-                {(f) => (
-                  <input
-                    {...bind(f)}
-                    type="email"
-                    autoComplete="username"
-                    required
-                  />
-                )}
-              </form.Field>
-            </label>
-            <label>
-              Password
-              <form.Field name="password">
-                {(f) => (
-                  <input
-                    {...bind(f)}
-                    type="password"
-                    autoComplete="current-password"
-                    placeholder="Enter your workspace password"
-                    required
-                  />
-                )}
-              </form.Field>
-            </label>
-            <FormError message={error} />
-            <form.Subscribe selector={(s) => s.isSubmitting}>
-              {(busy) => (
-                <button className="button primary" disabled={busy}>
-                  {busy ? (
-                    <Loader2 className="spin" size={17} />
-                  ) : (
-                    <>
-                      Sign in
-                      <ArrowRight size={17} />
-                    </>
+          <h2>{creating ? "Create your account." : "Good to see you."}</h2>
+          <p>
+            {creating
+              ? `Use your @${COMPANY_DOMAIN} email. You can sign in right after.`
+              : intro[mode]}
+          </p>
+          {creating ? (
+            <RegisterForm />
+          ) : (
+            <form
+              className="form"
+              onSubmit={(e) => {
+                e.preventDefault();
+                void form.handleSubmit();
+              }}
+            >
+              <label>
+                Work email
+                <form.Field name="email">
+                  {(f) => (
+                    <input
+                      {...bind(f)}
+                      type="email"
+                      autoComplete="username"
+                      required
+                    />
                   )}
-                </button>
-              )}
-            </form.Subscribe>
-          </form>
+                </form.Field>
+              </label>
+              <label>
+                Password
+                <form.Field name="password">
+                  {(f) => (
+                    <input
+                      {...bind(f)}
+                      type="password"
+                      autoComplete="current-password"
+                      placeholder="Enter your workspace password"
+                      required
+                    />
+                  )}
+                </form.Field>
+              </label>
+              <FormError message={error} />
+              <form.Subscribe selector={(s) => s.isSubmitting}>
+                {(busy) => (
+                  <button className="button primary" disabled={busy}>
+                    {busy ? (
+                      <Loader2 className="spin" size={17} />
+                    ) : (
+                      <>
+                        Sign in
+                        <ArrowRight size={17} />
+                      </>
+                    )}
+                  </button>
+                )}
+              </form.Subscribe>
+            </form>
+          )}
+          {mode !== "expired" && (
+            <p className="login-switch">
+              {creating ? "Already have an account?" : "New to TeamPulse?"}{" "}
+              <button
+                type="button"
+                className="text-button"
+                onClick={() => {
+                  setError("");
+                  setCreating((c) => !c);
+                }}
+              >
+                {creating ? "Sign in" : "Create an account"}
+              </button>
+            </p>
+          )}
           {mode !== "signin" && signedIn && (
             <Link to="/" className="text-button login-back">
               Back to workspace
             </Link>
           )}
-          <div className="login-demo">
-            <ShieldCheck size={19} />
-            <div>
-              <strong>Explore the local pilot</strong>
-              <p>
-                Management: ujjwal@flodataanalytics.com
-                <br />
-                Manager: nitish.kumar@flodataanalytics.com
-                <br />
-                Employee: kapil.sharma@flodataanalytics.com
-                <br />
-                Use the demo password in your local .env file.
-              </p>
+          {!creating && (
+            <div className="login-demo">
+              <ShieldCheck size={19} />
+              <div>
+                <strong>Explore the local pilot</strong>
+                <p>
+                  Management: ujjwal@flodataanalytics.com
+                  <br />
+                  Manager: nitish.kumar@flodataanalytics.com
+                  <br />
+                  Employee: kapil.sharma@flodataanalytics.com
+                  <br />
+                  Use the demo password in your local .env file.
+                </p>
+              </div>
             </div>
-          </div>
+          )}
           <span className="login-privacy">
             Work visibility, with trust at the center.
           </span>

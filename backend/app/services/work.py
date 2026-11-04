@@ -75,10 +75,18 @@ def latest_commitment(db, work_id):
 def audit(db, user, message, work_id=None):
     db.add(AuditEvent(actor_id=user.id, work_item_id=work_id, message=message))
 
+# Workflow nudges that also go to Google Chat for people who connected it.
+# Update requests are sent by their own channel adapter.
+CHAT_MIRRORED = ('planning', 'weekly', 'due', 'overdue', 'dependency', 'escalation', 'requested', 'update-response')
+
 def notify(db, recipient, key, message, work_id=None):
     if recipient and not db.scalar(select(Notification.id).where(Notification.key == key)):
         db.add(Notification(recipient_id=recipient, key=key, message=message, work_item_id=work_id))
         db.flush()
+        if key.split(':', 1)[0] in CHAT_MIRRORED:
+            from backend.app.channels.google_chat import queue_message
+            from backend.app.core.config import APP_URL
+            queue_message(db, recipient, f'{message}\n{APP_URL}/')
 
 def sync_blocked(db, work):
     deps = list(db.scalars(select(Dependency).where(Dependency.work_item_id == work.id, Dependency.status.in_(OPEN_DEP))))
