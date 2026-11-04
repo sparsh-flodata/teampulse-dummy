@@ -12,7 +12,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from backend.app.channels import google_chat
-from backend.app.core.config import APP_URL
+from backend.app.core.config import app_link
 from backend.app.core.security import current_user, email_allowed, find_employee_by_email
 from backend.app.db.session import get_db
 from backend.app.models import ChatLink, Employee, MessageReceipt, UpdateRequest
@@ -62,8 +62,9 @@ def _employee(db: Session, user: dict) -> Employee | None:
 
 def _not_registered(user: dict) -> str:
     email = user.get('email') or 'this Google account'
+    where = f' at {app_link("/login")}' if app_link('/login') else ''
     return (f'I couldn’t find an active TeamPulse account for {email}. '
-            f'Register with your work email at {APP_URL}/login, then message me again.')
+            f'Register with your work email{where}, then message me again.')
 
 
 @router.post('/api/integrations/google-chat/events', include_in_schema=False)
@@ -122,7 +123,7 @@ async def google_chat_events(request: Request, db: Session = Depends(get_db)):
             answer = f'Thanks. I sent your update to {sender.name if sender else "the requester"}.'
         except HTTPException as exc:
             db.rollback()
-            answer = f'I couldn’t send that as a reply: {exc.detail} Open {APP_URL}/chat to answer it there.'
+            answer = f'I couldn’t send that as a reply: {exc.detail} Answer it in TeamPulse, AI chat, instead.'
         db.add(MessageReceipt(employee_id=employee.id, request_id=request_id, fingerprint=fingerprint, response_json=json.dumps({'reply': answer})))
         db.commit()
         return _reply(answer, addon)
@@ -135,7 +136,8 @@ async def google_chat_events(request: Request, db: Session = Depends(get_db)):
     answer = result.get('reply', '')
     action = result.get('action')
     if action and action.get('status') == 'Proposed':
-        answer += f'\n\nReview and confirm this change in TeamPulse: {APP_URL}/chat'
+        link = app_link('/chat')
+        answer += '\n\nThis is only a draft. Open TeamPulse, AI chat, to review and confirm it' + (f': {link}' if link else '.')
     return _reply(answer, addon)
 
 

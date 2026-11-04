@@ -14,11 +14,29 @@ export const numberField = (min: number, max: number, label: string) =>
     .min(min, `${label} must be at least ${min}.`)
     .max(max, `${label} must be at most ${max}.`);
 
-export const optionalNumberField = (min: number, max: number, label: string) =>
+/** Whole numbers only (the API stores progress as an integer percentage). */
+export const wholeNumberField = (min: number, max: number, label: string) =>
+  z.coerce
+    .number({ error: `${label} must be a number.` })
+    .int(`${label} must be a whole number.`)
+    .min(min, `${label} must be at least ${min}.`)
+    .max(max, `${label} must be at most ${max}.`);
+
+export const optionalNumberField = (
+  min: number,
+  max: number,
+  label: string,
+  whole = false,
+) =>
   z.string().transform((v, ctx) => {
     if (v.trim() === "") return null;
     const n = Number(v);
-    if (Number.isNaN(n) || n < min || n > max) {
+    if (
+      Number.isNaN(n) ||
+      n < min ||
+      n > max ||
+      (whole && !Number.isInteger(n))
+    ) {
       ctx.addIssue({
         code: "custom",
         message: `${label} must be between ${min} and ${max}.`,

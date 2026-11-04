@@ -19,6 +19,12 @@ PUBLIC_HOST = (urlparse(APP_URL).hostname or '').lower()
 PUBLIC_HOST_RESTRICTED = PUBLIC_HOST not in ('', 'localhost', '127.0.0.1') and os.getenv('PUBLIC_HOST_OPEN', 'false').lower() != 'true'
 PUBLIC_PATHS = ('/api/integrations/google-chat/events', '/api/health')
 
+
+def app_link(path: str = '/') -> str:
+    """A link to put in outside messages, or '' when the public address does not serve the app."""
+    return '' if PUBLIC_HOST_RESTRICTED else APP_URL + path
+
+
 # ---- Identity ---------------------------------------------------------------
 # Only these email domains may register or be added as employees.
 ALLOWED_EMAIL_DOMAINS = tuple(

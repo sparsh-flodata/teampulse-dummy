@@ -52,7 +52,7 @@ export const cancelUpdateRequest = (id: number) =>
 export const replySchema = z.object({
   message: z.string().trim().min(3, "Write at least 3 characters.").max(4000),
   work_item_id: z.string().transform((v) => (v ? Number(v) : null)),
-  progress: optionalNumberField(0, 100, "Progress"),
+  progress: optionalNumberField(0, 100, "Progress", true),
   remaining_hours: optionalNumberField(0, 1000, "Hours remaining"),
   status: z.string().transform((v) => v || null),
 });

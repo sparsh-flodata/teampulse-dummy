@@ -85,8 +85,8 @@ def notify(db, recipient, key, message, work_id=None):
         db.flush()
         if key.split(':', 1)[0] in CHAT_MIRRORED:
             from backend.app.channels.google_chat import queue_message
-            from backend.app.core.config import APP_URL
-            queue_message(db, recipient, f'{message}\n{APP_URL}/')
+            from backend.app.core.config import app_link
+            queue_message(db, recipient, f'{message}\n{app_link("/")}'.rstrip())
 
 def sync_blocked(db, work):
     deps = list(db.scalars(select(Dependency).where(Dependency.work_item_id == work.id, Dependency.status.in_(OPEN_DEP))))

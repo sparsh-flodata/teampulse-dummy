@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { numberField, optionalId } from "@/lib/forms";
+import { numberField, optionalId, wholeNumberField } from "@/lib/forms";
 
 export const PRIORITIES = ["Low", "Medium", "High", "Urgent"] as const;
 export const WORK_STATUSES = [
@@ -13,7 +13,7 @@ export const WORK_STATUSES = [
 
 export const updateWorkSchema = z.object({
   status: z.enum(WORK_STATUSES),
-  progress: numberField(0, 100, "Progress"),
+  progress: wholeNumberField(0, 100, "Progress"),
   remaining_hours: numberField(0, 1000, "Remaining effort"),
   note: z.string().max(4000),
   accept_commitment: z.boolean(),

@@ -5,7 +5,7 @@ request itself never depends on the external service being up.
 """
 from dataclasses import dataclass
 from typing import Protocol
-from backend.app.core.config import APP_URL
+from backend.app.core.config import app_link
 from backend.app.models import now
 from backend.app.services.work import notify
 from backend.app.channels import google_chat
@@ -34,8 +34,9 @@ class GoogleChatChannel:
 
     def prepare(self, db, request, sender, recipient):
         InAppChannel().prepare(db, request, sender, recipient)
+        where = f'or open your inbox: {app_link("/chat")}' if app_link('/chat') else 'or answer in your TeamPulse inbox'
         text = (f'{sender.name} asked for an update:\n{request.prompt}\n\n'
-                f'Reply here in a sentence, or open your inbox: {APP_URL}/chat')
+                f'Reply here in a sentence, {where}')
         if google_chat.queue_message(db, recipient.id, text, request.id):
             return DeliveryResult('Delivered', 'Delivered to the TeamPulse update inbox; the Google Chat message is on its way.')
         first = recipient.name.split(' ')[0]
