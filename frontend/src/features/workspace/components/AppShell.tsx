@@ -23,7 +23,12 @@ import {
   UserRound,
 } from "lucide-react";
 import { Avatar } from "@/components/ui";
-import { BREATH_OUT_MS, MotionProvider, usePageLeaving } from "@/lib/motion";
+import {
+  BREATH_OUT_MS,
+  MotionProvider,
+  usePageLeaving,
+  usePageReveal,
+} from "@/lib/motion";
 import { AccountMenu } from "@/features/auth/components/AccountMenu";
 import { ModalHost } from "./ModalHost";
 import { stateQuery } from "../api";
@@ -38,6 +43,16 @@ import {
 import { NotificationsPopover } from "./NotificationsPopover";
 import { Sidebar } from "./Sidebar";
 import { Toast } from "./Toast";
+
+const SIDEBAR_KEY = "teampulse.sidebarCollapsed";
+
+function readSidebarCollapsed() {
+  try {
+    return localStorage.getItem(SIDEBAR_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
 
 const descriptions: Record<View, string> = {
   Overview: "A little clarity on where things stand.",
@@ -89,6 +104,9 @@ export function AppShell() {
   const smallScreen = useMediaQuery("(max-width:760px)");
   const searchRef = useRef<HTMLInputElement>(null);
   const sidebarRef = useRef<HTMLElement>(null);
+  const mainRef = useRef<HTMLElement>(null);
+  const [collapsed, setCollapsed] = useState(readSidebarCollapsed);
+  usePageReveal(mainRef, pathname);
 
   // Mobile navigation drawer: focus trap + Escape, restoring focus on close.
   useEffect(() => {
@@ -121,6 +139,29 @@ export function AppShell() {
     };
   }, [mobile, smallScreen]);
 
+  // The rail's state is remembered per browser; Ctrl/Cmd+B toggles it on desktop.
+  useEffect(() => {
+    try {
+      localStorage.setItem(SIDEBAR_KEY, collapsed ? "1" : "0");
+    } catch {
+      // Private windows may refuse storage; the rail still works.
+    }
+  }, [collapsed]);
+  useEffect(() => {
+    const key = (e: KeyboardEvent) => {
+      if (
+        (e.ctrlKey || e.metaKey) &&
+        e.key.toLowerCase() === "b" &&
+        !smallScreen
+      ) {
+        e.preventDefault();
+        setCollapsed((c) => !c);
+      }
+    };
+    document.addEventListener("keydown", key);
+    return () => document.removeEventListener("keydown", key);
+  }, [smallScreen]);
+
   // Ctrl/Cmd+K focuses the workspace search.
   useEffect(() => {
     const key = (e: KeyboardEvent) => {
@@ -148,7 +189,7 @@ export function AppShell() {
 
   return (
     <MotionProvider>
-      <div className="app-shell">
+      <div className={"app-shell" + (collapsed ? " is-collapsed" : "")}>
         {mobile && (
           <div className="mobile-backdrop" onClick={() => setMobile(false)} />
         )}
@@ -158,6 +199,8 @@ export function AppShell() {
           mobile={mobile}
           smallScreen={smallScreen}
           sidebarRef={sidebarRef}
+          collapsed={collapsed}
+          onToggleCollapsed={() => setCollapsed((c) => !c)}
           onNavigate={goTo}
           onCreateProject={() => {
             setMobile(false);
@@ -242,6 +285,7 @@ export function AppShell() {
             </div>
           </header>
           <motion.main
+            ref={mainRef}
             className={view === "AI chat" ? "chat-page" : ""}
             initial={false}
             animate={

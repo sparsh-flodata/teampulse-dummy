@@ -13,6 +13,7 @@ import {
   Pencil,
 } from "lucide-react";
 import { Avatar, Badge, Empty } from "@/components/ui";
+import { TabPanel } from "@/components/ui/TabPanel";
 import { ago } from "@/lib/format";
 import { DependencyCard } from "@/features/work/components/DependencyCard";
 import { WorkTable } from "@/features/work/components/WorkTable";
@@ -157,68 +158,72 @@ export function ProfilePage({ personId }: { personId: number }) {
               </button>
             ))}
           </div>
-          {tab === "Commitments" && (
-            <WorkTable
-              works={data.work}
-              state={state}
-              onWork={(w) => openWork(w.id)}
-              onPerson={(person) => nav.openProfile(person.id)}
-            />
-          )}
-          {tab === "Dependencies" && (
-            <div className="profile-dependencies">
-              {data.dependencies.length ? (
-                data.dependencies.map((d) => (
-                  <DependencyCard
-                    key={d.id}
-                    dep={d}
-                    state={state}
-                    onWork={(w) => openWork(w.id)}
-                  />
-                ))
-              ) : (
-                <Empty
-                  title="No shared dependencies"
-                  description="There are no recorded dependencies for this profile."
-                />
-              )}
-            </div>
-          )}
-          {tab === "History" && (
-            <div className="activity-list">
-              {data.activity.length ? (
-                data.activity.map((a) => (
-                  <div className="activity-event" key={a.id}>
-                    <Avatar
-                      person={state.directory.find((p) => p.id === a.actor_id)}
-                      size={30}
+          <TabPanel tabKey={tab}>
+            {tab === "Commitments" && (
+              <WorkTable
+                works={data.work}
+                state={state}
+                onWork={(w) => openWork(w.id)}
+                onPerson={(person) => nav.openProfile(person.id)}
+              />
+            )}
+            {tab === "Dependencies" && (
+              <div className="profile-dependencies">
+                {data.dependencies.length ? (
+                  data.dependencies.map((d) => (
+                    <DependencyCard
+                      key={d.id}
+                      dep={d}
+                      state={state}
+                      onWork={(w) => openWork(w.id)}
                     />
-                    <div>
-                      <p>{a.message}</p>
-                      <small>{ago(a.created_at, now)}</small>
+                  ))
+                ) : (
+                  <Empty
+                    title="No shared dependencies"
+                    description="There are no recorded dependencies for this profile."
+                  />
+                )}
+              </div>
+            )}
+            {tab === "History" && (
+              <div className="activity-list">
+                {data.activity.length ? (
+                  data.activity.map((a) => (
+                    <div className="activity-event" key={a.id}>
+                      <Avatar
+                        person={state.directory.find(
+                          (p) => p.id === a.actor_id,
+                        )}
+                        size={30}
+                      />
+                      <div>
+                        <p>{a.message}</p>
+                        <small>{ago(a.created_at, now)}</small>
+                      </div>
+                      <button
+                        className="icon-button"
+                        aria-label="Open related commitment"
+                        onClick={() => {
+                          const w = data.work.find(
+                            (w) => w.id === a.work_item_id,
+                          );
+                          if (w) void openWork(w.id);
+                        }}
+                      >
+                        <ArrowUpRight size={15} />
+                      </button>
                     </div>
-                    <button
-                      className="icon-button"
-                      aria-label="Open related commitment"
-                      onClick={() => {
-                        const w = data.work.find(
-                          (w) => w.id === a.work_item_id,
-                        );
-                        if (w) void openWork(w.id);
-                      }}
-                    >
-                      <ArrowUpRight size={15} />
-                    </button>
-                  </div>
-                ))
-              ) : (
-                <Empty
-                  title="A fresh start"
-                  description="Work updates will appear here as commitments evolve."
-                />
-              )}
-            </div>
-          )}
+                  ))
+                ) : (
+                  <Empty
+                    title="A fresh start"
+                    description="Work updates will appear here as commitments evolve."
+                  />
+                )}
+              </div>
+            )}
+          </TabPanel>
         </section>
         <aside className="profile-aside">
           <section className="panel profile-capacity">

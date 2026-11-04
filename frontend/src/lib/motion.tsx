@@ -1,21 +1,26 @@
-import { useEffect, type ReactNode } from "react";
-import { MotionConfig, type Variants } from "motion/react";
+import {
+  useEffect,
+  useLayoutEffect,
+  type ReactNode,
+  type RefObject,
+} from "react";
+import { MotionConfig, animate, type Variants } from "motion/react";
 import { createStore, useSelector } from "@tanstack/react-store";
 
 /**
  * Motion for TeamPulse: pages breathe in (rise and settle) and out (soften and sink),
- * sections arrive one after another, and anything below the fold eases in as it scrolls
- * into view. Only transform and opacity ever animate. Anyone who asks their system for
- * reduced motion gets no movement at all (MotionConfig reducedMotion="user" plus the
- * checks below).
+ * sections arrive one after another, tabs ease between their bodies, and anything below
+ * the fold eases in as it scrolls into view. Only transform and opacity ever animate.
+ * Anyone who asks their system for reduced motion gets no movement at all
+ * (MotionConfig reducedMotion="user" plus the checks below).
  */
 
-const EASE = [0.22, 1, 0.36, 1] as const; // an easing-out curve: quick start, soft landing
+export const EASE = [0.22, 1, 0.36, 1] as const; // an easing-out curve: quick start, soft landing
 
 export const BREATH_IN = { duration: 0.5, ease: EASE };
 export const BREATH_OUT_MS = 150;
 
-/** A page's sections arrive in sequence. */
+/** The sections of a view arrive in sequence. */
 export const stagger: Variants = {
   hidden: {},
   show: { transition: { staggerChildren: 0.07, delayChildren: 0.03 } },
@@ -44,17 +49,13 @@ export const prefersReducedMotion = () =>
   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 // ---- Breathing out ---------------------------------------------------------------
-// Navigation helpers call leavePage() first: the current page softens for a moment,
-// then the route changes and the next page breathes in.
-
-/** Pages that have been given motion so far; others change instantly, as before. */
-const ANIMATED_PATHS = new Set(["/"]);
+// Navigation helpers call leavePage() first: the current view softens for a moment,
+// then the route changes and the next view breathes in.
 
 export const motionStore = createStore({ leaving: false });
 
 export async function leavePage() {
-  if (prefersReducedMotion() || !ANIMATED_PATHS.has(window.location.pathname))
-    return;
+  if (prefersReducedMotion()) return;
   motionStore.setState(() => ({ leaving: true }));
   await new Promise((r) => setTimeout(r, BREATH_OUT_MS));
 }
@@ -75,4 +76,88 @@ export function usePageLeaving(pathname: string) {
     return () => clearTimeout(t);
   }, [leaving]);
   return leaving;
+}
+
+// ---- Breathing in, page by page ------------------------------------------------------
+
+/** The blocks a page is made of. Nested matches are revealed with their parent. */
+const REVEAL =
+  "section, .panel, .page-heading, .workspace-context, .sample-workspace-note, .connection-error, .page-footer";
+/** Blocks that animate themselves; the generic reveal leaves them and their contents alone. */
+const MANUAL = '[data-motion="manual"]';
+const FOLD = 0.92;
+
+/**
+ * On each route change the top-level blocks of the page rise in one after another.
+ * Blocks below the fold wait and ease in as they scroll into view.
+ */
+export function usePageReveal(
+  rootRef: RefObject<HTMLElement | null>,
+  pathname: string,
+) {
+  useLayoutEffect(() => {
+    const root = rootRef.current;
+    if (!root || prefersReducedMotion()) return;
+
+    const found = Array.from(root.querySelectorAll<HTMLElement>(REVEAL));
+    const targets = found.filter(
+      (el) =>
+        !el.parentElement?.closest(MANUAL) &&
+        !found.some((other) => other !== el && other.contains(el)),
+    );
+    if (!targets.length) return;
+
+    const now: HTMLElement[] = [];
+    const later: HTMLElement[] = [];
+    for (const el of targets) {
+      el.style.opacity = "0";
+      el.style.transform = "translateY(14px)";
+      (el.getBoundingClientRect().top < window.innerHeight * FOLD
+        ? now
+        : later
+      ).push(el);
+    }
+
+    const controls: { stop: () => void }[] = now.map((el, i) =>
+      animate(
+        el,
+        { opacity: [0, 1], y: [14, 0] },
+        {
+          duration: BREATH_IN.duration,
+          ease: EASE,
+          delay: Math.min(i, 8) * 0.07 + 0.03,
+        },
+      ),
+    );
+
+    const io: IntersectionObserver | null = later.length
+      ? new IntersectionObserver(
+          (entries) => {
+            for (const entry of entries) {
+              if (!entry.isIntersecting) continue;
+              io?.unobserve(entry.target);
+              controls.push(
+                animate(
+                  entry.target as HTMLElement,
+                  { opacity: [0, 1], y: [14, 0] },
+                  { duration: BREATH_IN.duration, ease: EASE },
+                ),
+              );
+            }
+          },
+          { threshold: 0.08, rootMargin: "0px 0px -6% 0px" },
+        )
+      : null;
+    later.forEach((el) => io?.observe(el));
+
+    return () => {
+      io?.disconnect();
+      controls.forEach((c) => c.stop());
+      // The heading and footer outlive a route: never leave them invisible.
+      for (const el of targets) {
+        el.style.opacity = "";
+        el.style.transform = "";
+      }
+    };
+  }, [rootRef, pathname]);
 }

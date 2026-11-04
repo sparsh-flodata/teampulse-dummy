@@ -15,6 +15,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { Avatar, Empty, FormError } from "@/components/ui";
+import { TabPanel } from "@/components/ui/TabPanel";
 import { ago } from "@/lib/format";
 import { errorMessage } from "@/lib/forms";
 import { isManager } from "@/features/workspace/domain";
@@ -513,7 +514,7 @@ export function ChatWorkspace() {
             </button>
           ))}
         </div>
-        <div className="update-request-list">
+        <TabPanel tabKey={requestTab} className="update-request-list">
           {shown.length ? (
             shown.map((r) => (
               <article
@@ -621,7 +622,7 @@ export function ChatWorkspace() {
               }
             />
           )}
-        </div>
+        </TabPanel>
         <div className="updates-channel-note">
           <Link2 size={13} />
           <p>

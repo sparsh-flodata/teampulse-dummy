@@ -11,6 +11,7 @@ import {
   Flag,
 } from "lucide-react";
 import { Avatar, Badge, Empty, FormError, Modal } from "@/components/ui";
+import { TabPanel } from "@/components/ui/TabPanel";
 import { ago, dateLabel } from "@/lib/format";
 import { errorMessage } from "@/lib/forms";
 import {
@@ -187,276 +188,282 @@ export function WorkDetail({
             </button>
           ))}
         </div>
-        {tab === "Update" && (
-          <>
-            {work.status !== "Completed" && manager && (
-              <form
-                className="form assignment-form"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  void assignForm.handleSubmit();
-                }}
-              >
-                <label>
-                  {work.owner_id ? "Reassign to" : "Recommend an assignee"}
-                  <assignForm.Field name="employee_id">
-                    {(field) => (
-                      <select
-                        name="employee_id"
-                        value={field.state.value}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                      >
-                        <optgroup label="On this project">
-                          {candidates
-                            .filter((p) => onProject(p.id))
-                            .map((p) => {
-                              const d = detailed.get(p.id);
-                              return (
-                                <option key={p.id} value={p.id}>
-                                  {p.name} ·{" "}
-                                  {d
-                                    ? (d.capacity.confirmed
-                                        ? d.capacity.available + "h available"
-                                        : "capacity unknown") +
-                                      " · " +
-                                      d.skills
-                                    : p.title}
-                                </option>
-                              );
-                            })}
-                        </optgroup>
-                        <optgroup label="Elsewhere in the organization (joins the project)">
-                          {candidates
-                            .filter((p) => !onProject(p.id))
-                            .map((p) => (
-                              <option key={p.id} value={p.id}>
-                                {p.name} · {p.title}
-                              </option>
-                            ))}
-                        </optgroup>
-                      </select>
-                    )}
-                  </assignForm.Field>
-                </label>
-                <p className="form-note">
-                  Suggestions rank skill overlap and confirmed capacity. The new
-                  owner must confirm feasibility
-                  {work.owner_id ? ", and the current owner is told" : ""}.
-                </p>
-                <button disabled={busy} className="button primary">
-                  {work.owner_id ? "Reassign" : "Propose assignment"}
-                  <ArrowRight size={14} />
-                </button>
-              </form>
-            )}
-            {work.can_edit && work.owner_id ? (
-              <form
-                className="form"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  void updateForm.handleSubmit();
-                }}
-              >
-                <div className="form-grid">
+        <TabPanel tabKey={tab}>
+          {tab === "Update" && (
+            <>
+              {work.status !== "Completed" && manager && (
+                <form
+                  className="form assignment-form"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    void assignForm.handleSubmit();
+                  }}
+                >
                   <label>
-                    Status
-                    <updateForm.Field name="status">
+                    {work.owner_id ? "Reassign to" : "Recommend an assignee"}
+                    <assignForm.Field name="employee_id">
                       {(field) => (
                         <select
-                          name="status"
+                          name="employee_id"
                           value={field.state.value}
                           onChange={(e) => field.handleChange(e.target.value)}
                         >
-                          {WORK_STATUSES.map((s) => (
-                            <option
-                              key={s}
-                              disabled={s === "Completed" && !own}
-                            >
-                              {s}
-                            </option>
-                          ))}
+                          <optgroup label="On this project">
+                            {candidates
+                              .filter((p) => onProject(p.id))
+                              .map((p) => {
+                                const d = detailed.get(p.id);
+                                return (
+                                  <option key={p.id} value={p.id}>
+                                    {p.name} ·{" "}
+                                    {d
+                                      ? (d.capacity.confirmed
+                                          ? d.capacity.available + "h available"
+                                          : "capacity unknown") +
+                                        " · " +
+                                        d.skills
+                                      : p.title}
+                                  </option>
+                                );
+                              })}
+                          </optgroup>
+                          <optgroup label="Elsewhere in the organization (joins the project)">
+                            {candidates
+                              .filter((p) => !onProject(p.id))
+                              .map((p) => (
+                                <option key={p.id} value={p.id}>
+                                  {p.name} · {p.title}
+                                </option>
+                              ))}
+                          </optgroup>
                         </select>
                       )}
-                    </updateForm.Field>
+                    </assignForm.Field>
                   </label>
-                  <label>
-                    Progress (%)
-                    <updateForm.Field name="progress">
-                      {(field) => (
-                        <input
-                          name="progress"
-                          type="number"
-                          min={0}
-                          max={100}
-                          required
-                          value={field.state.value}
-                          onChange={(e) => field.handleChange(e.target.value)}
-                        />
-                      )}
-                    </updateForm.Field>
-                  </label>
-                  <label>
-                    Remaining effort (hours)
-                    <updateForm.Field name="remaining_hours">
-                      {(field) => (
-                        <input
-                          name="remaining_hours"
-                          type="number"
-                          min={0}
-                          max={1000}
-                          step={0.5}
-                          required
-                          value={field.state.value}
-                          onChange={(e) => field.handleChange(e.target.value)}
-                        />
-                      )}
-                    </updateForm.Field>
-                  </label>
-                  <label>
-                    Expected completion
-                    <updateForm.Field name="due_date">
-                      {(field) => (
-                        <input
-                          name="due_date"
-                          type="date"
-                          required
-                          disabled={!own}
-                          value={field.state.value}
-                          onChange={(e) => field.handleChange(e.target.value)}
-                        />
-                      )}
-                    </updateForm.Field>
-                  </label>
-                  {manager && (
+                  <p className="form-note">
+                    Suggestions rank skill overlap and confirmed capacity. The
+                    new owner must confirm feasibility
+                    {work.owner_id ? ", and the current owner is told" : ""}.
+                  </p>
+                  <button disabled={busy} className="button primary">
+                    {work.owner_id ? "Reassign" : "Propose assignment"}
+                    <ArrowRight size={14} />
+                  </button>
+                </form>
+              )}
+              {work.can_edit && work.owner_id ? (
+                <form
+                  className="form"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    void updateForm.handleSubmit();
+                  }}
+                >
+                  <div className="form-grid">
                     <label>
-                      Priority
-                      <updateForm.Field name="priority">
+                      Status
+                      <updateForm.Field name="status">
                         {(field) => (
                           <select
-                            name="priority"
+                            name="status"
                             value={field.state.value}
                             onChange={(e) => field.handleChange(e.target.value)}
                           >
-                            {PRIORITIES.map((s) => (
-                              <option key={s}>{s}</option>
+                            {WORK_STATUSES.map((s) => (
+                              <option
+                                key={s}
+                                disabled={s === "Completed" && !own}
+                              >
+                                {s}
+                              </option>
                             ))}
                           </select>
                         )}
                       </updateForm.Field>
                     </label>
-                  )}
-                </div>
-                <label>
-                  What changed?
-                  <updateForm.Field name="note">
-                    {(field) => (
-                      <textarea
-                        name="note"
-                        placeholder="Share a meaningful update. Include a reason when revising dates or priority."
-                        maxLength={4000}
-                        value={field.state.value}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                      />
+                    <label>
+                      Progress (%)
+                      <updateForm.Field name="progress">
+                        {(field) => (
+                          <input
+                            name="progress"
+                            type="number"
+                            min={0}
+                            max={100}
+                            required
+                            value={field.state.value}
+                            onChange={(e) => field.handleChange(e.target.value)}
+                          />
+                        )}
+                      </updateForm.Field>
+                    </label>
+                    <label>
+                      Remaining effort (hours)
+                      <updateForm.Field name="remaining_hours">
+                        {(field) => (
+                          <input
+                            name="remaining_hours"
+                            type="number"
+                            min={0}
+                            max={1000}
+                            step={0.5}
+                            required
+                            value={field.state.value}
+                            onChange={(e) => field.handleChange(e.target.value)}
+                          />
+                        )}
+                      </updateForm.Field>
+                    </label>
+                    <label>
+                      Expected completion
+                      <updateForm.Field name="due_date">
+                        {(field) => (
+                          <input
+                            name="due_date"
+                            type="date"
+                            required
+                            disabled={!own}
+                            value={field.state.value}
+                            onChange={(e) => field.handleChange(e.target.value)}
+                          />
+                        )}
+                      </updateForm.Field>
+                    </label>
+                    {manager && (
+                      <label>
+                        Priority
+                        <updateForm.Field name="priority">
+                          {(field) => (
+                            <select
+                              name="priority"
+                              value={field.state.value}
+                              onChange={(e) =>
+                                field.handleChange(e.target.value)
+                              }
+                            >
+                              {PRIORITIES.map((s) => (
+                                <option key={s}>{s}</option>
+                              ))}
+                            </select>
+                          )}
+                        </updateForm.Field>
+                      </label>
                     )}
-                  </updateForm.Field>
-                </label>
-                {own && !work.commitment_confirmed && (
-                  <label className="checkbox">
-                    <updateForm.Field name="accept_commitment">
+                  </div>
+                  <label>
+                    What changed?
+                    <updateForm.Field name="note">
                       {(field) => (
-                        <input
-                          type="checkbox"
-                          name="accept"
-                          checked={field.state.value}
-                          onChange={(e) => field.handleChange(e.target.checked)}
+                        <textarea
+                          name="note"
+                          placeholder="Share a meaningful update. Include a reason when revising dates or priority."
+                          maxLength={4000}
+                          value={field.state.value}
+                          onChange={(e) => field.handleChange(e.target.value)}
                         />
                       )}
                     </updateForm.Field>
-                    I confirm this commitment is feasible.
                   </label>
-                )}
-                <div className="form-actions">
-                  <span className="muted">
-                    {work.confirmed_at
-                      ? "Last confirmed " + ago(work.confirmed_at, now)
-                      : "Progress has not been confirmed"}
-                  </span>
-                  <button className="button primary" disabled={busy}>
-                    {busy ? (
-                      <Loader2 size={15} className="spin" />
-                    ) : (
-                      <Check size={15} />
-                    )}
-                    Save update
-                  </button>
-                </div>
-              </form>
-            ) : (
-              work.owner_id && (
-                <p className="form-note">
-                  You can view this shared commitment. Its owner provides work
-                  updates.
-                </p>
-              )
-            )}
-          </>
-        )}
-        {tab === "Dependencies" && (
-          <div className="detail-dependencies">
-            {work.can_edit && (
-              <button className="button" onClick={onDependency}>
-                <Plus size={15} />
-                Add dependency
-              </button>
-            )}
-            {deps.length ? (
-              deps.map((d) => (
-                <DependencyCard
-                  key={d.id}
-                  dep={d}
-                  state={state}
-                  onWork={() => {}}
-                />
-              ))
-            ) : (
-              <Empty
-                title="Nothing in the way"
-                description="Capture a dependency when you need a deliverable from someone else."
-              />
-            )}
-          </div>
-        )}
-        {tab === "History" && (
-          <div className="history-list">
-            <h4>Commitment revisions</h4>
-            {(history.data ?? []).map((c) => (
-              <div className="history-event" key={c.revision}>
-                <span className="history-point" />
-                <div>
-                  <strong>
-                    Revision {c.revision} · expected {dateLabel(c.due_date)}
-                  </strong>
-                  <p>{c.reason}</p>
-                </div>
-              </div>
-            ))}
-            <h4>Work activity</h4>
-            {state.activity
-              .filter((a) => a.work_item_id === work.id)
-              .map((a) => (
-                <div className="history-event" key={a.id}>
-                  <Avatar
-                    person={state.employees.find((p) => p.id === a.actor_id)}
-                    size={25}
+                  {own && !work.commitment_confirmed && (
+                    <label className="checkbox">
+                      <updateForm.Field name="accept_commitment">
+                        {(field) => (
+                          <input
+                            type="checkbox"
+                            name="accept"
+                            checked={field.state.value}
+                            onChange={(e) =>
+                              field.handleChange(e.target.checked)
+                            }
+                          />
+                        )}
+                      </updateForm.Field>
+                      I confirm this commitment is feasible.
+                    </label>
+                  )}
+                  <div className="form-actions">
+                    <span className="muted">
+                      {work.confirmed_at
+                        ? "Last confirmed " + ago(work.confirmed_at, now)
+                        : "Progress has not been confirmed"}
+                    </span>
+                    <button className="button primary" disabled={busy}>
+                      {busy ? (
+                        <Loader2 size={15} className="spin" />
+                      ) : (
+                        <Check size={15} />
+                      )}
+                      Save update
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                work.owner_id && (
+                  <p className="form-note">
+                    You can view this shared commitment. Its owner provides work
+                    updates.
+                  </p>
+                )
+              )}
+            </>
+          )}
+          {tab === "Dependencies" && (
+            <div className="detail-dependencies">
+              {work.can_edit && (
+                <button className="button" onClick={onDependency}>
+                  <Plus size={15} />
+                  Add dependency
+                </button>
+              )}
+              {deps.length ? (
+                deps.map((d) => (
+                  <DependencyCard
+                    key={d.id}
+                    dep={d}
+                    state={state}
+                    onWork={() => {}}
                   />
+                ))
+              ) : (
+                <Empty
+                  title="Nothing in the way"
+                  description="Capture a dependency when you need a deliverable from someone else."
+                />
+              )}
+            </div>
+          )}
+          {tab === "History" && (
+            <div className="history-list">
+              <h4>Commitment revisions</h4>
+              {(history.data ?? []).map((c) => (
+                <div className="history-event" key={c.revision}>
+                  <span className="history-point" />
                   <div>
-                    <p>{a.message}</p>
-                    <small>{ago(a.created_at, now)}</small>
+                    <strong>
+                      Revision {c.revision} · expected {dateLabel(c.due_date)}
+                    </strong>
+                    <p>{c.reason}</p>
                   </div>
                 </div>
               ))}
-          </div>
-        )}
+              <h4>Work activity</h4>
+              {state.activity
+                .filter((a) => a.work_item_id === work.id)
+                .map((a) => (
+                  <div className="history-event" key={a.id}>
+                    <Avatar
+                      person={state.employees.find((p) => p.id === a.actor_id)}
+                      size={25}
+                    />
+                    <div>
+                      <p>{a.message}</p>
+                      <small>{ago(a.created_at, now)}</small>
+                    </div>
+                  </div>
+                ))}
+            </div>
+          )}
+        </TabPanel>
         <FormError message={error} />
       </div>
     </Modal>

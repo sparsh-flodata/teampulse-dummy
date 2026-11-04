@@ -1,0 +1,92 @@
+/* Layout motion: the collapsible sidebar and its page offset. Everything else
+   animates through motion (transform and opacity only). */
+.sidebar {
+  transition:
+    width 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    padding 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.app-main {
+  transition: margin-left 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.sidebar-toggle {
+  position: absolute;
+  top: 28px;
+  right: 14px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: oklch(40% 0.01 40);
+  cursor: pointer;
+}
+.sidebar-toggle:hover {
+  color: var(--color-brand);
+}
+.sidebar-toggle:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+}
+@media (max-width: 760px) {
+  .sidebar-toggle {
+    display: none;
+  }
+}
+@media (min-width: 761px) {
+  .app-shell.is-collapsed .sidebar {
+    width: 72px;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+  .app-shell.is-collapsed .app-main {
+    margin-left: 72px;
+  }
+  .app-shell.is-collapsed .brand > span:last-child,
+  .app-shell.is-collapsed .workspace-switch > div:not(.workspace-avatar),
+  .app-shell.is-collapsed .workspace-switch > svg,
+  .app-shell.is-collapsed .sidebar-label,
+  .app-shell.is-collapsed .sidebar-projects .split,
+  .app-shell.is-collapsed .sidebar nav button > span,
+  .app-shell.is-collapsed .sidebar nav button > small,
+  .app-shell.is-collapsed .sidebar nav button > b,
+  .app-shell.is-collapsed .sidebar-projects button > span:not(.project-dot),
+  .app-shell.is-collapsed .sidebar-user > div,
+  .app-shell.is-collapsed .sidebar-user > button,
+  .app-shell.is-collapsed .nav-scroll-end {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.18s ease;
+  }
+  .app-shell.is-collapsed .sidebar-toggle {
+    top: 70px;
+    right: auto;
+    left: 50%;
+    margin-left: -13px;
+  }
+  .app-shell.is-collapsed .workspace-switch {
+    padding: 0;
+    margin-left: 0;
+    margin-right: 0;
+    border-color: transparent;
+    background: none;
+    box-shadow: none;
+  }
+  .app-shell.is-collapsed .sidebar-scroll {
+    scrollbar-width: none;
+    scrollbar-gutter: auto;
+  }
+  .app-shell.is-collapsed .settings-link {
+    font-size: 0;
+    justify-content: center;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sidebar,
+  .app-main {
+    transition: none;
+  }
+}

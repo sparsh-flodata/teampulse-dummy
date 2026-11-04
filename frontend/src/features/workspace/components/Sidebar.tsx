@@ -16,6 +16,8 @@ import {
   X,
   ChevronDown,
   Plus,
+  PanelLeftClose,
+  PanelLeftOpen,
 } from "lucide-react";
 import { Avatar, Logo } from "@/components/ui";
 import { isManager, openDependency } from "../domain";
@@ -50,6 +52,8 @@ type Props = {
   onProject: (id: number) => void;
   onClose: () => void;
   onLogout: () => void;
+  collapsed: boolean;
+  onToggleCollapsed: () => void;
 };
 
 export function Sidebar({
@@ -63,6 +67,8 @@ export function Sidebar({
   onProject,
   onClose,
   onLogout,
+  collapsed,
+  onToggleCollapsed,
 }: Props) {
   const manager = isManager(state.user),
     myWork = state.work.filter(
@@ -79,6 +85,21 @@ export function Sidebar({
       aria-label="Workspace navigation"
       className={"sidebar " + (mobile ? "mobile-open" : "")}
     >
+      {!smallScreen && (
+        <button
+          className="sidebar-toggle"
+          onClick={onToggleCollapsed}
+          aria-expanded={!collapsed}
+          aria-label={collapsed ? "Expand navigation" : "Collapse navigation"}
+          title={(collapsed ? "Expand" : "Collapse") + " navigation (Ctrl+B)"}
+        >
+          {collapsed ? (
+            <PanelLeftOpen size={15} />
+          ) : (
+            <PanelLeftClose size={15} />
+          )}
+        </button>
+      )}
       <div className="sidebar-header">
         {smallScreen && (
           <button
@@ -113,6 +134,7 @@ export function Sidebar({
             .map(({ label, icon: Icon }) => (
               <button
                 key={label}
+                title={collapsed ? label : undefined}
                 className={
                   view === label || (label === "Projects" && view === "Project")
                     ? "active"

@@ -112,6 +112,7 @@ export function CommitmentsDashboard({ view }: { view: CommitmentsView }) {
 
   return (
     <motion.div
+      data-motion="manual"
       key={overviewScope}
       variants={stagger}
       initial={anim ? "hidden" : false}

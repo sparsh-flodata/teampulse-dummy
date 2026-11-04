@@ -12,6 +12,7 @@ import {
   Users,
 } from "lucide-react";
 import { Avatar, Badge, Empty, healthTone } from "@/components/ui";
+import { TabPanel } from "@/components/ui/TabPanel";
 import { ago, dateLabel } from "@/lib/format";
 import { useNow, useWorkspace } from "@/features/workspace/hooks";
 import {
@@ -127,41 +128,43 @@ export function ProjectPage({
           );
         })}
       </div>
-      {tab === "Overview" && (
-        <ProjectOverview data={data} actions={actions} onTab={onTab} />
-      )}
-      {tab === "Commitments" && (
-        <ProjectCommitments
-          data={data}
-          works={works}
-          actions={actions}
-          directory={state.directory}
-        />
-      )}
-      {tab === "Board" && (
-        <ProjectBoard
-          data={data}
-          works={works}
-          actions={actions}
-          directory={state.directory}
-          userId={state.user.id}
-        />
-      )}
-      {tab === "People" && (
-        <ProjectPeople
-          data={data}
-          teams={state.teams}
-          onProfile={(id) => void nav.openProfile(id)}
-          onWork={actions.openWork}
-        />
-      )}
-      {tab === "Activity" && (
-        <ProjectActivity
-          data={data}
-          directory={state.directory}
-          onWork={actions.openWork}
-        />
-      )}
+      <TabPanel tabKey={tab}>
+        {tab === "Overview" && (
+          <ProjectOverview data={data} actions={actions} onTab={onTab} />
+        )}
+        {tab === "Commitments" && (
+          <ProjectCommitments
+            data={data}
+            works={works}
+            actions={actions}
+            directory={state.directory}
+          />
+        )}
+        {tab === "Board" && (
+          <ProjectBoard
+            data={data}
+            works={works}
+            actions={actions}
+            directory={state.directory}
+            userId={state.user.id}
+          />
+        )}
+        {tab === "People" && (
+          <ProjectPeople
+            data={data}
+            teams={state.teams}
+            onProfile={(id) => void nav.openProfile(id)}
+            onWork={actions.openWork}
+          />
+        )}
+        {tab === "Activity" && (
+          <ProjectActivity
+            data={data}
+            directory={state.directory}
+            onWork={actions.openWork}
+          />
+        )}
+      </TabPanel>
       {(assigning || selfAssign) && (
         <AssignDialog
           work={(assigning || selfAssign)!}
