@@ -37,9 +37,7 @@ export function ProjectsPage() {
             <button
               className={"project-card tone-" + p.health.tone}
               key={p.id}
-              onClick={() =>
-                nav.go("All commitments", { status: "all", project: p.id })
-              }
+              onClick={() => nav.openProject(p.id)}
             >
               <div className="split">
                 <span

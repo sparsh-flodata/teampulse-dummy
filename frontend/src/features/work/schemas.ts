@@ -24,6 +24,21 @@ export const updateWorkSchema = z.object({
 });
 export type UpdateWorkInput = z.output<typeof updateWorkSchema>;
 
+/** A dependency recorded with a new commitment: who it waits on, and for what. */
+export const newDependencySchema = z.object({
+  owner_id: z.coerce.number().int().positive("Choose who it waits on."),
+  deliverable: z
+    .string()
+    .trim()
+    .min(3, "Describe what you need in at least 3 characters.")
+    .max(200),
+  due_date: z.string().min(1, "Choose when you need it."),
+  impact: z.enum(["Low", "Medium", "High", "Critical"]),
+  partial: z.enum(["partial", "full"]).transform((v) => v === "partial"),
+  effort_hours: numberField(0.5, 1000, "Their estimated effort"),
+});
+export type NewDependencyInput = z.output<typeof newDependencySchema>;
+
 export const createWorkSchema = z.object({
   title: z
     .string()
@@ -37,6 +52,7 @@ export const createWorkSchema = z.object({
   due_date: z.string().min(1, "Choose an expected completion date."),
   effort_hours: numberField(0.5, 1000, "Estimated effort"),
   required_skills: z.string().max(500),
+  dependencies: z.array(newDependencySchema).max(10),
 });
 export type CreateWorkInput = z.output<typeof createWorkSchema>;
 

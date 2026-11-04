@@ -23,7 +23,7 @@ import type { View } from "../navigation";
 import type { WorkspaceState } from "../types";
 
 const items: {
-  label: Exclude<View, "Profile" | "Settings">;
+  label: Exclude<View, "Profile" | "Settings" | "Project">;
   icon: typeof Activity;
 }[] = [
   { label: "Overview", icon: LayoutDashboard },
@@ -45,7 +45,7 @@ type Props = {
   mobile: boolean;
   smallScreen: boolean;
   sidebarRef: RefObject<HTMLElement | null>;
-  onNavigate: (view: Exclude<View, "Profile">) => void;
+  onNavigate: (view: Exclude<View, "Profile" | "Project">) => void;
   onCreateProject: () => void;
   onProject: (id: number) => void;
   onClose: () => void;
@@ -113,7 +113,11 @@ export function Sidebar({
             .map(({ label, icon: Icon }) => (
               <button
                 key={label}
-                className={view === label ? "active" : ""}
+                className={
+                  view === label || (label === "Projects" && view === "Project")
+                    ? "active"
+                    : ""
+                }
                 onClick={() => onNavigate(label)}
               >
                 <Icon size={18} />

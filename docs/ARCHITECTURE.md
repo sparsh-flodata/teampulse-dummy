@@ -22,10 +22,16 @@ Teams have optional parents and leads. Employees have roles, primary teams, repo
 | Update work | Own | Own + reporting work | Organization |
 | Confirm completion/revised dates | Own only | Own only | Own only |
 | Accept proposed assignment | Own only | Own only | Own only |
-| Assign new/unassigned work | Self creation | Reporting scope | Organization |
+| Assign or reassign a project commitment | Take an unassigned one on a project they work on | Anyone in the organization | Anyone in the organization |
 | Create projects/employees | No | Scoped team/employee access | Organization |
 | Edit roles, reporting lines, team structure | No | No | Yes |
 | Read private assistant conversations/proposals | Own only | Own only | Own only |
+
+Assigning someone outside a project adds them as a participant. A reassignment notifies the previous and new owner; the new owner confirms the commitment unless they took it themselves. Completed work is not reassigned. Editing someone else's work (status, progress, dates) still follows the reporting rules above.
+
+## Project page
+
+`GET /api/projects/{id}` (`services/projects.py`) returns one project within the viewer's access: department and lead, people involved (owning department, invited, anyone owning work there) with their open work, the visible commitments, effort-weighted progress and status counts, open dependencies, recent updates on its commitments, and what the viewer may do there. The frontend route `/projects/$projectId` shows it in Overview, Commitments, Board (kanban by status; drag or "Move to" changes status, and the server still decides), People and Activity tabs.
 
 A report working on another team's project does not grant access to unrelated work in that project. Reporting changes affect the next request. Full profile routes, work history, assignment, mutation, dependency cancellation, and notifications enforce server permissions. Deactivation invalidates existing sessions. Reporting/team cycles are rejected; active reports must be reassigned before a manager is deactivated or demoted.
 
@@ -34,6 +40,10 @@ A report working on another team's project does not grant access to unrelated wo
 Passwords use salted scrypt. Sign-in returns a 15-minute HS256 JWT access token (`Authorization: Bearer`) and an opaque refresh token stored as a SHA-256 hash in `refresh_tokens`. Refresh rotates the token; presenting an already-rotated token revokes that whole sign-in (token family). Logout revokes the family; deactivation revokes all of a person's refresh tokens and `current_user` rejects inactive accounts at once. Set `JWT_SECRET` in production; without it a per-installation key is kept in `data/.jwt-secret`.
 
 Self-registration (`POST /api/auth/register`) and admin-created employees accept only `ALLOWED_EMAIL_DOMAINS` (default `flodataanalytics.com`, exact domain match). New registrants join `REGISTRATION_TEAM` (or the first top-level team) as employees until an administrator places them. Email ownership is not verified yet; Google Chat linking uses the email Google asserts. Mutation requests still require the `X-TeamPulse-Request` header and an approved origin; sign-in throttling is in-process.
+
+## Dependencies and linked commitments
+
+Adding a dependency (from the create form, a commitment's Dependencies tab, the API, or the assistant) creates a commitment for the person it waits on, in the same project, due when the deliverable is needed. They confirm it like any assignment. The dependency keeps `upstream_work_id` pointing at that commitment and follows it: confirmed means Accepted, started means In Progress, ready for review means Delivered, and completed means the dependency is fulfilled (Verified) and the waiting work is unblocked. Both people are notified and the history records it. Choosing existing work as the upstream links instead of creating one. Managers and administrators can ask anyone in the organization (they join the project); everyone else asks people on the project. A new commitment can carry its dependencies in `POST /api/work` (`dependencies`), created atomically.
 
 ## Shared work health
 

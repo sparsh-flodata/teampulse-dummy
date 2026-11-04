@@ -3,7 +3,7 @@ import { useForm } from "@tanstack/react-form";
 import { Link2 } from "lucide-react";
 import { bind, errorMessage } from "@/lib/forms";
 import { CreateFormFrame } from "@/features/workspace/components/CreateDialog";
-import { isProjectParticipant } from "@/features/workspace/domain";
+import { isManager, isProjectParticipant } from "@/features/workspace/domain";
 import { useWorkspaceMutation } from "@/features/workspace/hooks";
 import type { Work, WorkspaceState } from "@/features/workspace/types";
 import { createDependency } from "../api";
@@ -21,12 +21,15 @@ export function CreateDependencyForm({
   const [error, setError] = useState("");
   const create = useWorkspaceMutation(
     createDependency,
-    "Dependency recorded. The owner has an in-app notification.",
+    "Dependency recorded. A commitment for it was created for them to confirm.",
   );
   const project = state.projects.find((p) => p.id === work.project_id);
-  const owners = state.directory.filter((p) =>
-    isProjectParticipant(p, project),
-  );
+  // Managers and administrators can ask anyone in the organization.
+  const owners = state.directory
+    .filter((p) =>
+      isManager(state.user) ? p.active : isProjectParticipant(p, project),
+    )
+    .sort((a, b) => a.name.localeCompare(b.name));
   const form = useForm({
     defaultValues: {
       deliverable: "",
@@ -121,12 +124,16 @@ export function CreateDependencyForm({
           </form.Field>
         </label>
       </div>
+      <p className="form-note">
+        Unless you pick existing work below, a new commitment is created for
+        them. When they complete it, this dependency is fulfilled.
+      </p>
       <label>
         Related upstream work (optional)
         <form.Field name="upstream_work_id">
           {(f) => (
             <select {...bind(f)}>
-              <option value="">A deliverable outside recorded work</option>
+              <option value="">Create a new commitment for them</option>
               {state.work
                 .filter((w) => w.id !== work.id && w.status !== "Completed")
                 .map((w) => (

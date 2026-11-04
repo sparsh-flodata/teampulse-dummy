@@ -30,7 +30,8 @@ export function DependencyCard({
   const set = (status: string) => change.mutate({ id: dep.id, status });
   const owner = state.directory.find((p) => p.id === dep.owner_id),
     requester = state.directory.find((p) => p.id === dep.requester_id),
-    work = state.work.find((w) => w.id === dep.work_item_id);
+    work = state.work.find((w) => w.id === dep.work_item_id),
+    upstream = state.work.find((w) => w.id === dep.upstream_work_id);
   return (
     <div
       className={
@@ -49,6 +50,15 @@ export function DependencyCard({
         <ArrowUpRight size={15} />
       </button>
       <p>{dep.reason || "A required deliverable for " + work?.title}</p>
+      {upstream && openDependency(dep) && (
+        <p className="dep-link">
+          Fulfilled when{" "}
+          <button className="text-button" onClick={() => onWork(upstream)}>
+            {upstream.title}
+          </button>{" "}
+          is completed.
+        </p>
+      )}
       <div className="dependency-people">
         <div>
           <Avatar person={owner} size={27} />

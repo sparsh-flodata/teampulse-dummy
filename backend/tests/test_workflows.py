@@ -156,7 +156,6 @@ def test_assignment_proposal_and_employee_acceptance(ctx):
     assert c.post('/api/work/9/assign',json={'employee_id':6}).status_code==200
     work=next(w for w in c.get('/api/state').json()['work'] if w['id']==9)
     assert not work['commitment_confirmed']
-    assert c.post('/api/work/9/assign',json={'employee_id':3}).status_code==409
     assert c.patch('/api/work/9',json={'accept_commitment':True}).status_code==403
     login(c,'karan')
     assert c.patch('/api/work/9',json={'accept_commitment':True}).status_code==200

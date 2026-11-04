@@ -1,0 +1,80 @@
+[
+ {
+  "scope": "app",
+  "shape": "app screen",
+  "theme": "hum",
+  "axes": "light/rounded-sans/chromatic-yellow",
+  "nav": "four tabs and a More menu",
+  "signature": "needs-you-today cards, one plain sentence and one action each",
+  "sections": [
+   "greeting",
+   "needs you today",
+   "coming up",
+   "your team",
+   "ask pulse",
+   "states"
+  ],
+  "waived": [],
+  "prompt": "TeamPulse home for non-technical managers, phone and desktop, everyday words",
+  "date": "2026-11-03",
+  "mode": "build"
+ },
+ {
+  "scope": "app",
+  "shape": "app screen",
+  "theme": "console",
+  "axes": "dark/grotesk-sans/chromatic-amber",
+  "nav": "sidebar",
+  "signature": "the attention queue with the selected commitment's trail",
+  "sections": [
+   "readings",
+   "queue and record",
+   "handovers",
+   "room",
+   "states"
+  ],
+  "waived": [],
+  "prompt": "TeamPulse overview: three directions for an internal work-coordination dashboard (restructured)",
+  "date": "2026-11-03",
+  "mode": "build"
+ },
+ {
+  "scope": "app",
+  "shape": "app screen",
+  "theme": "dose",
+  "axes": "light/grotesk-sans/chromatic-green",
+  "nav": "sidebar",
+  "signature": "the due register, one plastic compartment per workday",
+  "sections": [
+   "figures",
+   "register",
+   "statement band",
+   "room",
+   "states"
+  ],
+  "waived": [],
+  "prompt": "TeamPulse overview: three directions for an internal work-coordination dashboard (restructured)",
+  "date": "2026-11-03",
+  "mode": "build"
+ },
+ {
+  "scope": "app",
+  "shape": "app screen",
+  "theme": "coral",
+  "axes": "light/grotesk-sans/warm",
+  "nav": "sidebar",
+  "signature": "the commitments ledger on one cotton sheet",
+  "sections": [
+   "health line",
+   "figures",
+   "ledger",
+   "brief board",
+   "dependencies",
+   "states"
+  ],
+  "waived": [],
+  "prompt": "TeamPulse overview: three directions for an internal work-coordination dashboard (current layout kept)",
+  "date": "2026-11-03",
+  "mode": "build"
+ }
+]

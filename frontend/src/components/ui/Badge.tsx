@@ -61,12 +61,21 @@ const ICONS = {
   neutral: Clock,
 } as const;
 
-export function Badge({ value, tone }: { value: string; tone?: BadgeTone }) {
+export function Badge({
+  value,
+  tone,
+  plain = false,
+}: {
+  value: string;
+  tone?: BadgeTone;
+  /** A label rather than a status: no icon. */
+  plain?: boolean;
+}) {
   const t = tone ?? badgeTone(value);
   const Icon = ICONS[t];
   return (
     <span className={"badge " + t}>
-      <Icon size={13} strokeWidth={2.4} aria-hidden="true" />
+      {!plain && <Icon size={13} strokeWidth={2.4} aria-hidden="true" />}
       {value}
     </span>
   );

@@ -1,4 +1,5 @@
 import { ChevronRight, Flag } from "lucide-react";
+import { motion } from "motion/react";
 import { Avatar, Badge, Empty, healthTone } from "@/components/ui";
 import { dateLabel } from "@/lib/format";
 import type { Work, WorkspaceState } from "@/features/workspace/types";
@@ -33,7 +34,7 @@ export function WorkTable({
           <thead>
             <tr>
               <th>Commitment</th>
-              <th>Owner</th>
+              <th>Assignee</th>
               <th>Status</th>
               <th>Expected</th>
               <th>Progress</th>
@@ -99,10 +100,17 @@ export function WorkTable({
                   <td>
                     <div className="progress-cell">
                       <div className="progress-track">
-                        <i
+                        <motion.i
                           style={{
-                            width: w.progress + "%",
+                            width: "100%",
+                            originX: 0,
                             background: PROGRESS_COLORS[w.tone],
+                          }}
+                          initial={{ scaleX: 0 }}
+                          animate={{ scaleX: w.progress / 100 }}
+                          transition={{
+                            duration: 0.7,
+                            ease: [0.22, 1, 0.36, 1],
                           }}
                         />
                       </div>

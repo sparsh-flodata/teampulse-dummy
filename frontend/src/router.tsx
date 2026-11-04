@@ -19,6 +19,8 @@ export function getRouter() {
     routeTree,
     context: { queryClient },
     scrollRestoration: true,
+    // Smooth scrolling is for in-page scrolls; a new page starts at the top at once.
+    scrollRestorationBehavior: "instant",
     defaultPreload: "intent",
     // Let TanStack Query own caching; loaders just ensure data exists.
     defaultPreloadStaleTime: 0,

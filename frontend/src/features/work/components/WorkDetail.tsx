@@ -80,19 +80,36 @@ export function WorkDetail({
     },
   });
 
-  const candidates = state.employees
-    .filter((p) => isProjectParticipant(p, project))
-    .sort((a, b) => {
-      const skill = work.required_skills
-        .toLowerCase()
-        .split(",")
-        .map((s) => s.trim())
-        .filter(Boolean);
-      const score = (p: Person) =>
-        skill.filter((s) => p.skills.toLowerCase().includes(s)).length * 100 +
-        (p.capacity.available || 0);
-      return score(b) - score(a);
-    });
+  // Managers and administrators can assign anyone in the organization. People in the
+  // viewer's reporting scope come with capacity and skills (ranked first); others are listed
+  // by role, and join the project when assigned.
+  const detailed = new Map<number, Person>(
+    state.employees.map((p) => [p.id, p]),
+  );
+  const skillScore = (p?: Person) => {
+    if (!p) return -1;
+    const skill = work.required_skills
+      .toLowerCase()
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+    return (
+      skill.filter((s) => p.skills.toLowerCase().includes(s)).length * 100 +
+      (p.capacity.available || 0)
+    );
+  };
+  const candidates = state.directory
+    .filter((p) => p.active && p.id !== work.owner_id)
+    .sort(
+      (a, b) =>
+        skillScore(detailed.get(b.id)) - skillScore(detailed.get(a.id)) ||
+        a.name.localeCompare(b.name),
+    );
+  const onProject = (id: number) =>
+    isProjectParticipant(
+      state.directory.find((p) => p.id === id)!,
+      project,
+    );
   const assignForm = useForm({
     defaultValues: { employee_id: String(candidates[0]?.id ?? "") },
     onSubmit: async ({ value }) => {
@@ -172,7 +189,7 @@ export function WorkDetail({
         </div>
         {tab === "Update" && (
           <>
-            {!work.owner_id && manager && (
+            {work.status !== "Completed" && manager && (
               <form
                 className="form assignment-form"
                 onSubmit={(e) => {
@@ -181,7 +198,7 @@ export function WorkDetail({
                 }}
               >
                 <label>
-                  Recommend an owner
+                  {work.owner_id ? "Reassign to" : "Recommend an assignee"}
                   <assignForm.Field name="employee_id">
                     {(field) => (
                       <select
@@ -189,25 +206,45 @@ export function WorkDetail({
                         value={field.state.value}
                         onChange={(e) => field.handleChange(e.target.value)}
                       >
-                        {candidates.map((p) => (
-                          <option key={p.id} value={p.id}>
-                            {p.name} ·{" "}
-                            {p.capacity.confirmed
-                              ? p.capacity.available + "h available"
-                              : "capacity unknown"}{" "}
-                            · {p.skills}
-                          </option>
-                        ))}
+                        <optgroup label="On this project">
+                          {candidates
+                            .filter((p) => onProject(p.id))
+                            .map((p) => {
+                              const d = detailed.get(p.id);
+                              return (
+                                <option key={p.id} value={p.id}>
+                                  {p.name} ·{" "}
+                                  {d
+                                    ? (d.capacity.confirmed
+                                        ? d.capacity.available + "h available"
+                                        : "capacity unknown") +
+                                      " · " +
+                                      d.skills
+                                    : p.title}
+                                </option>
+                              );
+                            })}
+                        </optgroup>
+                        <optgroup label="Elsewhere in the organization (joins the project)">
+                          {candidates
+                            .filter((p) => !onProject(p.id))
+                            .map((p) => (
+                              <option key={p.id} value={p.id}>
+                                {p.name} · {p.title}
+                              </option>
+                            ))}
+                        </optgroup>
                       </select>
                     )}
                   </assignForm.Field>
                 </label>
                 <p className="form-note">
-                  Suggestions rank skill overlap and confirmed capacity. The
-                  employee must confirm feasibility.
+                  Suggestions rank skill overlap and confirmed capacity. The new
+                  owner must confirm feasibility
+                  {work.owner_id ? ", and the current owner is told" : ""}.
                 </p>
                 <button disabled={busy} className="button primary">
-                  Propose assignment
+                  {work.owner_id ? "Reassign" : "Propose assignment"}
                   <ArrowRight size={14} />
                 </button>
               </form>

@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { z } from "zod";
+import { leavePage } from "@/lib/motion";
 
 export type View =
   | "Overview"
@@ -15,7 +16,8 @@ export type View =
   | "My profile"
   | "My team"
   | "Organization"
-  | "Profile";
+  | "Profile"
+  | "Project";
 
 export const viewPaths = {
   Overview: "/",
@@ -30,7 +32,7 @@ export const viewPaths = {
   "My profile": "/me",
   "My team": "/team",
   Organization: "/organization",
-} as const satisfies Record<Exclude<View, "Profile">, string>;
+} as const satisfies Record<Exclude<View, "Profile" | "Project">, string>;
 
 export type FormKind = "work" | "project" | "employee" | "dependency";
 export type WorkScope = "personal" | "team" | "organization";
@@ -59,8 +61,36 @@ export const workspaceSearchSchema = z.object({
 
 export type WorkspaceSearch = z.infer<typeof workspaceSearchSchema>;
 
-export function useWorkspaceSearch(): WorkspaceSearch {
-  return useSearch({ from: "/_app" });
+/** What pages filter by. Opening or closing a modal (work, create) does not change it. */
+const pickFilters = (s: WorkspaceSearch) => ({
+  q: s.q,
+  scope: s.scope,
+  drill: s.drill,
+  status: s.status,
+  project: s.project,
+  team: s.team,
+});
+export type PageFilters = ReturnType<typeof pickFilters>;
+
+/**
+ * The page filters in the URL. Subscribing to only these keeps a page (and the shell)
+ * from re-rendering every time a modal opens, which is what made modals stutter.
+ */
+export function useWorkspaceSearch(): PageFilters {
+  return useSearch({
+    from: "/_app",
+    select: pickFilters,
+    structuralSharing: true,
+  });
+}
+
+/** The open modal, if any: a commitment (?work=) or a create form (?create=). */
+export function useModalSearch() {
+  return useSearch({
+    from: "/_app",
+    select: (s: WorkspaceSearch) => ({ work: s.work, create: s.create }),
+    structuralSharing: true,
+  });
 }
 
 /** Navigation helpers mirroring the old app's view switching. */
@@ -73,24 +103,36 @@ export function useWorkspaceNavigation() {
         to: ".",
         search: (prev: WorkspaceSearch) => ({ ...prev, ...patch }),
         replace,
+        // Opening a dialog or typing a filter must not scroll the page behind it.
+        resetScroll: false,
       }),
     [navigate],
   );
 
   return {
     /** Go to a page with a fresh filter set (status defaults to "active"). */
-    go: (
-      view: Exclude<View, "Profile">,
+    go: async (
+      view: Exclude<View, "Profile" | "Project">,
       extra: Partial<WorkspaceSearch> = {},
     ) => {
-      window.scrollTo(0, 0);
+      await leavePage();
+      window.scrollTo({ top: 0, behavior: "instant" });
       return navigate({ to: viewPaths[view], search: extra });
     },
-    openProfile: (personId: number) => {
-      window.scrollTo(0, 0);
+    openProfile: async (personId: number) => {
+      await leavePage();
+      window.scrollTo({ top: 0, behavior: "instant" });
       return navigate({
         to: "/people/$personId",
         params: { personId },
+      });
+    },
+    openProject: async (projectId: number) => {
+      await leavePage();
+      window.scrollTo({ top: 0, behavior: "instant" });
+      return navigate({
+        to: "/projects/$projectId",
+        params: { projectId },
       });
     },
     openWork: (workId: number) => patchSearch({ work: workId }),

@@ -3,20 +3,20 @@ import {
   CheckSquare,
   Link2,
   Users,
-  Sparkles,
   ArrowUpRight,
   ArrowRight,
   ArrowDownToLine,
   Activity,
   X,
-  ShieldCheck,
   SlidersHorizontal,
   Flag,
 } from "lucide-react";
-import { Avatar, Empty } from "@/components/ui";
+import { Avatar, Badge, Empty, healthTone } from "@/components/ui";
 import { dateLabel } from "@/lib/format";
 import { showToast } from "@/lib/ui-store";
 import { DependencyCard } from "@/features/work/components/DependencyCard";
+import { motion } from "motion/react";
+import { revealOnScroll, rise, stagger } from "@/lib/motion";
 import { WorkTable } from "@/features/work/components/WorkTable";
 import {
   commitmentsCsv,
@@ -105,11 +105,24 @@ export function CommitmentsDashboard({ view }: { view: CommitmentsView }) {
     },
   ];
 
+  // Motion is on for the Overview for now; other pages render exactly as before.
+  const anim = view === "Overview";
+  const riseProps = anim ? { variants: rise } : {};
+  const scrollProps = anim ? revealOnScroll : {};
+
   return (
-    <>
+    <motion.div
+      key={overviewScope}
+      variants={stagger}
+      initial={anim ? "hidden" : false}
+      animate="show"
+    >
       {view === "Overview" && (
         <>
-          <section className={"pulse-banner tone-" + summary.tone}>
+          <motion.section
+            {...riseProps}
+            className={"pulse-banner tone-" + summary.tone}
+          >
             <div className="pulse-banner-symbol">
               <Activity size={23} />
               <i />
@@ -137,10 +150,15 @@ export function CommitmentsDashboard({ view }: { view: CommitmentsView }) {
               Let's make a plan
               <ArrowUpRight size={16} />
             </button>
-          </section>
-          <section className="stat-grid">
+          </motion.section>
+          <motion.section
+            variants={anim ? stagger : undefined}
+            className="stat-grid"
+          >
             {stats.map(({ label, value, sub, icon: Icon, tone, filter }) => (
-              <button
+              <motion.button
+                variants={rise}
+                whileTap={{ scale: 0.985 }}
                 className={"stat-card tone-" + tone}
                 key={label}
                 onClick={() =>
@@ -163,9 +181,9 @@ export function CommitmentsDashboard({ view }: { view: CommitmentsView }) {
                   <ArrowUpRight size={19} />
                 </strong>
                 <small>{sub}</small>
-              </button>
+              </motion.button>
             ))}
-          </section>
+          </motion.section>
         </>
       )}
       <div className={view === "Overview" ? "overview-grid" : ""}>
@@ -190,12 +208,16 @@ export function CommitmentsDashboard({ view }: { view: CommitmentsView }) {
               </button>
             </div>
           )}
-          <section className="panel commitments-panel">
+          <motion.section {...riseProps} className="panel commitments-panel">
             <div className="panel-heading">
               <div>
                 <h2>
                   {view === "Overview"
-                    ? "Work in motion"
+                    ? overviewScope === "team"
+                      ? "Team tasks"
+                      : overviewScope === "organization"
+                        ? "Organization tasks"
+                        : "Your tasks"
                     : view === "My work"
                       ? "My commitments"
                       : "All commitments"}
@@ -203,7 +225,11 @@ export function CommitmentsDashboard({ view }: { view: CommitmentsView }) {
                 </h2>
                 <p>
                   {view === "Overview"
-                    ? "The latest picture of your team’s commitments."
+                    ? overviewScope === "team"
+                      ? "Tasks assigned to your reporting team."
+                      : overviewScope === "organization"
+                        ? "Every task in the organization."
+                        : "Tasks assigned to you."
                     : "Delivery dates are commitments. Effort is an estimate."}
                 </p>
               </div>
@@ -303,13 +329,18 @@ export function CommitmentsDashboard({ view }: { view: CommitmentsView }) {
                 </button>
               </div>
             )}
-          </section>
+          </motion.section>
           {view === "Overview" && (
-            <section className="panel dependencies-preview">
+            <motion.section
+              {...scrollProps}
+              className="panel dependencies-preview"
+            >
               <div className="panel-heading">
                 <div>
-                  <h2>A little coordination goes a long way</h2>
-                  <p>Shared dependencies that could use a nudge.</p>
+                  <h2>Shared dependencies</h2>
+                  <p>
+                    Open dependencies between teammates that could use a nudge.
+                  </p>
                 </div>
                 <button
                   className="text-button"
@@ -336,107 +367,130 @@ export function CommitmentsDashboard({ view }: { view: CommitmentsView }) {
                   />
                 )}
               </div>
-            </section>
+            </motion.section>
           )}
         </div>
         {view === "Overview" && (
           <aside className="overview-aside">
-            <section className="briefing-card">
-              <div className="split">
-                <span className="eyebrow">
-                  <Sparkles size={14} />
-                  The daily brief
-                </span>
-                <span className="briefing-date">{dateLabel(state.today)}</span>
-              </div>
-              <h2>
-                Big picture.
-                <br />
-                Clear next steps.
-              </h2>
-              <p className="briefing-intro">
-                A snapshot from your team's recorded work.
-              </p>
-              <div className="brief-item">
-                <span className="brief-number">01</span>
+            <motion.section {...scrollProps} className="panel focus-panel">
+              <div className="panel-heading">
                 <div>
-                  <h4>
-                    {risk.length
-                      ? "Keep an eye on delivery."
-                      : "Keep the momentum."}
-                  </h4>
-                  <p>
-                    {risk.length ? (
-                      <>
-                        <button onClick={() => openWork(risk[0].id)}>
-                          {risk[0].title}
-                        </button>{" "}
-                        {risk[0].health === "Overdue"
-                          ? "is past its expected date. Confirm what changed before adjusting the plan."
-                          : "needs a progress check. Check its latest context."}
-                      </>
-                    ) : (
-                      "No current delivery exceptions are recorded. Keep confirmations up to date."
-                    )}
-                  </p>
+                  <h2>Today’s focus</h2>
+                  <p>{dateLabel(state.today)}, from recorded work.</p>
                 </div>
               </div>
-              <div className="brief-item">
-                <span className="brief-number">02</span>
-                <div>
-                  <h4>
-                    {deps.length
-                      ? "Unblock the next step."
-                      : "Room to move forward."}
-                  </h4>
-                  <p>
-                    {deps.length ? (
-                      <>
-                        {deps[0].deliverable} is needed for shared work.{" "}
-                        {
-                          state.employees
-                            .find((p) => p.id === deps[0].owner_id)
-                            ?.name.split(" ")[0]
-                        }{" "}
-                        owns the next step.
-                      </>
-                    ) : (
-                      "No unresolved dependencies are recorded."
-                    )}
-                  </p>
-                </div>
+              <ul className="focus-list">
+                <li
+                  className={
+                    "focus-item " +
+                    (risk.length
+                      ? risk[0].health === "Overdue"
+                        ? "tone-red"
+                        : "tone-amber"
+                      : "tone-green")
+                  }
+                >
+                  <div className="focus-main">
+                    <Badge
+                      value={risk.length ? risk[0].health : "No delivery risks"}
+                      tone={risk.length ? healthTone(risk[0].tone) : "green"}
+                    />
+                    <strong>
+                      {risk.length ? risk[0].title : "Delivery is on track"}
+                    </strong>
+                    <p>
+                      {risk.length
+                        ? risk[0].health === "Overdue"
+                          ? "Past its expected date. Confirm what changed before adjusting the plan."
+                          : "Needs a progress check from its assignee."
+                        : "No delivery exceptions are recorded. Keep confirmations up to date."}
+                    </p>
+                  </div>
+                  {risk.length > 0 && (
+                    <button
+                      className="button small"
+                      onClick={() => openWork(risk[0].id)}
+                    >
+                      Open
+                    </button>
+                  )}
+                </li>
+                <li
+                  className={
+                    "focus-item " + (deps.length ? "tone-amber" : "tone-green")
+                  }
+                >
+                  <div className="focus-main">
+                    <Badge
+                      value={deps.length ? "Waiting" : "Nothing blocked"}
+                      tone={deps.length ? "amber" : "green"}
+                    />
+                    <strong>
+                      {deps.length
+                        ? deps[0].deliverable
+                        : "No open dependencies"}
+                    </strong>
+                    <p>
+                      {deps.length
+                        ? `${
+                            state.directory
+                              .find((p) => p.id === deps[0].owner_id)
+                              ?.name.split(" ")[0] ?? "Someone"
+                          } is delivering it. Shared work is waiting.`
+                        : "Nothing is waiting on anyone."}
+                    </p>
+                  </div>
+                  {deps.length > 0 && (
+                    <button
+                      className="button small"
+                      onClick={() => openWork(deps[0].work_item_id)}
+                    >
+                      Open
+                    </button>
+                  )}
+                </li>
+                <li
+                  className={
+                    "focus-item " +
+                    (available.length ? "tone-green" : "tone-neutral")
+                  }
+                >
+                  <div className="focus-main">
+                    <Badge
+                      value={
+                        available.length ? "Room to help" : "Capacity unknown"
+                      }
+                      tone={available.length ? "green" : "neutral"}
+                    />
+                    <strong>
+                      {available.length
+                        ? `${available[0].name} has ${available[0].capacity.available}h free`
+                        : "Confirm availability"}
+                    </strong>
+                    <p>
+                      {available.length
+                        ? "Confirmed room in the next five workdays. Check skills before assigning."
+                        : "Ask teammates to confirm their availability before assigning more work."}
+                    </p>
+                  </div>
+                  <button
+                    className="button small"
+                    onClick={() => nav.go("Team & capacity")}
+                  >
+                    Team
+                  </button>
+                </li>
+              </ul>
+              <div className="panel-footer focus-footer">
+                <button
+                  className="text-button"
+                  onClick={() => nav.go("AI chat")}
+                >
+                  Ask the assistant to plan
+                </button>
               </div>
-              <div className="brief-item">
-                <span className="brief-number">03</span>
-                <div>
-                  <h4>A little room to help.</h4>
-                  <p>
-                    {available.length ? (
-                      <>
-                        {available[0].name.split(" ")[0]} has{" "}
-                        {available[0].capacity.available}h of confirmed room in
-                        the next five workdays. Review skills before proposing
-                        work.
-                      </>
-                    ) : (
-                      "Confirm availability with your teammates before assigning more work."
-                    )}
-                  </p>
-                </div>
-              </div>
-              <button
-                className="briefing-button"
-                onClick={() => nav.go("AI chat")}
-              >
-                Talk through the plan
-                <ArrowUpRight size={16} />
-              </button>
-              <small className="briefing-disclosure">
-                <ShieldCheck size={12} />
-                Based on recorded facts. No performance judgments.
-              </small>
-            </section>
-            <section className="panel team-snapshot">
+            </motion.section>
+            <motion.section {...scrollProps} className="panel team-snapshot">
               <div className="panel-heading">
                 <h2>Team at a glance</h2>
                 <button
@@ -482,10 +536,10 @@ export function CommitmentsDashboard({ view }: { view: CommitmentsView }) {
                 <span className="tiny-dot" />
                 Work visibility. Human context.
               </div>
-            </section>
+            </motion.section>
           </aside>
         )}
       </div>
-    </>
+    </motion.div>
   );
 }

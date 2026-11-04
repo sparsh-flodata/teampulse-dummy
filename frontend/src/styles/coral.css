@@ -398,10 +398,18 @@ textarea:focus {
 .coord-author .coord-agent {
   margin-left: 6px;
   padding: 1px 6px;
-  border: 1px solid color-mix(in oklab, var(--color-info-ink) 18%, var(--color-info-soft));
+  border: 1px solid
+    color-mix(in oklab, var(--color-info-ink) 18%, var(--color-info-soft));
   border-radius: var(--radius-6);
   background: var(--color-info-soft);
   color: var(--color-info-ink);
   font-size: var(--text-8);
   font-weight: var(--weight-semibold);
+}
+
+/* Smooth scrolling (anchors, scroll-to-top, keyboard paging); off for reduced motion */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
 }

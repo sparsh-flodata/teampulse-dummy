@@ -8,4 +8,5 @@ export const queryKeys = {
   updateRequests: ["update-requests"] as const,
   assistantHistory: ["assistant", "history"] as const,
   googleChat: ["integrations", "google-chat"] as const,
+  project: (projectId: number) => ["projects", projectId] as const,
 };

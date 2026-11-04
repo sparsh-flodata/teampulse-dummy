@@ -25,8 +25,9 @@ def test_reporting_manager_profiles_do_not_expose_peer_capacity(ctx):
     assert c.get('/api/people/3/profile').status_code==403
     assert c.get('/api/people/7/profile').status_code==403
     assert c.patch('/api/work/3',json={'progress':80}).status_code==403
-    assert c.post('/api/work',json=work_body(owner=3)).status_code==403
-    assert c.post('/api/work/9/assign',json={'employee_id':3}).status_code==403
+    # Managers may assign anyone in the organization (the assignee confirms); editing others' work stays scoped.
+    assert c.post('/api/work',json=work_body(owner=3)).status_code==201
+    assert c.post('/api/work/9/assign',json={'employee_id':3}).status_code in (200,404)
 
 
 def test_every_role_keeps_own_work_and_directory(ctx):
