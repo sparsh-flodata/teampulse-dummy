@@ -33,6 +33,10 @@ def create_requests(db,user,ids,prompt,channel='in_app'):
             records.append(previous);continue
         request=UpdateRequest(requester_id=user.id,recipient_id=person.id,prompt=prompt,channel=channel)
         db.add(request);db.flush()
+        # The reply goes through the check-in handler too, so it also updates the work (plan 5).
+        from backend.app.services.proactive import open_request_check_in,record_request_message
+        check_in=open_request_check_in(db,request,person)
+        if check_in:record_request_message(db,check_in,user,request)
         result=CHANNELS[channel].prepare(db,request,user,person)
         request.status=result.state;request.delivery_detail=result.detail
         audit(db,user,f'Requested a work update from {person.name} through {CHANNEL_LABELS[channel]}.')
@@ -45,7 +49,15 @@ def serialize_request(db,request,user):
     sender=db.get(Employee,request.requester_id);recipient=db.get(Employee,request.recipient_id)
     authorized=bool(sender and sender.active and recipient and recipient.active and recipient.id in profile_ids(db,sender))
     visible_response=request.response if authorized else None
-    return {'id':request.id,'requester_id':request.requester_id,'recipient_id':request.recipient_id,'requester_name':sender.name if sender else 'Former teammate','recipient_name':recipient.name if recipient else 'Former teammate','prompt':request.prompt,'channel':request.channel,'status':request.status,'delivery_detail':request.delivery_detail,'response':visible_response,'work_item_id':request.work_item_id if authorized else None,'created_at':request.created_at.isoformat()+'Z','responded_at':request.responded_at.isoformat()+'Z' if request.responded_at else None,'can_reply':authorized and user.id==request.recipient_id and request.status=='Delivered','access_changed':not authorized}
+    return {'id':request.id,'requester_id':request.requester_id,'recipient_id':request.recipient_id,'requester_name':sender.name if sender else 'Former teammate','recipient_name':recipient.name if recipient else 'Former teammate','prompt':request.prompt,'channel':request.channel,'status':request.status,'delivery_detail':request.delivery_detail,'response':visible_response,'work_item_id':request.work_item_id if authorized else None,'created_at':request.created_at.isoformat()+'Z','responded_at':request.responded_at.isoformat()+'Z' if request.responded_at else None,'can_reply':authorized and user.id==request.recipient_id and request.status=='Delivered','access_changed':not authorized,
+            'attachments':request_attachments(db,request,user) if authorized else []}
+
+
+def request_attachments(db,request,user):
+    from backend.app.api.routes.attachments import serialize_attachments
+    from backend.app.models import Attachment
+    rows=list(db.scalars(select(Attachment).where(Attachment.update_request_id==request.id).order_by(Attachment.id)))
+    return serialize_attachments(db,rows,user) if rows else []
 
 
 def reply_to_request(db,user,request,body):
@@ -67,6 +79,9 @@ def reply_to_request(db,user,request,body):
         patch_work(db,user,work,WorkPatch(progress=progress,remaining_hours=remaining,status=body.status,note=body.message))
         request.work_item_id=work.id
     request.response=body.message;request.responded_at=now();request.status='Responded'
+    from backend.app.models import CheckIn
+    for check_in in db.scalars(select(CheckIn).where(CheckIn.update_request_id==request.id,CheckIn.status=='Open')):
+        check_in.status='Done'  # answered in the inbox; the check-in handler sets its own status afterwards
     from backend.app.services.work import notify
     notify(db,sender.id,f'update-response:{request.id}',f'{user.name} replied to your update request.',request.work_item_id)
     db.flush()

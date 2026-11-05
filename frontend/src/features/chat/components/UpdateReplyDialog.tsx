@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useForm } from "@tanstack/react-form";
 import { FormError, Modal, SubmitButton } from "@/components/ui";
+import { RichText } from "@/components/ui/RichText";
 import { bind, errorMessage } from "@/lib/forms";
 import { useWorkspaceMutation } from "@/features/workspace/hooks";
 import type { UpdateRequest, WorkspaceState } from "@/features/workspace/types";
@@ -58,7 +59,7 @@ export function UpdateReplyDialog({
           void form.handleSubmit();
         }}
       >
-        <p className="form-note">{request.prompt}</p>
+        <RichText className="form-note" text={request.prompt} />
         <label>
           Related commitment
           <form.Field name="work_item_id">

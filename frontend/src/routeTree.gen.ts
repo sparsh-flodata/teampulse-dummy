@@ -17,6 +17,7 @@ import { Route as AppCapacityRouteImport } from './routes/_app/capacity'
 import { Route as AppChatRouteImport } from './routes/_app/chat'
 import { Route as AppCommitmentsRouteImport } from './routes/_app/commitments'
 import { Route as AppDependenciesRouteImport } from './routes/_app/dependencies'
+import { Route as AppFilesRouteImport } from './routes/_app/files'
 import { Route as AppMeRouteImport } from './routes/_app/me'
 import { Route as AppMyWorkRouteImport } from './routes/_app/my-work'
 import { Route as AppOrganizationRouteImport } from './routes/_app/organization'
@@ -63,6 +64,11 @@ const AppCommitmentsRoute = AppCommitmentsRouteImport.update({
 const AppDependenciesRoute = AppDependenciesRouteImport.update({
   id: '/dependencies',
   path: '/dependencies',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppFilesRoute = AppFilesRouteImport.update({
+  id: '/files',
+  path: '/files',
   getParentRoute: () => AppRoute,
 } as any)
 const AppMeRoute = AppMeRouteImport.update({
@@ -114,6 +120,7 @@ export interface FileRoutesByFullPath {
   '/chat': typeof AppChatRoute
   '/commitments': typeof AppCommitmentsRoute
   '/dependencies': typeof AppDependenciesRoute
+  '/files': typeof AppFilesRoute
   '/me': typeof AppMeRoute
   '/my-work': typeof AppMyWorkRoute
   '/organization': typeof AppOrganizationRoute
@@ -130,6 +137,7 @@ export interface FileRoutesByTo {
   '/chat': typeof AppChatRoute
   '/commitments': typeof AppCommitmentsRoute
   '/dependencies': typeof AppDependenciesRoute
+  '/files': typeof AppFilesRoute
   '/me': typeof AppMeRoute
   '/my-work': typeof AppMyWorkRoute
   '/organization': typeof AppOrganizationRoute
@@ -149,6 +157,7 @@ export interface FileRoutesById {
   '/_app/chat': typeof AppChatRoute
   '/_app/commitments': typeof AppCommitmentsRoute
   '/_app/dependencies': typeof AppDependenciesRoute
+  '/_app/files': typeof AppFilesRoute
   '/_app/me': typeof AppMeRoute
   '/_app/my-work': typeof AppMyWorkRoute
   '/_app/organization': typeof AppOrganizationRoute
@@ -169,6 +178,7 @@ export interface FileRouteTypes {
     | '/chat'
     | '/commitments'
     | '/dependencies'
+    | '/files'
     | '/me'
     | '/my-work'
     | '/organization'
@@ -185,6 +195,7 @@ export interface FileRouteTypes {
     | '/chat'
     | '/commitments'
     | '/dependencies'
+    | '/files'
     | '/me'
     | '/my-work'
     | '/organization'
@@ -203,6 +214,7 @@ export interface FileRouteTypes {
     | '/_app/chat'
     | '/_app/commitments'
     | '/_app/dependencies'
+    | '/_app/files'
     | '/_app/me'
     | '/_app/my-work'
     | '/_app/organization'
@@ -277,6 +289,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppDependenciesRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/files': {
+      id: '/_app/files'
+      path: '/files'
+      fullPath: '/files'
+      preLoaderRoute: typeof AppFilesRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/me': {
       id: '/_app/me'
       path: '/me'
@@ -342,6 +361,7 @@ interface AppRouteChildren {
   AppChatRoute: typeof AppChatRoute
   AppCommitmentsRoute: typeof AppCommitmentsRoute
   AppDependenciesRoute: typeof AppDependenciesRoute
+  AppFilesRoute: typeof AppFilesRoute
   AppMeRoute: typeof AppMeRoute
   AppMyWorkRoute: typeof AppMyWorkRoute
   AppOrganizationRoute: typeof AppOrganizationRoute
@@ -359,6 +379,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppChatRoute: AppChatRoute,
   AppCommitmentsRoute: AppCommitmentsRoute,
   AppDependenciesRoute: AppDependenciesRoute,
+  AppFilesRoute: AppFilesRoute,
   AppMeRoute: AppMeRoute,
   AppMyWorkRoute: AppMyWorkRoute,
   AppOrganizationRoute: AppOrganizationRoute,

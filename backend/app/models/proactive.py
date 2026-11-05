@@ -23,6 +23,7 @@ class CheckIn(Base):
     status: Mapped[str] = mapped_column(String(20), default='Open')  # Open, Clarifying, Confirming, Done, Expired
     clarify_rounds: Mapped[int] = mapped_column(Integer, default=0)
     pending_json: Mapped[str] = mapped_column(Text, default='{}')
+    message: Mapped[str] = mapped_column(Text, default='')  # the composed check-in, for the admin preview
     created_at: Mapped[datetime] = mapped_column(DateTime, default=now)
     last_message_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     expires_at: Mapped[datetime] = mapped_column(DateTime)

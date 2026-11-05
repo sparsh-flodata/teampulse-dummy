@@ -37,7 +37,14 @@ class GoogleChatChannel:
         where = f'or open your inbox: {app_link("/chat")}' if app_link('/chat') else 'or answer in your TeamPulse inbox'
         text = (f'{sender.name} asked for an update:\n{request.prompt}\n\n'
                 f'Reply here in a sentence, {where}')
-        if google_chat.queue_message(db, recipient.id, text, request.id):
+        from sqlalchemy import select
+        from backend.app.models import CheckIn
+        from backend.app.services.proactive import request_items_text
+        check_in = db.scalar(select(CheckIn).where(CheckIn.update_request_id == request.id))
+        if check_in:
+            text = (f'{sender.name} asked for an update:\n{request.prompt}\n\n{request_items_text(db, check_in)}'
+                    + (f'\nOr open your inbox: {app_link("/chat")}' if app_link('/chat') else ''))
+        if google_chat.queue_message(db, recipient.id, text, request.id, check_in_id=check_in.id if check_in else None):
             return DeliveryResult('Delivered', 'Delivered to the TeamPulse update inbox; the Google Chat message is on its way.')
         first = recipient.name.split(' ')[0]
         reason = 'Google Chat is not configured for this workspace' if not google_chat.outbound_enabled() else f'{first} has not connected Google Chat yet'

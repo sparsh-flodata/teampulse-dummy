@@ -13,6 +13,7 @@ from backend.app.db.migrations import migrate
 from backend.app.api.router import router
 from backend.app.core.config import FRONTEND_DIST, PUBLIC_HOST, PUBLIC_HOST_RESTRICTED, PUBLIC_PATHS
 from backend.app.channels.google_chat import process_outbox
+from backend.app.services.proactive import run_check_ins
 
 async def workflow_loop():
     while True:
@@ -26,6 +27,7 @@ async def workflow_loop():
 def workflow_tick():
     with SessionLocal() as db:
         run_workflows(db)
+        run_check_ins(db)
         process_outbox(db)
 
 @asynccontextmanager

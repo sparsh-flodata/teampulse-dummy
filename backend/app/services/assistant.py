@@ -13,6 +13,7 @@ from fastapi import HTTPException
 from backend.app.models import Conversation, AgentAction, MessageReceipt, WorkItem
 from backend.app.schemas import DependencyCreate, WorkCreate, WorkPatch
 from backend.app.services.coordination import coordination_intent,create_requests,validate_recipients,allowed_recipients
+from backend.app.services.formatting import sanitize
 from backend.app.services.work import today, business_day, serialize_work, visible_projects, visible_work, create_work, patch_work, get_work
 
 class Proposal(BaseModel):
@@ -30,6 +31,7 @@ class Proposal(BaseModel):
     progress: int | None = Field(default=None, ge=0, le=100)
     remaining_hours: float | None = Field(default=None, ge=0, le=1000)
     note: str = Field(default='', max_length=4000)
+    risk: bool | None = None  # check-ins: a blocker with no teammate to record it against
     # dependency: who the selected work waits on, and for what
     owner_id: int | None = None
     deliverable: str | None = Field(default=None, min_length=3, max_length=200)
@@ -141,6 +143,7 @@ async def converse(db, user, message, work_id, request_id=None, recipient_ids=No
         action.status = 'Applied'
         auto_applied = True
         result.reply = 'Saved your explicit progress update using your automatic-update preference. Completion, new commitments, and delivery-date changes still require confirmation.'
+    result.reply = sanitize(result.reply) or 'I could not put that into words. Please try again.'
     db.add_all([Conversation(employee_id=user.id, role='user', message=message), Conversation(employee_id=user.id, role='assistant', message=result.reply, agent=AGENTS[state['route']])])
     response = {'reply': result.reply, 'mode': mode, 'auto_applied': auto_applied,
                 'agent': AGENTS[state['route']], 'steps': state['steps'], 'action': {'id': action.id, 'payload': json.loads(action.payload), 'status': action.status} if action else None}
@@ -175,4 +178,4 @@ def apply_proposal(db, user, action):
     base = json.loads(action.base_snapshot)
     if not base or base != snapshot(db, work):
         raise HTTPException(409, 'Work changed since this proposal was drafted. Dismiss it and send a fresh update.')
-    return patch_work(db, user, work, WorkPatch(status=p.status, progress=p.progress, remaining_hours=p.remaining_hours, due_date=p.due_date, note=p.note))
+    return patch_work(db, user, work, WorkPatch(status=p.status, progress=p.progress, remaining_hours=p.remaining_hours, due_date=p.due_date, risk=p.risk, note=p.note))

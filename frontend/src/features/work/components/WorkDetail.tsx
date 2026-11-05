@@ -21,6 +21,7 @@ import {
 } from "@/features/workspace/domain";
 import { useNow, useWorkspaceMutation } from "@/features/workspace/hooks";
 import type { Person, Work, WorkspaceState } from "@/features/workspace/types";
+import { AttachmentFeed } from "@/features/attachments/components/AttachmentFeed";
 import { assignWork, updateWork, workHistoryQuery } from "../api";
 import { PRIORITIES, WORK_STATUSES, updateWorkSchema } from "../schemas";
 import { DependencyCard } from "./DependencyCard";
@@ -175,7 +176,7 @@ export function WorkDetail({
           </div>
         </div>
         <div className="tabs">
-          {["Update", "Dependencies", "History"].map((t) => (
+          {["Update", "Dependencies", "Files & links", "History"].map((t) => (
             <button
               key={t}
               className={tab === t ? "active" : ""}
@@ -430,6 +431,14 @@ export function WorkDetail({
                   description="Capture a dependency when you need a deliverable from someone else."
                 />
               )}
+            </div>
+          )}
+          {tab === "Files & links" && (
+            <div className="detail-files">
+              <AttachmentFeed
+                filters={{ work_item_id: work.id }}
+                showWork={false}
+              />
             </div>
           )}
           {tab === "History" && (

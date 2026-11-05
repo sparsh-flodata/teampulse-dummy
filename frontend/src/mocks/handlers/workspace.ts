@@ -26,6 +26,7 @@ import { API, authUser, fail, invalid, saved, unauthorized } from "../http";
 type Ctx = {
   userId: number;
   params: PathParams;
+  request: Request;
   body: Record<string, unknown>;
 };
 type Handler = (ctx: Ctx) => Response | Promise<Response>;
@@ -48,13 +49,86 @@ function authed(handler: Handler) {
     reloadDb();
     const userId = authUser(request);
     if (userId === null) return unauthorized();
-    return handler({ userId, params, body });
+    return handler({ userId, params, body, request });
   };
 }
 
 const id = (params: PathParams, key = "id") => Number(params[key]);
 const str = (v: unknown) => (typeof v === "string" ? v : "");
 const num = (v: unknown) => (typeof v === "number" ? v : Number(v));
+const addDays = (date: string, days: number) => {
+  const d = new Date(date + "T12:00:00Z");
+  d.setUTCDate(d.getUTCDate() + days);
+  return d.toISOString().slice(0, 10);
+};
+
+function preferencesOf(userId: number) {
+  const p = employee(userId);
+  return {
+    proactive_checkins: p?.proactive_checkins ?? true,
+    checkins_paused_until: p?.checkins_paused_until ?? null,
+    checkin_hour: 9,
+    org_timezone: "Asia/Kolkata",
+    enabled: true,
+  };
+}
+
+/** Daily check-ins as the server would compose them for one day (weekdays only). */
+function checkInsFor(date: string) {
+  const weekday = new Date(date + "T12:00:00Z").getUTCDay();
+  if (weekday === 0 || weekday === 6) return [];
+  const soon = addDays(date, 2);
+  return db.employees
+    .filter(
+      (p) =>
+        p.active &&
+        p.proactive_checkins &&
+        !(p.checkins_paused_until && date < p.checkins_paused_until),
+    )
+    .map((p) => ({
+      person: p,
+      work: db.work
+        .filter(
+          (w) =>
+            w.owner_id === p.id &&
+            w.status !== "Completed" &&
+            w.due_date <= soon,
+        )
+        .slice(0, 5),
+    }))
+    .filter((x) => x.work.length)
+    .slice(0, 8)
+    .map(({ person, work }, i) => {
+      const items = work.map((w, n) => ({
+        n: n + 1,
+        work_item_id: w.id,
+        title: w.title,
+      }));
+      const lines = work.map(
+        (w, n) =>
+          `${n + 1}. **${w.title}**: ${w.due_date < date ? "was due" : "due"} ${w.due_date}, ${w.progress}% done`,
+      );
+      return {
+        id: i + 1,
+        employee_id: person.id,
+        employee_name: person.name,
+        kind: "daily",
+        status: i % 3 === 0 ? "Answered" : "Open",
+        period: date,
+        clarify_rounds: i % 3 === 0 ? 1 : 0,
+        items,
+        message: [
+          `Good morning ${person.name.split(" ")[0]}. A quick check on what you owe:`,
+          lines.join("\n"),
+          "Reply in your own words, for example `1 done, 2 moves to Friday`.",
+        ].join("\n\n"),
+        chat_delivery: i % 2 === 0 ? "Dry run" : "Not linked",
+        created_at: date + "T03:30:00Z",
+        expires_at: addDays(date, 1) + "T03:30:00Z",
+      };
+    });
+}
+
 const managerOnly = (userId: number) =>
   ["manager", "admin"].includes(employee(userId)?.role ?? "");
 
@@ -298,6 +372,8 @@ export const workspaceHandlers = [
         planning: "Hybrid",
         active: true,
         agent_auto_updates: false,
+        proactive_checkins: true,
+        checkins_paused_until: null,
         capacity: {
           committed: 0,
           usable: 30,
@@ -375,6 +451,43 @@ export const workspaceHandlers = [
         },
       });
       return HttpResponse.json(saved(db.employees[index]));
+    }),
+  ),
+
+  // ------------------------------------------------------------- check-ins
+  http.get(
+    `${API}/me/preferences`,
+    authed(({ userId }) => HttpResponse.json(preferencesOf(userId))),
+  ),
+
+  http.patch(
+    `${API}/me/preferences`,
+    authed(({ userId, body }) => {
+      const p = employee(userId);
+      if (!p) return unauthorized();
+      if (typeof body.proactive_checkins === "boolean")
+        p.proactive_checkins = body.proactive_checkins;
+      if (typeof body.pause_until_tomorrow === "boolean")
+        p.checkins_paused_until = body.pause_until_tomorrow
+          ? addDays(db.meta.today, 1)
+          : null;
+      return HttpResponse.json(saved(preferencesOf(userId)));
+    }),
+  ),
+
+  http.get(
+    `${API}/admin/check-ins`,
+    authed(({ userId, request }) => {
+      if (employee(userId)?.role !== "admin")
+        return fail(403, "Administrator access is required.");
+      const date =
+        new URL(request.url).searchParams.get("date") || db.meta.today;
+      return HttpResponse.json({
+        date,
+        enabled: true,
+        dry_run: true,
+        check_ins: checkInsFor(date),
+      });
     }),
   ),
 

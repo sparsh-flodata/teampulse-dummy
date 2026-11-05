@@ -1,6 +1,6 @@
 # Proactive Assistant: MVP plan
 
-Status: plan, not built. Written 2026-11-05 for handoff (implementer: Sonnet).
+Status: built in one pass on 2026-11-05 (the phase handoffs in section 15 were not used). Live verification items are listed in section 15.
 Branch: `feat/tanstack-start`. Target: a pilot with 2 to 3 real users on Google Chat and the in-app AI chat.
 
 ## 1. What the MVP does
@@ -556,31 +556,29 @@ Tabs use the existing `TabPanel`, so they get the same transitions.
 
 ### Status (updated 2026-11-05)
 
-**Phase 1 (Haiku): mostly done, not committed.**
+All sections were implemented in one pass instead of the phases below. Backend and frontend tests,
+typecheck and lint pass; see the commit for details.
 
-Done:
-- Migration 6 in `db/migrations.py`: new columns on `employees`, `agent_actions`, `channel_outbox`, plus version 6.
-  Tested on a copy of the existing database: runs cleanly, and a second run changes nothing.
-- Models: `CheckIn` (`models/proactive.py`) and `Attachment` (`models/attachments.py`), with the unique constraints
-  and indexes from section 3. New columns added to `Employee`, `AgentAction` and `OutboxMessage`.
-- Config flags in `core/config.py` and `.env.example`. `ORG_TIMEZONE` falls back to the existing `APP_TIMEZONE`.
-- `services/formatting.py`: `sanitize`, `to_google_chat`, `to_plain`, with `tests/test_formatting.py`.
-- Chat edges: `_reply()` in the webhook route and `send_message()` in the Google Chat channel both use `to_google_chat`.
-- `RichText.tsx` renders assistant messages in the chat screen. User messages stay plain text.
-- Frontend typecheck, lint and production build pass.
+Choices made where the plan was open:
+- Dependency items are included only when the commitment behind the dependency is the person's own, so a reply always
+  updates real work; the item is titled by the deliverable.
+- Work awaiting verification and commitments the owner has not accepted are not asked about.
+- Manager-request check-ins list up to 6 items and stay open for 7 days (or until the request is cancelled).
+- A blocker with no teammate to name ("waiting on client data") is proposed as an at-risk flag with a note.
+- Undo groups the actions applied in one turn; `agent_actions.base_snapshot` holds `{"before", "after"}` for them.
+- `check_ins.message` stores the composed text for the admin preview (added in the migration-6 additions map).
+- A Chat file with no open check-in opens a short-lived `file` check-in that asks which commitment it is for.
+- File open links carry a 30-minute, per-viewer, per-file token, because a new tab or an `<img>` cannot send the
+  bearer token. The open endpoint still re-checks visibility and is not on the public host.
+- There is no separate `checkin` node in the LangGraph assistant: the inbound router calls `checkin_reply` directly,
+  so the graph keeps its rule that the model never writes. The `Check-in agent` label is used for these turns.
 
-Left in Phase 1:
-- Read the backend pytest summary. The run exited 0, but its output was not read yet.
-- Check that the app starts on a fresh, empty database.
-- Look at one assistant reply in the browser, with bold, a list and a link.
-- Commit, with the Haiku co-author line. The plan and the Phase 1 files are not committed yet.
-
-**Phase 2 (Sonnet): not started.** Starts after Phase 1 is committed.
-**Phase 3 (Haiku): not started.**
-**Phase 4 (Sonnet): not started.**
-
-Each phase is one session. Start each session with: "Read `docs/PROACTIVE_ASSISTANT_PLAN.md`, do Phase N only,
-run typecheck, lint and the tests, then commit." Later phases depend on earlier ones being committed.
+Needs live verification (could not be reached from the build environment):
+- The app's `chat.bot` service account downloading an uploaded attachment from a DM (9.1). If it cannot, Open
+  returns the 502 message for everyone but the sender.
+- The real shape of `message.attachment[]` in both Chat event formats.
+- Groq JSON-mode extraction quality on real replies (the validation in 7.2 runs either way).
+- A dry-run day, then `PROACTIVE_DRY_RUN=false` (section 11).
 
 ### Phase 1: Haiku, the foundations (mechanical, fully specified)
 

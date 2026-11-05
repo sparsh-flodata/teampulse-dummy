@@ -68,21 +68,30 @@ export type MockDb = {
 const STORAGE_KEY = "teampulse.mockdb.v1";
 export const DEMO_PASSWORD = "TeamPulse-demo-2026!";
 
+/** Fills fields added after the seed (or a stored copy) was written. */
+function withDefaults(data: MockDb): MockDb {
+  for (const p of data.employees) {
+    p.proactive_checkins ??= true;
+    p.checkins_paused_until ??= null;
+  }
+  return data;
+}
+
 function fresh(): MockDb {
-  return {
+  return withDefaults({
     ...(structuredClone(seedJson) as unknown as Omit<
       MockDb,
       "accessTokens" | "refreshTokens"
     >),
     accessTokens: {},
     refreshTokens: {},
-  };
+  });
 }
 
 function load(): MockDb {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) return JSON.parse(stored) as MockDb;
+    if (stored) return withDefaults(JSON.parse(stored) as MockDb);
   } catch {
     // Fall through to a fresh seed.
   }

@@ -22,3 +22,7 @@ def test_headings_become_bold_and_output_is_capped():
 
 def test_plain_text_removes_markers():
     assert to_plain('**Bold** and `code` [docs](https://e.x)') == 'Bold and code docs (https://e.x)'
+
+
+def test_bullet_characters_become_the_list_marker():
+    assert sanitize('Your work:\n• One\n* Two') == 'Your work:\n- One\n- Two'

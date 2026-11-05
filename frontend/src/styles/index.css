@@ -15,4 +15,5 @@
 /* Coral: containers, badges, sidebar rules and density. Loaded last. */
 @import "./coral.css";
 @import "./projects.css";
+@import "./attachments.css";
 @import "./motion.css";

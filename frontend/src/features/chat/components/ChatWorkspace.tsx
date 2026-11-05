@@ -27,6 +27,7 @@ import {
 } from "@/features/workspace/hooks";
 import { useWorkspaceNavigation } from "@/features/workspace/navigation";
 import type { UpdateRequest } from "@/features/workspace/types";
+import { AttachmentList } from "@/features/attachments/components/AttachmentList";
 import {
   assistantHistoryQuery,
   cancelUpdateRequest,
@@ -419,8 +420,11 @@ export function ChatWorkspace() {
               )}
             </div>
           ))}
+          {/* Only proposals still waiting are confirmable; Applied, Undone,
+              Dismissed and decided ones live on in the transcript text. */}
           {actions
             .filter((a) => a.status === "Proposed")
+            .sort((a, b) => a.id - b.id)
             .map((a) => (
               <ProposalCard
                 key={a.id}
@@ -555,7 +559,7 @@ export function ChatWorkspace() {
                     ? r.requester_name
                     : r.recipient_name}
                 </h4>
-                <p>{r.prompt}</p>
+                <RichText className="request-prompt" text={r.prompt} />
                 <div className="request-meta">
                   <span>
                     <Link2 size={10} />
@@ -575,6 +579,14 @@ export function ChatWorkspace() {
                       Employee update
                     </span>
                     <p>{r.response}</p>
+                    {!!r.attachments?.length && (
+                      <AttachmentList
+                        items={r.attachments}
+                        showWork={false}
+                        showProject={false}
+                        compact
+                      />
+                    )}
                     {r.work_item_id && (
                       <button
                         onClick={() => {

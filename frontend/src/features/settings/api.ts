@@ -42,3 +42,63 @@ export const googleChatQuery = () =>
 
 export const disconnectGoogleChat = () =>
   api.post<GoogleChatStatus>("/integrations/google-chat/disconnect");
+
+/** Check-in preferences, with the server's schedule for the explanation. */
+export type Preferences = {
+  proactive_checkins: boolean;
+  /** YYYY-MM-DD, org-local: check-ins resume on this day. */
+  checkins_paused_until: string | null;
+  checkin_hour: number;
+  org_timezone: string;
+  /** Check-ins are switched on for the workspace. */
+  enabled: boolean;
+};
+
+export const preferencesQuery = () =>
+  queryOptions({
+    queryKey: queryKeys.preferences,
+    queryFn: () => api.get<Preferences>("/me/preferences"),
+  });
+
+export const preferencesSchema = z
+  .object({
+    proactive_checkins: z.boolean(),
+    // false resumes check-ins paused earlier.
+    pause_until_tomorrow: z.boolean(),
+  })
+  .partial();
+export type PreferencesInput = z.output<typeof preferencesSchema>;
+
+export const updatePreferences = (body: PreferencesInput) =>
+  api.patch<Preferences>("/me/preferences", preferencesSchema.parse(body));
+
+export type CheckInPreview = {
+  id: number;
+  employee_id: number;
+  employee_name: string;
+  kind: "daily" | "request" | "file";
+  status: string;
+  period: string;
+  clarify_rounds: number;
+  items: { n: number; work_item_id: number; title: string }[];
+  message: string;
+  chat_delivery: string;
+  created_at: string;
+  expires_at: string;
+};
+
+export type CheckInsPreview = {
+  date: string;
+  enabled: boolean;
+  dry_run: boolean;
+  check_ins: CheckInPreview[];
+};
+
+export const adminCheckInsQuery = (date: string) =>
+  queryOptions({
+    queryKey: queryKeys.adminCheckIns(date),
+    queryFn: () =>
+      api.get<CheckInsPreview>(
+        "/admin/check-ins?date=" + encodeURIComponent(date),
+      ),
+  });

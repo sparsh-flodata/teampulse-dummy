@@ -1,6 +1,7 @@
 """Every write the frontend can make, sent with the exact payload shape its forms produce
 (frontend/src/features/*/schemas.ts and api.ts, after zod transforms), against the real API.
 The backend models reject unknown fields, so a renamed field on either side fails here."""
+from datetime import date
 from test_workflows import ctx, login
 from backend.app.services.work import today, business_day
 import backend.app.core.security as security
@@ -85,3 +86,24 @@ def test_settings_notification_and_chat_payloads(ctx):
     login(c)
     again = c.post('/api/update-requests', json={'recipient_ids': [3], 'prompt': 'One more check-in please', 'channel': 'in_app'}).json()[0]
     assert c.post(f'/api/update-requests/{again["id"]}/cancel').status_code == 200
+
+
+def test_checkin_preference_and_admin_preview_payloads(ctx):
+    c, _ = ctx
+    login(c, 'ananya')
+    # CheckInsPanel: each control sends one field
+    keys = {'proactive_checkins', 'checkins_paused_until', 'checkin_hour', 'org_timezone', 'enabled'}
+    assert c.get('/api/me/preferences').json().keys() >= keys
+    off = c.patch('/api/me/preferences', json={'proactive_checkins': False})
+    assert off.status_code == 200 and off.json()['proactive_checkins'] is False, off.text
+    assert c.patch('/api/me/preferences', json={'proactive_checkins': True}).json()['proactive_checkins'] is True
+    paused = c.patch('/api/me/preferences', json={'pause_until_tomorrow': True}).json()
+    assert paused['checkins_paused_until'] == str(date.fromisoformat(paused['checkins_paused_until']))
+    assert c.patch('/api/me/preferences', json={'pause_until_tomorrow': False}).json()['checkins_paused_until'] is None
+    state = c.get('/api/state').json()
+    assert {'proactive_checkins', 'checkins_paused_until'} <= state['user'].keys()
+    # AdminCheckInsPanel: admins only, ?date=YYYY-MM-DD
+    assert c.get('/api/admin/check-ins').status_code == 403
+    login(c)  # admin
+    preview = c.get('/api/admin/check-ins', params={'date': str(today())})
+    assert preview.status_code == 200 and preview.json().keys() >= {'date', 'enabled', 'dry_run', 'check_ins'}, preview.text

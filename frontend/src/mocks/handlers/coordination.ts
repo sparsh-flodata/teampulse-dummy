@@ -38,7 +38,9 @@ function plan(
   const view = viewOf(userId);
   const text = message.toLowerCase();
   let action: AgentAction | null = null;
+  let actions: AgentAction[] = [];
   let reply: string;
+  let agent: string | undefined;
 
   const wantsUpdates =
     recipients.length > 0 ||
@@ -67,6 +69,44 @@ function plan(
       };
       reply = `I can request updates from ${names(ids)}. Confirm below to deliver the request to their TeamPulse inbox and, where they have connected it, Google Chat.`;
     }
+  } else if (/check[- ]?in/.test(text)) {
+    // A check-in reply that proposes several changes in one turn.
+    const own = db.work
+      .filter((w) => w.owner_id === userId && w.status !== "Completed")
+      .slice(0, 3);
+    const first = nextId(
+      Object.values(db.conversations).flatMap((c) => c.actions),
+    );
+    const payloads: Record<string, unknown>[] = [
+      { kind: "update", status: "Completed", note: message },
+      {
+        kind: "update",
+        due_date: own[1]
+          ? new Date(Date.parse(own[1].due_date) + 2 * 86_400_000)
+              .toISOString()
+              .slice(0, 10)
+          : null,
+        note: "Waiting for review",
+      },
+      { kind: "update", risk: true, note: "Waiting on vendor access" },
+    ];
+    actions = own.map((w, i) => ({
+      id: first + i,
+      status: "Proposed",
+      payload: { ...payloads[i], work_item_id: w.id },
+    }));
+    action = actions[0] ?? null;
+    agent = "Check-in agent";
+    reply = actions.length
+      ? "Thanks. Before I save anything, please confirm:\n" +
+        own
+          .map(
+            (w, i) =>
+              `${i + 1}. **${w.title}**: ${["mark complete", "move the expected date by two days", "flag as at risk"][i]}`,
+          )
+          .join("\n") +
+        "\n\nReply `yes` to save all, or confirm each below."
+      : "You have no open commitments to check in on.";
   } else if (text.includes("summar")) {
     const own = db.work.filter(
       (w) => w.owner_id === userId && w.status !== "Completed",
@@ -116,7 +156,12 @@ function plan(
     reply =
       "I can summarize your week, draft a commitment, or update selected work. In offline mode, try “Summarize my commitments”, select a work item and say “65% complete, 4 hours remaining”, or ask a teammate for an update.";
   }
-  return { reply, action };
+  return {
+    reply,
+    action,
+    actions: action && !actions.length ? [action] : actions,
+    agent,
+  };
 }
 
 export const coordinationHandlers = [
@@ -194,14 +239,26 @@ export const coordinationHandlers = [
         ? body.recipient_ids.map(Number)
         : [];
       const workId = body.work_item_id == null ? null : num(body.work_item_id);
-      const { reply, action } = plan(userId, message, workId, recipients);
+      const { reply, action, actions, agent } = plan(
+        userId,
+        message,
+        workId,
+        recipients,
+      );
       convo.messages.push(
         { role: "user", message },
-        { role: "assistant", message: reply },
+        { role: "assistant", message: reply, agent: agent ?? null },
       );
-      if (action) convo.actions.unshift(action);
+      convo.actions.unshift(...[...actions].reverse());
       return HttpResponse.json(
-        saved({ reply, mode: "offline", auto_applied: false, action }),
+        saved({
+          reply,
+          mode: "offline",
+          auto_applied: false,
+          agent,
+          action,
+          actions,
+        }),
       );
     }),
   ),
@@ -214,7 +271,7 @@ export const coordinationHandlers = [
       if (!action || action.status !== "Proposed")
         return fail(404, "This proposal is no longer available.");
       const approve = Boolean(body.approve);
-      action.status = approve ? "Approved" : "Dismissed";
+      action.status = approve ? "Approved" : "Rejected";
       if (!approve) return HttpResponse.json(saved({ status: action.status }));
 
       const payload = action.payload;
@@ -256,6 +313,8 @@ export const coordinationHandlers = [
       const work = db.work.find((w) => w.id === Number(payload.work_item_id));
       if (work && viewOf(userId).editable_work_ids.includes(work.id)) {
         applyWorkUpdate(work, payload);
+        if (payload.due_date) work.due_date = String(payload.due_date);
+        if (typeof payload.risk === "boolean") work.risk = payload.risk;
         logActivity(
           userId,
           `Confirmed an assistant update: ${work.progress}% complete.`,

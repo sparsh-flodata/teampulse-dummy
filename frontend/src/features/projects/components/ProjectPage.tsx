@@ -9,6 +9,7 @@ import {
   Link2,
   ListChecks,
   Loader2,
+  Paperclip,
   Users,
 } from "lucide-react";
 import { Avatar, Badge, Empty, healthTone } from "@/components/ui";
@@ -20,6 +21,7 @@ import {
   useWorkspaceSearch,
 } from "@/features/workspace/navigation";
 import type { Work } from "@/features/workspace/types";
+import { ProjectFiles } from "@/features/attachments/components/ProjectFiles";
 import { projectQuery, type ProjectDetail } from "../api";
 import { AssignDialog } from "./AssignDialog";
 import { ProjectActivity } from "./ProjectActivity";
@@ -33,6 +35,7 @@ export const PROJECT_TABS = [
   "Board",
   "People",
   "Activity",
+  "Files & links",
 ] as const;
 export type ProjectTab = (typeof PROJECT_TABS)[number];
 
@@ -42,6 +45,7 @@ const TAB_ICONS = {
   Board: Columns3,
   People: Users,
   Activity: History,
+  "Files & links": Paperclip,
 } as const;
 
 /** Shared by every tab: open a commitment, assign it, take it. */
@@ -161,6 +165,13 @@ export function ProjectPage({
           <ProjectActivity
             data={data}
             directory={state.directory}
+            onWork={actions.openWork}
+          />
+        )}
+        {tab === "Files & links" && (
+          <ProjectFiles
+            projectId={projectId}
+            members={data.members}
             onWork={actions.openWork}
           />
         )}

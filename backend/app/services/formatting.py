@@ -41,7 +41,7 @@ def sanitize(md: str) -> str:
         heading = HEADING.match(line)
         if heading:
             line = f'**{heading.group(1).strip()}**'
-        line = re.sub(r'^(\s*)\* ', r'\1- ', line)
+        line = re.sub(r'^(\s*)[*•] ', r'\1- ', line)
         out.append(line)
     text = LINK_ANY.sub(
         lambda m: m.group(0) if m.group(2).startswith('https://') else m.group(1),

@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useForm } from "@tanstack/react-form";
 import { Settings, Sparkles, ShieldCheck } from "lucide-react";
 import { SubmitButton } from "@/components/ui";
+import { AdminCheckInsPanel } from "./AdminCheckInsPanel";
+import { CheckInsPanel } from "./CheckInsPanel";
 import { GoogleChatPanel } from "./GoogleChatPanel";
 import { bind, errorMessage } from "@/lib/forms";
 import { useWorkspace, useWorkspaceMutation } from "@/features/workspace/hooks";
@@ -166,6 +168,7 @@ export function SettingsPage() {
           </ul>
         </section>
         <GoogleChatPanel />
+        <CheckInsPanel />
         <section className="panel assistant-status">
           <Sparkles size={20} />
           <div>
@@ -182,6 +185,7 @@ export function SettingsPage() {
           </div>
         </section>
       </div>
+      {p.role === "admin" && <AdminCheckInsPanel />}
     </div>
   );
 }

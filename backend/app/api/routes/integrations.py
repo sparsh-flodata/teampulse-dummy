@@ -15,18 +15,14 @@ from backend.app.channels import google_chat
 from backend.app.core.config import app_link
 from backend.app.core.security import current_user, email_allowed, find_employee_by_email
 from backend.app.db.session import get_db
-from backend.app.models import ChatLink, Employee, MessageReceipt, UpdateRequest
-from backend.app.schemas import UpdateReply
-from backend.app.services.assistant import converse
+from backend.app.models import ChatLink, Employee, MessageReceipt
 from backend.app.services.formatting import to_google_chat
-from backend.app.services.coordination import reply_to_request
+from backend.app.services.proactive import handle_inbound
 
 router = APIRouter()
 log = logging.getLogger('teampulse.google_chat')
 
-HELP = ('Hi, I’m TeamPulse. Tell me how your work is going in your own words, for example '
-        '“the Atlas review is 60% done, 4 hours left”. When someone asks you for an update, '
-        'your next message here answers them.')
+from backend.app.services.proactive import HELP
 
 
 def _normalize(event: dict) -> tuple[str, dict, dict, dict, bool]:
@@ -104,40 +100,28 @@ async def google_chat_events(request: Request, db: Session = Depends(get_db)):
         return _reply(f'Connected to TeamPulse as {employee.name}. ' + HELP, addon)
 
     text = (message.get('argumentText') or message.get('text') or '').strip()
-    if not text:
+    attachments = [a for a in (message.get('attachment') or []) if isinstance(a, dict)]
+    if not text and not attachments:
         return _reply(HELP, addon)
-    if text.lower() in ('help', 'hi', 'hello', 'start'):
+    if text.lower() in ('hi', 'hello', 'start'):
         return _reply(HELP, addon)
 
     # Google retries deliveries; the message name makes each one count once.
-    request_id = ('gchat:' + (message.get('name') or hashlib.sha256(text.encode()).hexdigest()))[:120]
-    fingerprint = hashlib.sha256(text.encode()).hexdigest()
+    request_id = ('gchat:' + (message.get('name') or hashlib.sha256((text + json.dumps(attachments, sort_keys=True)).encode()).hexdigest()))[:120]
     receipt = db.scalar(select(MessageReceipt).where(MessageReceipt.employee_id == employee.id, MessageReceipt.request_id == request_id))
     if receipt:
         return _reply(json.loads(receipt.response_json).get('reply', ''), addon)
 
-    pending = db.scalar(select(UpdateRequest).where(UpdateRequest.recipient_id == employee.id, UpdateRequest.channel == 'google_chat',
-                                                    UpdateRequest.status == 'Delivered').order_by(UpdateRequest.id))
-    if pending and len(text) >= 3:
-        try:
-            reply_to_request(db, employee, pending, UpdateReply(message=text))
-            sender = db.get(Employee, pending.requester_id)
-            answer = f'Thanks. I sent your update to {sender.name if sender else "the requester"}.'
-        except HTTPException as exc:
-            db.rollback()
-            answer = f'I couldn’t send that as a reply: {exc.detail} Answer it in TeamPulse, AI chat, instead.'
-        db.add(MessageReceipt(employee_id=employee.id, request_id=request_id, fingerprint=fingerprint, response_json=json.dumps({'reply': answer})))
-        db.commit()
-        return _reply(answer, addon)
-
+    # Commands, a pending yes/no, a reply to a check-in or manager request, else the assistant (plan 6).
     try:
-        result = await converse(db, employee, text[:4000], None, request_id)
+        result = await handle_inbound(db, employee, text[:4000], 'google_chat', request_id,
+                                      chat_attachments=attachments, chat_message=message.get('name') or '')
     except HTTPException as exc:
         db.rollback()
         return _reply(f'{exc.detail}', addon)
     answer = result.get('reply', '')
     action = result.get('action')
-    if action and action.get('status') == 'Proposed':
+    if action and action.get('status') == 'Proposed' and result.get('agent') != 'Check-in agent':
         link = app_link('/chat')
         answer += '\n\nThis is only a draft. Open TeamPulse, AI chat, to review and confirm it' + (f': {link}' if link else '.')
     return _reply(answer, addon)

@@ -30,7 +30,12 @@ function inline(text: string, keyBase: string): ReactNode[] {
   });
 }
 
-type Block = { kind: "p" | "ul" | "ol" | "gap"; lines: string[] };
+type Block = {
+  kind: "p" | "ul" | "ol" | "gap";
+  lines: string[];
+  /** Number of the first item of a numbered list, so "3." stays 3. */
+  start?: number;
+};
 
 function blocksOf(text: string): Block[] {
   const blocks: Block[] = [];
@@ -41,12 +46,17 @@ function blocksOf(text: string): Block[] {
       continue;
     }
     const bullet = /^- (.*)$/.exec(line);
-    const numbered = /^\d+\. (.*)$/.exec(line);
+    const numbered = /^(\d{1,9})\. (.*)$/.exec(line);
     const kind: Block["kind"] = bullet ? "ul" : numbered ? "ol" : "p";
-    const content = bullet?.[1] ?? numbered?.[1] ?? line;
+    const content = bullet?.[1] ?? numbered?.[2] ?? line;
     const last = blocks.at(-1);
     if (last && last.kind === kind) last.lines.push(content);
-    else blocks.push({ kind, lines: [content] });
+    else
+      blocks.push({
+        kind,
+        lines: [content],
+        start: numbered ? Number(numbered[1]) : undefined,
+      });
   }
   return blocks.filter((b) => b.kind !== "gap");
 }
@@ -72,7 +82,7 @@ export function RichText({
           );
         if (block.kind === "ol")
           return (
-            <ol key={keyBase}>
+            <ol key={keyBase} start={block.start}>
               {block.lines.map((l, i) => (
                 <li key={i}>{inline(l, `${keyBase}-${i}`)}</li>
               ))}

@@ -9,6 +9,10 @@ class Availability(Input):
     planning: Planning
     agent_auto_updates: bool = False
 
+class Preferences(Input):
+    proactive_checkins: bool | None = None
+    pause_until_tomorrow: bool | None = None
+
 class EmployeeCreate(Input):
     name: str = Field(min_length=2, max_length=120)
     email: str = Field(min_length=3, max_length=254)

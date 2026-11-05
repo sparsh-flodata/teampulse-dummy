@@ -72,7 +72,7 @@ PROACTIVE_ENABLED = os.getenv('PROACTIVE_ENABLED', 'false').strip().lower() == '
 # Dry run: check-ins are composed and stored, but Google Chat messages are not sent.
 PROACTIVE_DRY_RUN = os.getenv('PROACTIVE_DRY_RUN', 'true').strip().lower() == 'true'
 # Timezone for weekday and check-in hour decisions. Defaults to the app's timezone.
-ORG_TIMEZONE = os.getenv('ORG_TIMEZONE', os.getenv('APP_TIMEZONE', 'Asia/Kolkata')).strip()
+ORG_TIMEZONE = (os.getenv('ORG_TIMEZONE', '').strip() or os.getenv('APP_TIMEZONE', '').strip() or 'Asia/Kolkata')
 CHECKIN_HOUR = int(os.getenv('CHECKIN_HOUR', '10'))
 CHECKIN_MAX_ITEMS = int(os.getenv('CHECKIN_MAX_ITEMS', '4'))
 UNDO_WINDOW_MINUTES = int(os.getenv('UNDO_WINDOW_MINUTES', '120'))

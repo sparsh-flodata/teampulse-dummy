@@ -1,4 +1,5 @@
 import { setupWorker } from "msw/browser";
+import { attachmentHandlers } from "./handlers/attachments";
 import { authHandlers } from "./handlers/auth";
 import { coordinationHandlers } from "./handlers/coordination";
 import { workspaceHandlers } from "./handlers/workspace";
@@ -8,6 +9,7 @@ export const worker = setupWorker(
   ...authHandlers,
   ...workspaceHandlers,
   ...coordinationHandlers,
+  ...attachmentHandlers,
 );
 
 export async function startMocks() {

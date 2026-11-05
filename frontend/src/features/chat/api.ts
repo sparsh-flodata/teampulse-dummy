@@ -26,7 +26,10 @@ export const assistantHistoryQuery = queryOptions({
 
 export type ChatResult = {
   reply: string;
+  /** The first proposal of the turn (kept for older clients). */
   action: AgentAction | null;
+  /** Every proposal of the turn; a check-in reply can carry several. */
+  actions?: AgentAction[];
   auto_applied?: boolean;
   /** The graph agent that handled the message, e.g. "Dependency agent". */
   agent?: string;

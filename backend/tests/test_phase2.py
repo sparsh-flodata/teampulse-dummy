@@ -183,5 +183,7 @@ def test_additive_migration_preserves_existing_records(tmp_path):
         assert conn.execute(text('SELECT name,active,agent_auto_updates FROM employees')).one()==('Existing person',1,0)
         assert conn.execute(text('SELECT name,parent_id,lead_id FROM teams')).one()==('Preserved team',None,None)
         assert conn.execute(text('SELECT base_snapshot FROM agent_actions')).scalar()=='{}'
-        assert conn.execute(text('SELECT COUNT(*) FROM schema_migrations')).scalar()==5
+        assert conn.execute(text('SELECT COUNT(*) FROM schema_migrations')).scalar()==6
+        assert conn.execute(text('SELECT proactive_checkins,checkins_paused_until FROM employees')).one()==(1,None)
+        assert conn.execute(text("SELECT source,check_in_id FROM agent_actions")).one()==('chat',None)
     engine.dispose()

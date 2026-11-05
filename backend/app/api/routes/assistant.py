@@ -7,7 +7,8 @@ from backend.app.models import Employee, AgentAction, Conversation
 from backend.app.schemas import ChatInput, Decision
 from backend.app.core.security import current_user
 from backend.app.services.work import audit
-from backend.app.services.assistant import converse, apply_proposal
+from backend.app.services.assistant import apply_proposal
+from backend.app.services.proactive import handle_inbound
 
 router = APIRouter()
 
@@ -19,7 +20,7 @@ def chat_history(user: Employee = Depends(current_user), db: Session = Depends(g
 
 @router.post('/api/assistant/chat')
 async def chat(body: ChatInput, user: Employee = Depends(current_user), db: Session = Depends(get_db)):
-    return await converse(db, user, body.message, body.work_item_id, body.request_id, body.recipient_ids)
+    return await handle_inbound(db, user, body.message, 'in_app', body.request_id, work_id=body.work_item_id, recipient_ids=body.recipient_ids)
 
 @router.post('/api/assistant/actions/{action_id}/decide')
 def decide(action_id: int, body: Decision, user: Employee = Depends(current_user), db: Session = Depends(get_db)):
@@ -43,5 +44,8 @@ def decide(action_id: int, body: Decision, user: Employee = Depends(current_user
             db.add(Conversation(employee_id=user.id,role='assistant',message=text))
     action.status = 'Approved' if body.approve else 'Rejected'
     audit(db, user, f'{action.status} an assistant proposal.')
+    if action.check_in_id:
+        from backend.app.services.checkin_reply import after_card_decision
+        after_card_decision(db, user, action, body.approve)
     db.commit()
     return {'status': action.status,'requests':delivered}

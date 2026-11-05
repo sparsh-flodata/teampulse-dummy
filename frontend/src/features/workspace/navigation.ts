@@ -11,6 +11,7 @@ export type View =
   | "Dependencies"
   | "Team & capacity"
   | "Activity"
+  | "Files & links"
   | "AI chat"
   | "Settings"
   | "My profile"
@@ -27,6 +28,7 @@ export const viewPaths = {
   Dependencies: "/dependencies",
   "Team & capacity": "/capacity",
   Activity: "/activity",
+  "Files & links": "/files",
   "AI chat": "/chat",
   Settings: "/settings",
   "My profile": "/me",

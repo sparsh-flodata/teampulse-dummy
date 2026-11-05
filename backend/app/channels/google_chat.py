@@ -119,13 +119,24 @@ def send_message(space: str, text: str) -> str:
     return response.json().get('name', '')
 
 
-def queue_message(db, employee_id: int, text: str, update_request_id: int | None = None) -> bool:
-    """Queue a DM to a linked employee. False when they have not connected Google Chat."""
+def queue_message(db, employee_id: int, text: str, update_request_id: int | None = None,
+                  check_in_id: int | None = None, dry_run: bool = False) -> bool:
+    """Queue a DM to a linked employee. False when they have not connected Google Chat.
+
+    dry_run stores the message as 'Skipped': it is recorded for review but never sent.
+    """
     if not outbound_enabled() or not db.get(ChatLink, employee_id):
         return False
-    db.add(OutboxMessage(channel='google_chat', employee_id=employee_id, update_request_id=update_request_id, text=text))
+    db.add(OutboxMessage(channel='google_chat', employee_id=employee_id, update_request_id=update_request_id,
+                         check_in_id=check_in_id, text=text, status='Skipped' if dry_run else 'Pending'))
     db.flush()
     return True
+
+
+def media_request(resource_name: str) -> tuple[str, dict]:
+    """URL and headers to download an attachment the app received (Chat API media endpoint, chat.bot scope).
+    Blocking (the token may be fetched); call it from a worker thread."""
+    return f'{CHAT_API}/media/{resource_name}?alt=media', {'Authorization': 'Bearer ' + _token.get()}
 
 
 def process_outbox(db, sender=send_message) -> int:

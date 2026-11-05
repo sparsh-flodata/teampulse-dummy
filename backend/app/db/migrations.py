@@ -21,6 +21,7 @@ def migrate(engine):
                                ('source', "VARCHAR(20) NOT NULL DEFAULT 'chat'"), ('applied_at', 'TIMESTAMP')],
             'channel_outbox': [('check_in_id', 'INTEGER REFERENCES check_ins(id)')],
             'conversations': [('agent', "VARCHAR(40) NOT NULL DEFAULT ''")],
+            'check_ins': [('message', "TEXT NOT NULL DEFAULT ''")],
         }
         for table, columns in additions.items():
             existing = {c['name'] for c in inspect(conn).get_columns(table)}

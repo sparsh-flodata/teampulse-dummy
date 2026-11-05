@@ -316,7 +316,7 @@ def health_summary(works):
 
 
 def serialize_person(db, p):
-    return {k: getattr(p, k) for k in ('id', 'name', 'email', 'role', 'title', 'team_id', 'manager_id', 'skills', 'weekly_hours', 'reserved_hours', 'planning', 'color', 'active', 'agent_auto_updates')} | {'capacity': capacity(db, p)}
+    return {k: getattr(p, k) for k in ('id', 'name', 'email', 'role', 'title', 'team_id', 'manager_id', 'skills', 'weekly_hours', 'reserved_hours', 'planning', 'color', 'active', 'agent_auto_updates', 'proactive_checkins')} | {'checkins_paused_until': str(p.checkins_paused_until) if p.checkins_paused_until else None, 'capacity': capacity(db, p)}
 
 def serialize_dependency(d):
     tone = 'green' if d.status in ('Verified', 'Cancelled') else 'red' if (not d.partial or d.due_date < today() or d.status in ('At Risk', 'Blocked')) else 'amber'

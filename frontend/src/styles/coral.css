@@ -377,6 +377,108 @@ textarea:focus {
   background: var(--color-wait-soft);
 }
 
+/* Check-ins in Settings: same layout as the Google Chat panel */
+.checkins-panel {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-top: var(--space-block);
+  padding: 23px;
+}
+.checkins-panel > div {
+  flex: 1;
+  display: grid;
+  gap: 10px;
+  justify-items: start;
+}
+.checkins-panel .split {
+  width: 100%;
+}
+.checkins-panel h3 {
+  font-size: var(--text-12);
+  font-weight: var(--weight-medium);
+}
+.checkins-panel p {
+  font-size: var(--text-11);
+  color: var(--color-ink-2);
+}
+.checkins-panel p.checkins-note {
+  padding: 8px 10px;
+  border-radius: var(--radius-4);
+  background: var(--color-wait-soft);
+}
+.checkins-panel .checkbox {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: var(--text-11);
+}
+.checkins-panel .checkbox input {
+  accent-color: var(--color-brand);
+}
+.checkins-paused {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: var(--text-10);
+  color: var(--color-muted);
+}
+
+/* Admin check-in preview: a plain table across the Settings grid */
+.checkins-preview {
+  grid-column: 1 / -1;
+}
+.checkins-preview > .panel-heading {
+  border-bottom: 1px solid var(--color-border);
+  flex-wrap: wrap;
+}
+.checkins-preview > .panel-heading > div {
+  flex: 1;
+  min-width: 220px;
+}
+.checkins-mode {
+  margin-left: 8px;
+  display: inline-flex;
+}
+.checkins-date {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--text-9);
+  color: var(--color-muted);
+}
+.checkins-preview-scroll {
+  overflow-x: auto;
+  max-width: 100%;
+}
+.checkins-table td {
+  vertical-align: top;
+}
+.checkins-items {
+  margin: 0;
+  padding-left: 1.4em;
+}
+.checkins-message {
+  min-width: 260px;
+  max-width: 460px;
+}
+.checkins-message summary {
+  cursor: pointer;
+  color: var(--color-brand);
+}
+.checkins-message .rich-text {
+  margin-top: 8px;
+  white-space: normal;
+}
+.checkins-loading {
+  padding: 20px 19px;
+  color: var(--color-muted);
+}
+.checkins-preview > .error {
+  margin: 12px 19px;
+}
+
 /* Sign-in / create-account switch */
 .login-switch {
   margin-top: 14px;

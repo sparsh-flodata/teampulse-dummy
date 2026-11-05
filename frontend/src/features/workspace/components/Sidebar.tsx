@@ -10,6 +10,7 @@ import {
   FolderKanban,
   Link2,
   History,
+  Paperclip,
   Sparkles,
   Settings,
   LogOut,
@@ -39,6 +40,7 @@ const items: {
   { label: "Dependencies", icon: Link2 },
   { label: "Team & capacity", icon: Users },
   { label: "Activity", icon: History },
+  { label: "Files & links", icon: Paperclip },
 ];
 
 type Props = {

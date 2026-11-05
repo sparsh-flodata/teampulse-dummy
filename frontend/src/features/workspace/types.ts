@@ -1,5 +1,7 @@
 // Domain model shared by every workspace feature. Mirrors the API contract.
 
+import type { Attachment } from "@/features/attachments/types";
+
 export type Tone = "green" | "amber" | "red" | "neutral";
 
 export type Capacity = {
@@ -59,6 +61,9 @@ export type Person = {
   capacity: Capacity;
   active: boolean;
   agent_auto_updates: boolean;
+  proactive_checkins: boolean;
+  /** YYYY-MM-DD, org-local; check-ins skip days before it and resume on it. */
+  checkins_paused_until: string | null;
 };
 
 export type Project = {
@@ -185,12 +190,18 @@ export type UpdateRequest = {
   responded_at: string | null;
   can_reply: boolean;
   access_changed: boolean;
+  /** Files and links sent with the reply (plan 9). */
+  attachments?: Attachment[];
 };
+
+/** Only "Proposed" actions wait for a decision; the rest are history. */
+export type AgentActionStatus =
+  "Proposed" | "Approved" | "Rejected" | "Applied" | "Undone" | "Dismissed";
 
 export type AgentAction = {
   id: number;
   payload: Record<string, unknown>;
-  status: string;
+  status: AgentActionStatus;
 };
 
 export type ChatMessage = {
