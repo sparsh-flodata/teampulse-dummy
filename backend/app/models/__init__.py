@@ -7,3 +7,5 @@ from .coordination import UpdateRequest
 
 from .collaboration import ProjectMember, DemoSetup
 from .channels import ChatLink, OutboxMessage
+from .proactive import CheckIn
+from .attachments import Attachment

@@ -65,3 +65,14 @@ GOOGLE_CHAT_AUDIENCE = os.getenv('GOOGLE_CHAT_AUDIENCE', '').strip()
 GOOGLE_CHAT_ENDPOINT = os.getenv('GOOGLE_CHAT_ENDPOINT', APP_URL + '/api/integrations/google-chat/events').strip()
 # Service-account key (JSON) the app uses to send messages on its own.
 GOOGLE_CHAT_SERVICE_ACCOUNT_FILE = os.getenv('GOOGLE_CHAT_SERVICE_ACCOUNT_FILE', '').strip()
+
+# ---- Proactive assistant (docs/PROACTIVE_ASSISTANT_PLAN.md) ----------------------
+# Kill switch: when false, nothing is sent to anyone on a schedule.
+PROACTIVE_ENABLED = os.getenv('PROACTIVE_ENABLED', 'false').strip().lower() == 'true'
+# Dry run: check-ins are composed and stored, but Google Chat messages are not sent.
+PROACTIVE_DRY_RUN = os.getenv('PROACTIVE_DRY_RUN', 'true').strip().lower() == 'true'
+# Timezone for weekday and check-in hour decisions. Defaults to the app's timezone.
+ORG_TIMEZONE = os.getenv('ORG_TIMEZONE', os.getenv('APP_TIMEZONE', 'Asia/Kolkata')).strip()
+CHECKIN_HOUR = int(os.getenv('CHECKIN_HOUR', '10'))
+CHECKIN_MAX_ITEMS = int(os.getenv('CHECKIN_MAX_ITEMS', '4'))
+UNDO_WINDOW_MINUTES = int(os.getenv('UNDO_WINDOW_MINUTES', '120'))

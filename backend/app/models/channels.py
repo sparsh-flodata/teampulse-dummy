@@ -35,3 +35,4 @@ class OutboxMessage(Base):
     last_error: Mapped[str] = mapped_column(Text, default='')
     created_at: Mapped[datetime] = mapped_column(DateTime, default=now)
     sent_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    check_in_id: Mapped[int | None] = mapped_column(ForeignKey('check_ins.id'), nullable=True)

@@ -30,6 +30,8 @@ class Employee(Base):
     capacity_confirmed_on: Mapped[date | None] = mapped_column(Date, nullable=True)
     planning: Mapped[str] = mapped_column(String(20), default='Hybrid')
     color: Mapped[str] = mapped_column(String(20), default='#5b6f8f')
+    proactive_checkins: Mapped[bool] = mapped_column(Boolean, default=True)
+    checkins_paused_until: Mapped[date | None] = mapped_column(Date, nullable=True)
 
 class RefreshToken(Base):
     """One rotating refresh token. Tokens of one sign-in share a family_id;

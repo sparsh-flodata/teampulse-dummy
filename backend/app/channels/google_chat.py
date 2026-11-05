@@ -19,6 +19,7 @@ import jwt
 from sqlalchemy import select
 from backend.app.core.config import GOOGLE_CHAT_AUDIENCE, GOOGLE_CHAT_ENDPOINT, GOOGLE_CHAT_SERVICE_ACCOUNT_FILE
 from backend.app.models import ChatLink, OutboxMessage, UpdateRequest, now
+from backend.app.services.formatting import to_google_chat
 
 log = logging.getLogger('teampulse.google_chat')
 
@@ -112,7 +113,7 @@ _token = _AppToken()
 
 def send_message(space: str, text: str) -> str:
     """Post a text message to a space the app is a member of. Returns the message name."""
-    response = httpx.post(f'{CHAT_API}/{space}/messages', json={'text': text[:4000]},
+    response = httpx.post(f'{CHAT_API}/{space}/messages', json={'text': to_google_chat(text)},
                           headers={'Authorization': 'Bearer ' + _token.get()}, timeout=15)
     response.raise_for_status()
     return response.json().get('name', '')

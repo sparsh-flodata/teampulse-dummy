@@ -1065,3 +1065,28 @@
     font-size: var(--text-9);
   }
 }
+
+/* Assistant replies: the markdown subset from RichText. */
+.rich-text > * + * {
+  margin-top: 0.5em;
+}
+.rich-text ul,
+.rich-text ol {
+  margin: 0;
+  padding-left: 1.25em;
+}
+.rich-text li + li {
+  margin-top: 0.2em;
+}
+.rich-text code {
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+  padding: 0.05em 0.3em;
+  border-radius: 4px;
+  background: var(--color-paper-2);
+}
+.rich-text a {
+  color: var(--color-brand);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}

@@ -15,8 +15,11 @@ def migrate(engine):
         applied = set(conn.execute(text('SELECT version FROM schema_migrations')).scalars())
         additions = {
             'teams': [('parent_id', 'INTEGER REFERENCES teams(id)'), ('lead_id', 'INTEGER REFERENCES employees(id)')],
-            'employees': [('active', 'BOOLEAN NOT NULL DEFAULT true'), ('agent_auto_updates', 'BOOLEAN NOT NULL DEFAULT false')],
-            'agent_actions': [('base_snapshot', "TEXT NOT NULL DEFAULT '{}'")],
+            'employees': [('active', 'BOOLEAN NOT NULL DEFAULT true'), ('agent_auto_updates', 'BOOLEAN NOT NULL DEFAULT false'),
+                           ('proactive_checkins', 'BOOLEAN NOT NULL DEFAULT true'), ('checkins_paused_until', 'DATE')],
+            'agent_actions': [('base_snapshot', "TEXT NOT NULL DEFAULT '{}'"), ('check_in_id', 'INTEGER REFERENCES check_ins(id)'),
+                               ('source', "VARCHAR(20) NOT NULL DEFAULT 'chat'"), ('applied_at', 'TIMESTAMP')],
+            'channel_outbox': [('check_in_id', 'INTEGER REFERENCES check_ins(id)')],
             'conversations': [('agent', "VARCHAR(40) NOT NULL DEFAULT ''")],
         }
         for table, columns in additions.items():
@@ -50,3 +53,6 @@ def migrate(engine):
             # New tables (refresh_tokens, chat_links, channel_outbox) come from create_all above.
             conn.execute(text('DROP TABLE IF EXISTS sessions'))
             conn.execute(text("INSERT INTO schema_migrations(version, description) VALUES(5, 'JWT refresh tokens and the Google Chat channel')"))
+        if 6 not in applied:
+            # New tables (check_ins, attachments) come from create_all above; columns from the additions map.
+            conn.execute(text("INSERT INTO schema_migrations(version, description) VALUES(6, 'Proactive check-ins, attachments, and undo support')"))

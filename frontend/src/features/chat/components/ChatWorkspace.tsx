@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { Avatar, Empty, FormError } from "@/components/ui";
 import { TabPanel } from "@/components/ui/TabPanel";
+import { RichText } from "@/components/ui/RichText";
 import { ago } from "@/lib/format";
 import { errorMessage } from "@/lib/forms";
 import { isManager } from "@/features/workspace/domain";
@@ -411,7 +412,11 @@ export function ChatWorkspace() {
                   {state.user.name.split(" ")[0]}
                 </span>
               )}
-              <p>{m.message}</p>
+              {m.role === "assistant" ? (
+                <RichText text={m.message} />
+              ) : (
+                <p>{m.message}</p>
+              )}
             </div>
           ))}
           {actions

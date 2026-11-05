@@ -18,6 +18,7 @@ from backend.app.db.session import get_db
 from backend.app.models import ChatLink, Employee, MessageReceipt, UpdateRequest
 from backend.app.schemas import UpdateReply
 from backend.app.services.assistant import converse
+from backend.app.services.formatting import to_google_chat
 from backend.app.services.coordination import reply_to_request
 
 router = APIRouter()
@@ -47,6 +48,7 @@ def _normalize(event: dict) -> tuple[str, dict, dict, dict, bool]:
 def _reply(text: str | None, addon: bool) -> dict:
     if text is None:
         return {}
+    text = to_google_chat(text)
     if addon:
         return {'hostAppDataAction': {'chatDataAction': {'createMessageAction': {'message': {'text': text}}}}}
     return {'text': text}
