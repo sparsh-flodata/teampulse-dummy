@@ -9,7 +9,7 @@ from test_workflows import ctx, login
 from test_google_chat import chat, event, post
 from backend.app.core import config
 from backend.app.channels import google_chat
-from backend.app.models import (AgentAction, Attachment, AuditEvent, ChatLink, CheckIn, Commitment, Conversation, Notification,
+from backend.app.models import (AgentAction, Attachment, AuditEvent, ChatLink, CheckIn, Commitment, Conversation, Employee, Notification,
                                 OutboxMessage, WorkItem, now)
 from backend.app.services import proactive, checkin_reply
 from backend.app.services.work import business_day, latest_commitment, today
@@ -98,6 +98,20 @@ def test_check_ins_respect_the_switch_the_window_opt_out_and_pause(ctx, on, monk
     with sessions() as db:
         assert not db.scalar(select(CheckIn.id).where(CheckIn.employee_id.in_((1, 2))))
     assert say(c, 'resume')['reply'] == 'Check-ins are back on.'
+
+
+def test_the_pilot_allowlist_limits_who_gets_check_ins(ctx, on, monkeypatch):
+    c, sessions = ctx
+    with sessions() as db:
+        stale(db, 1, 2, 12)
+    monkeypatch.setattr(config, 'PROACTIVE_PILOT_EMAILS', ('nobody@example.com',))
+    assert run(sessions) == 0
+    with sessions() as db:
+        rahul = db.get(Employee, 2)
+        monkeypatch.setattr(config, 'PROACTIVE_PILOT_EMAILS', (rahul.email.lower(),))
+    assert run(sessions) == 1
+    with sessions() as db:
+        assert [ci.employee_id for ci in db.scalars(select(CheckIn).where(CheckIn.kind == 'daily'))] == [2]
 
 
 def test_dry_run_stores_chat_messages_as_skipped(ctx, on, monkeypatch):
@@ -218,6 +232,24 @@ def test_a_late_reply_asks_for_a_date_then_a_reason_and_tells_the_manager(ctx, o
         assert notice and 'Rahul moved Publish the updated database schema to' in notice.message and 'client data' in notice.message
 
 
+def test_manager_notices_follow_dry_run(ctx, on, monkeypatch):
+    """In dry run nothing reaches Google Chat, including the manager's notice after a confirmed slip."""
+    c, sessions = ctx
+    monkeypatch.setattr(google_chat, 'outbound_enabled', lambda: True)
+    with sessions() as db:
+        db.add(ChatLink(employee_id=1, google_user='users/nitish', space='spaces/nitish'))
+        stale(db, 2)
+    run(sessions)
+    login(c, 'rahul')
+    say(c, 'this will be late')
+    say(c, str(business_day(today(), 4)))
+    say(c, 'waiting on client data')
+    assert say(c, 'yes')['reply'].startswith('Done:')
+    with sessions() as db:
+        notice = db.scalar(select(OutboxMessage).where(OutboxMessage.employee_id == 1, OutboxMessage.check_in_id.is_(None)))
+        assert notice and notice.status == 'Skipped'
+
+
 def test_a_blocker_on_a_teammate_becomes_a_dependency_after_yes(ctx, on):
     c, sessions = ctx
     with sessions() as db:
@@ -268,12 +300,67 @@ def test_the_llm_failing_falls_back_to_the_parser(ctx, on, monkeypatch):
     from backend.app.services import assistant
     monkeypatch.setattr(assistant, 'provider_configured', lambda: True)
 
+    calls = []
+
     async def broken(*args):
+        calls.append(args)
         raise httpx.ConnectError('down')
     monkeypatch.setattr(checkin_reply, 'llm_extract', broken)
     login(c)
-    say(c, '1 is 65%')
-    assert work(c, 12)['progress'] == 65
+    say(c, '1 is 65%')  # clear: the parser handles it and the model is never asked
+    assert work(c, 12)['progress'] == 65 and calls == []
+    reply = say(c, '2 is going ok')['reply']  # unclear: the model is asked, fails, and the parser's question stands
+    assert reply.startswith('Roughly how far along') and len(calls) == 1
+
+
+def test_the_model_only_adds_updates_it_can_prove(ctx, on, monkeypatch):
+    c, sessions = ctx
+    with sessions() as db:
+        stale(db, 1, 12)
+    run(sessions)
+    from backend.app.services import assistant
+    monkeypatch.setattr(assistant, 'provider_configured', lambda: True)
+
+    async def reads_it(db, employee, thread, text, history, focus):
+        return checkin_reply.Extraction(is_reply=True, updates=[checkin_reply.ItemUpdate(n=2, progress=65, evidence='the other one is at 65%')])
+    monkeypatch.setattr(checkin_reply, 'llm_extract', reads_it)
+    login(c)
+    result = say(c, 'the other one is at 65%')  # the parser cannot tell which item; the model can, with evidence
+    assert result['mode'] == 'connected' and work(c, 1)['progress'] == 65
+
+
+def test_the_parser_reads_clauses_ordinals_skips_and_acknowledgements(ctx, on):
+    c, sessions = ctx
+    with sessions() as db:
+        stale(db, 1, 12)
+    run(sessions)
+    with sessions() as db:
+        person = db.get(Employee, 1)
+        thread = checkin_reply.Thread.load(checkin(sessions, 1))
+        assert [i['n'] for i in thread.items] == [1, 2]
+
+        def read(text, t=thread):
+            parsed = checkin_reply.deterministic_extract(db, person, t, text)
+            ex = checkin_reply.validate(db, person, t, parsed.extraction, text)
+            return {u.n: u for u in ex.updates}, ex.ambiguity, ex.ambiguity_n, parsed.extraction.is_reply
+
+        ups, amb, _, _ = read('nothing new on 2, 1 is at 55%')  # was: 55% saved on item 2 as well
+        assert ups[1].progress == 55 and ups[2].skip and ups[2].progress is None and amb == 'none'
+        ups, amb, n, _ = read('almost done with 1')
+        assert not ups and (amb, n) == ('hedged_completion', 1)
+        ups, amb, n, _ = read('2 will be late')
+        assert not ups and (amb, n) == ('date_without_date', 2)
+        ups, amb, _, _ = read('1 moved to friday because the client data came in late')
+        assert ups[1].new_due_date.weekday() == 4 and 'client data' in ups[1].reason and amb == 'none'
+        ups, amb, _, _ = read('finished the first one, the second is 30% with about 5 hours to go')
+        assert ups[1].status == 'Completed' and (ups[2].progress, ups[2].remaining_hours) == (30, 5.0) and amb == 'none'
+        assert read('thanks')[3] is False and read('can you show my week?')[3] is False
+        ups, _, _, _ = read('both done')  # two items: both means both (still waits for a yes)
+        assert ups[1].status == ups[2].status == 'Completed'
+        three = checkin_reply.Thread(thread.check_in, thread.items + [{'n': 3, 'work_item_id': 2, 'dependency_id': None}], thread.pending)
+        ups, amb, _, _ = read('both done', three)  # three items: "both" is unclear, so ask
+        assert not ups and amb == 'which_item'
+        db.rollback()
 
 
 def test_extraction_reads_numbered_replies():

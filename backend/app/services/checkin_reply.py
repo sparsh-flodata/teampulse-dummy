@@ -83,14 +83,24 @@ SLIP = re.compile(r'\b(?:late|delay(?:ed)?|slip(?:s|ping|ped)?|push(?:ed)?(?: it
 DATE_CUE = re.compile(r'\b(?:move|moved|push|pushed|shift|change|extend|due|deadline|until|till|by)\b', re.I)
 REASON = re.compile(r'\b(?:because|since|due to|as (?:the|we|i|our|they|it)|reason(?: is)?:?)\s+(.{3,})', re.I)
 SKIP = re.compile(r'\b(?:skip|no change|nothing new|no update|same as (?:before|yesterday))\b', re.I)
-QUESTION = re.compile(r'^\s*(?:what|how|who|when|where|why|which|show|list|summari[sz]e|tell me|can you|could you|please (?:show|list|tell))\b|\?\s*$', re.I)
+QUESTION = re.compile(r'^\s*(?:what|how|who|when|where|why|which|show|list|summari[sz]e|tell me|can you|could you|please (?:show|list|tell)|'
+                      r'remind me|give me|draft|explain|find)\b|\?\s*$', re.I)
 ACK = re.compile(r'^\s*(?:thanks|thank you|thx|ok|okay|cool|great|noted|got it|👍)[\s.!]*$', re.I)
 YES = re.compile(r'^\s*(?:yes|y|yep|yeah|confirm|confirmed|correct|ok|okay|sure|👍)[\s.!]*$', re.I)
 NO = re.compile(r'^\s*(?:no|n|nope|cancel|wrong|don.t|do not)[\s.!]*$', re.I)
 NUMBER_ONLY = re.compile(r'^\s*(?:item\s*|#|no\.?\s*|number\s*)?([1-9])[\s.!)]*$', re.I)
-MULTI = re.compile(r'(?:^|(?<=[\s,;.!?(]))([1-9](?:\s*(?:,|and|&)\s*[1-9])+)(?=\s+(?:are|were|both|is|done|finished|completed)\b|\s*[:\-–—])', re.I)
+MULTI = re.compile(r'(?:^|(?<=[\s,;.!?(]))([1-9](?:\s*(?:,|and|&)\s*[1-9])+)(?=\s+(?:are|were|both|done|finished|completed)\b|\s*[:\-–—])', re.I)
 ADDR = re.compile(r'(?:^|(?<=[\s,;.!?(]))(?:item\s*|#|no\.?\s*|number\s*)?([1-9])'
-                  r'(?=\s*(?:is\b|was\b|:|\)|=|-(?!\d)|–|—)|\.\s|\s+(?:done|finished|completed|skip|blocked|at|now|still|no change)\b)', re.I)
+                  r'(?=\s*(?:is\b|was\b|:|\)|=|-(?!\d)|–|—)|\.\s|\s+(?:done|finished|completed|skip|blocked|at|now|still|no change|will|has|had|'
+                  r'needs?|should|might|may|can|could|won.?t|isn.?t|moved?|slipp\w*|went|got|requires?|depends?)\b)', re.I)
+# "nothing new on 2": a skip for item 2, read before anything else so "2, 1 is ..." is never one list.
+SKIP_ON = re.compile(r'\b(?:nothing new|no changes?|no updates?|skip)\s+(?:on|for|with|to)\s+(?:item\s*|#)?([1-9])\b', re.I)
+# "almost done with 1": the item named at the end of its clause.
+TAIL = re.compile(r'\b(?:with|on|for|about)\s+(?:item\s*|#|number\s*)?([1-9])(?=\s*(?:$|[.,;!?]))', re.I)
+# "the first one", "the second is ...".
+ORD = re.compile(r'\b(?:the\s+)?(first|second|third|fourth|fifth|1st|2nd|3rd|4th|5th)\b'
+                 r'(?=\s+(?:one|item|task|commitment|is|was|will|has|needs?)\b)', re.I)
+ORDINALS = {'first': 1, '1st': 1, 'second': 2, '2nd': 2, 'third': 3, '3rd': 3, 'fourth': 4, '4th': 4, 'fifth': 5, '5th': 5}
 STOP = {'with', 'from', 'that', 'this', 'into', 'for', 'and', 'the', 'review', 'update', 'work', 'task', 'item', 'final', 'draft', 'module'}
 WEEKDAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
 MONTHS = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec']
@@ -204,7 +214,12 @@ def item_title(db, item) -> str:
 
 
 def short_title(title: str, limit: int = 60) -> str:
-    return title if len(title) <= limit else title[:limit - 1].rstrip() + '…'
+    if len(title) <= limit:
+        return title
+    cut = title[:limit - 1]
+    if ' ' in cut[limit // 2:]:
+        cut = cut.rsplit(' ', 1)[0]
+    return cut.rstrip(' ,.;:-–—·') + '…'
 
 
 def item_list(db, items) -> str:
@@ -328,22 +343,44 @@ def deterministic_extract(db, employee, thread: Thread, text: str, focus: int | 
     base = today()
     items = thread.items
     numbers = {i['n'] for i in items}
-    markers = []
+    if ACK.match(text):
+        return Parsed(Extraction(is_reply=False))  # "thanks" is not an update
+    markers: list[tuple[int, int, frozenset]] = []
+
+    def taken(pos: int) -> bool:
+        return any(s <= pos < e for s, e, _ in markers)
+
+    for m in SKIP_ON.finditer(text):
+        if int(m.group(1)) in numbers:
+            markers.append((m.start(), m.end(), frozenset({int(m.group(1))})))
     for m in MULTI.finditer(text):
         ns = frozenset(int(x) for x in re.findall(r'[1-9]', m.group(1)) if int(x) in numbers)
-        if ns:
+        if ns and not taken(m.start(1)):
             markers.append((m.start(), m.end(), ns))
     for m in ADDR.finditer(text):
         n = int(m.group(1))
-        if n in numbers and not any(s <= m.start() < e for s, e, _ in markers):
+        if n in numbers and not taken(m.start(1)):
             markers.append((m.start(), m.end(), frozenset({n})))
-    if re.search(r'\b(?:all|everything|both)\b.{0,20}\b(?:done|finished|completed)\b', text, re.I) and not HEDGE.search(text) and not markers:
+    for m in TAIL.finditer(text):
+        n = int(m.group(1))
+        if n in numbers and not taken(m.start(1)):
+            markers.append((m.start(), m.end(), frozenset({n})))
+    for m in ORD.finditer(text):
+        n = ORDINALS[m.group(1).lower()]
+        if n in numbers and not taken(m.start(1)):
+            markers.append((m.start(), m.end(), frozenset({n})))
+    everything = re.search(r'\b(all|everything|both)\b.{0,20}\b(?:done|finished|completed)\b', text, re.I)
+    if everything and not HEDGE.search(text) and not markers and (everything.group(1).lower() != 'both' or len(numbers) == 2):
         markers.append((0, 0, frozenset(numbers)))
     markers.sort()
 
-    # Text before the first marker, or the whole message when nothing is numbered.
+    # Text before the first marker, or the whole message when nothing is numbered. Words before the first
+    # marker in the same clause ("finished the first one", "almost done with 1") belong to that marker.
     chunks: list[tuple[frozenset | None, int, int]] = []
     first = markers[0][0] if markers else len(text)
+    if markers and text[:first].strip() and not re.search(r'[.;!?\n,]', text[:first]):
+        markers[0] = (0, markers[0][1], markers[0][2])
+        first = 0
     if text[:first].strip():
         chunks.append((None, 0, first))
     for i, (start, end, ns) in enumerate(markers):
@@ -698,7 +735,7 @@ def _manager_notice(db, employee, payload: dict, action_id: int):
     text = text.rstrip('.') + '.'
     notify(db, employee.manager_id, f'checkin-escalation:{action_id}', to_plain(text), work.id)
     from backend.app.channels import google_chat
-    google_chat.queue_message(db, employee.manager_id, text)
+    google_chat.queue_message(db, employee.manager_id, text, dry_run=config.PROACTIVE_DRY_RUN)
 
 
 def _resolve(db, employee, thread: Thread, actions, approve: bool) -> list[str]:
@@ -945,20 +982,20 @@ async def handle(db, employee, check_in, text: str, *, channel: str, chat_attach
         if not text.strip() and refs:
             extraction = Extraction(is_reply=True)
         else:
-            raw = None
-            if provider_configured():
+            # The parser is exact on clear replies and costs nothing. The model is asked only when the parser is
+            # not sure, and its answer is used only when it finds updates that pass the same validation.
+            parsed = deterministic_extract(db, employee, thread, text, focus)
+            if not parsed.extraction.is_reply and not refs:
+                return {'handoff': True}
+            extraction = validate(db, employee, thread, parsed.extraction, text)
+            if not (extraction.updates and extraction.ambiguity == 'none') and provider_configured():
                 try:
                     raw = await llm_extract(db, employee, thread, text, _history(db, employee, check_in), focus)
-                    mode = 'connected' if raw else mode
+                    checked = validate(db, employee, thread, raw, text) if raw is not None else None
+                    if checked and checked.updates:
+                        extraction, mode = checked, 'connected'
                 except (httpx.HTTPError, ValueError, KeyError, IndexError, ValidationError):
-                    log.warning('Check-in extraction fell back to the deterministic parser (check-in %s).', check_in.id)
-                    raw = None
-            parsed = deterministic_extract(db, employee, thread, text, focus)
-            if raw is None:
-                raw = parsed.extraction
-            if not raw.is_reply and not refs:
-                return {'handoff': True}
-            extraction = validate(db, employee, thread, raw, text)
+                    log.warning('Check-in extraction kept the parser result; the model call failed (check-in %s).', check_in.id)
         pending['question'] = None
         pending['queue'] = [x for x in pending['queue'] if x.get('ambiguity') == 'which_item_for_file']
     else:

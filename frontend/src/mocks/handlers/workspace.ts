@@ -486,6 +486,7 @@ export const workspaceHandlers = [
         date,
         enabled: true,
         dry_run: true,
+        pilot_emails: [],
         check_ins: checkInsFor(date),
       });
     }),

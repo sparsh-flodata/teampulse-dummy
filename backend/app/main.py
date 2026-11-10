@@ -15,6 +15,23 @@ from backend.app.core.config import FRONTEND_DIST, PUBLIC_HOST, PUBLIC_HOST_REST
 from backend.app.channels.google_chat import process_outbox
 from backend.app.services.proactive import run_check_ins
 
+def _app_logging():
+    """TeamPulse's own loggers (teampulse.*) at INFO on stderr, next to uvicorn's lines. Without this, Python's
+    default drops everything below WARNING, so check-in counts and delivery notes never show in the logs.
+    The loggers carry ids, counts and timings only, never message text."""
+    import logging
+    log = logging.getLogger('teampulse')
+    if not log.handlers:
+        handler = logging.StreamHandler()
+        handler.setFormatter(logging.Formatter('%(levelname)s:     %(name)s: %(message)s'))
+        log.addHandler(handler)
+        log.setLevel(os.getenv('LOG_LEVEL', 'INFO').upper())
+        log.propagate = False
+
+
+_app_logging()
+
+
 async def workflow_loop():
     while True:
         await asyncio.sleep(60)

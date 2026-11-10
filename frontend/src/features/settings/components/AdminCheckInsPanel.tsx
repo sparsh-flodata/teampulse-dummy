@@ -37,6 +37,13 @@ export function AdminCheckInsPanel() {
             What the assistant composed for each person, and whether Google Chat
             delivered it. Administrators only.
           </p>
+          {data && (
+            <p className="checkins-audience">
+              {data.pilot_emails.length
+                ? `Pilot only: ${data.pilot_emails.join(", ")}`
+                : "Everyone with check-ins on. Set PROACTIVE_PILOT_EMAILS to limit it to the pilot."}
+            </p>
+          )}
         </div>
         <label className="checkins-date">
           <span>Day</span>

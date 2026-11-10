@@ -91,6 +91,8 @@ export type CheckInsPreview = {
   date: string;
   enabled: boolean;
   dry_run: boolean;
+  /** When set, only these people get daily check-ins (PROACTIVE_PILOT_EMAILS). */
+  pilot_emails: string[];
   check_ins: CheckInPreview[];
 };
 

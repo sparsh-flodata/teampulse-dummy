@@ -40,4 +40,5 @@ def update_preferences(body: Preferences, user: Employee = Depends(current_user)
 def admin_check_ins(date: date | None = None, user: Employee = Depends(current_user), db: Session = Depends(get_db)):
     require_admin(user)
     day = date or org_now().date()
-    return {'date': str(day), 'enabled': config.PROACTIVE_ENABLED, 'dry_run': config.PROACTIVE_DRY_RUN, 'check_ins': preview(db, day)}
+    return {'date': str(day), 'enabled': config.PROACTIVE_ENABLED, 'dry_run': config.PROACTIVE_DRY_RUN,
+            'pilot_emails': list(config.PROACTIVE_PILOT_EMAILS), 'check_ins': preview(db, day)}

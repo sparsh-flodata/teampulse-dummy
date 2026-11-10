@@ -1,10 +1,10 @@
 # Registers a Windows scheduled task that starts scripts/pilot.ps1 at logon and restarts it if it stops,
 # so the pilot survives reboots. Run once in PowerShell as the user who runs TeamPulse. Remove with:
 #   Unregister-ScheduledTask -TaskName 'TeamPulse pilot' -Confirm:$false
-param([int]$Port = 8787)
+param([int]$Port = 8787, [switch]$Docker)
 $ErrorActionPreference = 'Stop'
 $script = Join-Path $PSScriptRoot 'pilot.ps1'
-$action = New-ScheduledTaskAction -Execute 'powershell.exe' -Argument "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$script`" -Port $Port" `
+$action = New-ScheduledTaskAction -Execute 'powershell.exe' -Argument "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$script`" -Port $Port$(if ($Docker) { ' -Docker' })" `
     -WorkingDirectory (Split-Path -Parent $PSScriptRoot)
 $trigger = New-ScheduledTaskTrigger -AtLogOn -User $env:USERNAME
 $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable `

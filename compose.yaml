@@ -1,6 +1,7 @@
 services:
   db:
     image: postgres:17-alpine
+    restart: unless-stopped
     environment:
       POSTGRES_DB: teampulse
       POSTGRES_USER: teampulse
@@ -16,6 +17,8 @@ services:
       retries: 10
   app:
     build: .
+    # One container, one process: exactly one check-in tick (docs/PILOT_RUNBOOK.md).
+    restart: unless-stopped
     ports:
       - "127.0.0.1:8787:8787"
     environment:
@@ -33,9 +36,17 @@ services:
       AI_BASE_URL: ${AI_BASE_URL:-}
       AI_MODEL: ${AI_MODEL:-}
       AI_API_KEY: ${AI_API_KEY:-}
+      # Proactive assistant (docs/PROACTIVE_ASSISTANT_PLAN.md): off, and in dry run, unless .env says otherwise.
+      PROACTIVE_ENABLED: ${PROACTIVE_ENABLED:-false}
+      PROACTIVE_DRY_RUN: ${PROACTIVE_DRY_RUN:-true}
+      PROACTIVE_PILOT_EMAILS: ${PROACTIVE_PILOT_EMAILS:-}
+      ORG_TIMEZONE: ${ORG_TIMEZONE:-}
+      CHECKIN_HOUR: ${CHECKIN_HOUR:-10}
+      CHECKIN_MAX_ITEMS: ${CHECKIN_MAX_ITEMS:-4}
+      UNDO_WINDOW_MINUTES: ${UNDO_WINDOW_MINUTES:-120}
     volumes:
-      # Mount the Chat service-account key read-only when GOOGLE_CHAT_SERVICE_ACCOUNT_FILE is set:
-      # - ${GOOGLE_CHAT_SERVICE_ACCOUNT_FILE}:/run/secrets/google-chat.json:ro
+      # Chat service-account key, read-only. Requires GOOGLE_CHAT_SERVICE_ACCOUNT_FILE in .env; remove this line if you do not use Google Chat.
+      - ${GOOGLE_CHAT_SERVICE_ACCOUNT_FILE}:/run/secrets/google-chat.json:ro
       - ./data:/app/data
     depends_on:
       db:

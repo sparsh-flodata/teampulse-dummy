@@ -573,11 +573,26 @@ Choices made where the plan was open:
 - There is no separate `checkin` node in the LangGraph assistant: the inbound router calls `checkin_reply` directly,
   so the graph keeps its rule that the model never writes. The `Check-in agent` label is used for these turns.
 
+Verified on 2026-11-11, on the pilot machine:
+- Dry run against a throwaway copy of the live PostgreSQL data: 56 check-ins composed, a second run created none,
+  and the 3 Chat-linked people were recorded as `Skipped` (not sent). Messages render correctly in both formats.
+- Twelve real-style replies, read by the parser and by Groq (`openai/gpt-oss-120b`). The run found parser bugs, now
+  fixed and covered by tests. The worst: "nothing new on 2, 1 is at 55%" saved 55% on item 2 as well. Also fixed:
+  "both done" with three items, "thanks" read as a vague reply, and clauses like "almost done with 1",
+  "2 will be late", "1 moved to friday because ...", "finished the first one, the second is 30% ...".
+- Groq did worse than the fixed parser on these replies (it missed a stated date and called "going fine" not a
+  reply), and it hit rate limits after about nine quick calls. Extraction is now **parser first**. The model is
+  asked only when the parser is unsure, and its answer is used only when it finds updates that pass validation.
+- Changed: manager notices now respect dry run; `PROACTIVE_PILOT_EMAILS` limits daily check-ins to the pilot
+  (everyone is opted in by default, so without it all 56 people would get one); the admin preview shows the pilot
+  list; compose passes the proactive settings to the container and restarts both services;
+  `scripts/pilot.ps1 -Docker` supervises only the tunnel when the app runs in docker compose.
+
 Needs live verification (could not be reached from the build environment):
 - The app's `chat.bot` service account downloading an uploaded attachment from a DM (9.1). If it cannot, Open
   returns the 502 message for everyone but the sender.
 - The real shape of `message.attachment[]` in both Chat event formats.
-- Groq JSON-mode extraction quality on real replies (the validation in 7.2 runs either way).
+- ~~Groq JSON-mode extraction quality on real replies~~: checked 2026-11-11 (above).
 - A dry-run day, then `PROACTIVE_DRY_RUN=false` (section 11).
 
 ### Phase 1: Haiku, the foundations (mechanical, fully specified)

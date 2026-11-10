@@ -4,6 +4,11 @@ For the 2 to 3 person pilot in [the plan](PROACTIVE_ASSISTANT_PLAN.md), section 
 
 ## One-time setup
 
+Two ways to run it. **Docker** (what this machine uses): `docker compose up -d --build` runs Postgres and the app on
+port 8787, and both restart on their own. The proactive settings below go in `.env`; compose passes them to the
+container. After changing `.env`, run `docker compose up -d` to apply it. **Directly on Windows**: `uv sync`, then
+`scripts/pilot.ps1` runs the backend itself. Use one or the other, never both: both listen on 8787.
+
 1. `uv sync`, `pnpm install`, `pnpm build`.
 2. In `.env`:
    - `APP_URL=https://<your reserved ngrok domain>` and `NGROK_DOMAIN=<the same domain, without https://>`
@@ -11,10 +16,13 @@ For the 2 to 3 person pilot in [the plan](PROACTIVE_ASSISTANT_PLAN.md), section 
    - `ORG_TIMEZONE`, `CHECKIN_HOUR`, `CHECKIN_MAX_ITEMS`, `UNDO_WINDOW_MINUTES` (the defaults are fine)
    - Optionally `AI_BASE_URL`, `AI_MODEL`, `AI_API_KEY` for Groq extraction. Without them, the deterministic parser is used.
    - Keep `PROACTIVE_ENABLED=false` and `PROACTIVE_DRY_RUN=true` for now.
+   - **Set `PROACTIVE_PILOT_EMAILS`** to the pilot users' emails, comma-separated. Without it, every active person
+     with check-ins on gets one (everyone is opted in by default: 56 people in the live data on 2026-11-11).
 3. Install ngrok and sign in once (`ngrok config add-authtoken ...`). `scripts/pilot.ps1` uses `ngrok http --url=...`,
    which needs ngrok 3.16 or later. On older versions, change `--url=https://` to `--domain=`.
 4. Register the startup task, so the backend and the tunnel start at logon and come back after a crash or a reboot:
-   `powershell -ExecutionPolicy Bypass -File scripts/register-pilot-task.ps1`, then
+   `powershell -ExecutionPolicy Bypass -File scripts/register-pilot-task.ps1` (add `-Docker` when the app runs in
+   docker compose: the task then only starts the stack and keeps the tunnel up), then
    `Start-ScheduledTask -TaskName 'TeamPulse pilot'`. Logs are in `data/logs/`.
 5. Check that `https://<domain>/api/health` answers, that each pilot user has messaged the Chat app, and that
    Settings shows Google Chat as connected for each of them.
@@ -32,7 +40,8 @@ prevents a duplicate check-in even if two processes run, but replies and outbox 
 
 ## Dry-run day
 
-1. Set `PROACTIVE_ENABLED=true` (keep `PROACTIVE_DRY_RUN=true`) and restart the task.
+1. Set `PROACTIVE_ENABLED=true` (keep `PROACTIVE_DRY_RUN=true`) and restart: `docker compose up -d` with Docker,
+   or restart the task otherwise. Check-ins also appear in each pilot user's AI chat, even in dry run, so tell them first.
 2. After the check-in hour, open Settings as an administrator and read the **Check-in preview** for today: who
    got a check-in, which items, and the composed message. In dry run, Chat delivery shows `Skipped`. Check-ins
    also appear in each person's AI chat, where they can reply as normal.
@@ -40,7 +49,7 @@ prevents a duplicate check-in even if two processes run, but replies and outbox 
 
 ## Going live
 
-Set `PROACTIVE_DRY_RUN=false` and restart. From the next weekday at `CHECKIN_HOUR`, each opted-in person with
+Set `PROACTIVE_DRY_RUN=false` and restart (`docker compose up -d` with Docker). From the next weekday at `CHECKIN_HOUR`, each opted-in person with
 something that needs their word gets one Google Chat DM a day. People can say `pause`, `resume`, `undo` or `help`,
 or change it in Settings → Check-ins.
 

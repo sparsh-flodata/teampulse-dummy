@@ -101,6 +101,11 @@ async def google_chat_events(request: Request, db: Session = Depends(get_db)):
 
     text = (message.get('argumentText') or message.get('text') or '').strip()
     attachments = [a for a in (message.get('attachment') or []) if isinstance(a, dict)]
+    if attachments:
+        # Structure only, for verifying the real event shape (plan 9.1): field names, source and type.
+        # Never URLs, file names or message text.
+        log.info('Chat message with %s attachment(s): %s', len(attachments),
+                 [{'fields': sorted(a), 'source': a.get('source'), 'type': str(a.get('contentType', ''))[:60]} for a in attachments])
     if not text and not attachments:
         return _reply(HELP, addon)
     if text.lower() in ('hi', 'hello', 'start'):

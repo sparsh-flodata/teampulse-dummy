@@ -168,6 +168,8 @@ def run_check_ins(db, at: datetime | None = None) -> int:
     from backend.app.channels import google_chat
     created = 0
     people = list(db.scalars(select(Employee).where(Employee.active.is_(True), Employee.proactive_checkins.is_(True)).order_by(Employee.id)))
+    if config.PROACTIVE_PILOT_EMAILS:
+        people = [p for p in people if p.email.lower() in config.PROACTIVE_PILOT_EMAILS]
     for person in people:
         if _paused(person, local.date()):
             continue

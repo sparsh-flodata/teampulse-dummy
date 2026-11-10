@@ -76,3 +76,6 @@ ORG_TIMEZONE = (os.getenv('ORG_TIMEZONE', '').strip() or os.getenv('APP_TIMEZONE
 CHECKIN_HOUR = int(os.getenv('CHECKIN_HOUR', '10'))
 CHECKIN_MAX_ITEMS = int(os.getenv('CHECKIN_MAX_ITEMS', '4'))
 UNDO_WINDOW_MINUTES = int(os.getenv('UNDO_WINDOW_MINUTES', '120'))
+# Pilot allowlist: when set, only these people (comma-separated emails) get daily check-ins.
+# Empty means every active person who has check-ins on. Manager update requests are not affected.
+PROACTIVE_PILOT_EMAILS = tuple(e.strip().lower() for e in os.getenv('PROACTIVE_PILOT_EMAILS', '').split(',') if e.strip())
