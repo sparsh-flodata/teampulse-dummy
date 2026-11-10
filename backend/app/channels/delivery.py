@@ -1,10 +1,14 @@
 """Delivery adapters prepare requests inside the database transaction.
-A future external adapter must enqueue an outbox job and verify its sender/reply identity.
+
+External adapters enqueue an outbox message; the workflow tick sends it, so the
+request itself never depends on the external service being up.
 """
 from dataclasses import dataclass
 from typing import Protocol
+from backend.app.core.config import app_link
 from backend.app.models import now
 from backend.app.services.work import notify
+from backend.app.channels import google_chat
 
 
 @dataclass(frozen=True)
@@ -24,9 +28,28 @@ class InAppChannel:
         return DeliveryResult('Delivered', 'Delivered to the employee’s TeamPulse update inbox.')
 
 
-class UnconfiguredChannel:
+class GoogleChatChannel:
+    """Always lands in the TeamPulse inbox (where replies can update work), and is
+    also sent as a Google Chat DM when the recipient has connected the Chat app."""
+
     def prepare(self, db, request, sender, recipient):
-        return DeliveryResult('Queued', 'WhatsApp is not configured. No external message has been sent.')
+        InAppChannel().prepare(db, request, sender, recipient)
+        where = f'or open your inbox: {app_link("/chat")}' if app_link('/chat') else 'or answer in your TeamPulse inbox'
+        text = (f'{sender.name} asked for an update:\n{request.prompt}\n\n'
+                f'Reply here in a sentence, {where}')
+        from sqlalchemy import select
+        from backend.app.models import CheckIn
+        from backend.app.services.proactive import request_items_text
+        check_in = db.scalar(select(CheckIn).where(CheckIn.update_request_id == request.id))
+        if check_in:
+            text = (f'{sender.name} asked for an update:\n{request.prompt}\n\n{request_items_text(db, check_in)}'
+                    + (f'\nOr open your inbox: {app_link("/chat")}' if app_link('/chat') else ''))
+        if google_chat.queue_message(db, recipient.id, text, request.id, check_in_id=check_in.id if check_in else None):
+            return DeliveryResult('Delivered', 'Delivered to the TeamPulse update inbox; the Google Chat message is on its way.')
+        first = recipient.name.split(' ')[0]
+        reason = 'Google Chat is not configured for this workspace' if not google_chat.outbound_enabled() else f'{first} has not connected Google Chat yet'
+        return DeliveryResult('Delivered', f'Delivered to the TeamPulse update inbox. {reason}.')
 
 
-CHANNELS = {'in_app': InAppChannel(), 'whatsapp': UnconfiguredChannel()}
+CHANNELS = {'in_app': InAppChannel(), 'google_chat': GoogleChatChannel()}
+CHANNEL_LABELS = {'in_app': 'TeamPulse inbox', 'google_chat': 'Google Chat'}

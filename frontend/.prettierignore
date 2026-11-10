@@ -1,0 +1,3 @@
+src/mocks/fixtures/
+src/routeTree.gen.ts
+dist/

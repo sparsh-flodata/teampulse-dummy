@@ -10,7 +10,7 @@
 }
 .table-scroll:focus-visible,
 .organization-tree-scroll:focus-visible {
-  outline: 2px solid #a995d5;
+  outline: 2px solid oklch(71.1% 0.009 55);
   outline-offset: -2px;
 }
 .work-table {
@@ -21,8 +21,8 @@
   position: sticky;
   top: 0;
   z-index: 2;
-  background: #faf9fc;
-  box-shadow: 0 1px 0 #eae3f0;
+  background: oklch(98.4% 0.004 55);
+  box-shadow: 0 1px 0 oklch(92.5% 0.006 55);
 }
 .table-scroll > .empty {
   min-height: 100%;
@@ -33,9 +33,9 @@
   overscroll-behavior: contain;
 }
 .department-branch {
-  border: 1px solid #eee6f4;
-  border-radius: 9px;
-  background: #fff;
+  border: 1px solid oklch(93.5% 0.006 55);
+  border-radius: var(--radius-9);
+  background: var(--color-surface);
   padding: 0 16px 14px !important;
 }
 .department-branch .team-tree-heading {
@@ -51,27 +51,27 @@
 .department-expander {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-10);
   text-align: left;
   flex: 1;
   min-width: 0;
   padding: 9px 0;
-  color: #846297;
+  color: oklch(42.3% 0.012 40);
 }
 .department-expander > span:last-child {
   min-width: 0;
 }
 .department-expander strong {
-  font-size: 12px;
-  font-weight: 600;
+  font-size: var(--text-12);
+  font-weight: var(--weight-semibold);
   display: block;
-  color: #795687;
+  color: oklch(40.4% 0.012 40);
 }
 .department-expander small {
-  font-size: 9px;
+  font-size: var(--text-9);
   display: block;
   margin-top: 5px;
-  color: #a086ae;
+  color: oklch(47.1% 0.012 40);
 }
 .department-branch .team-tree-members > button > span:nth-child(2) {
   min-width: 0;
@@ -79,13 +79,13 @@
   overflow-wrap: anywhere;
 }
 .department-branch .team-tree-members small {
-  font-size: 8px;
+  font-size: var(--text-8);
   line-height: 1.7;
-  color: #a58db3;
+  color: oklch(48% 0.012 40);
 }
 .project-collaboration {
-  color: #9b7cae;
-  font-size: 9px;
+  color: oklch(46% 0.012 40);
+  font-size: var(--text-9);
   margin: 13px 0 0;
 }
 @media (max-width: 760px) {
@@ -105,13 +105,13 @@
     grid-template-columns: 1fr;
   }
   .department-expander {
-    gap: 7px;
+    gap: var(--space-7);
   }
   .department-expander strong {
-    font-size: 11px;
+    font-size: var(--text-11);
   }
   .department-branch .team-tree-heading > .button {
-    font-size: 8px;
+    font-size: var(--text-8);
     padding: 6px;
   }
 }

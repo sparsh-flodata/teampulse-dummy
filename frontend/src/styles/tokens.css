@@ -1,0 +1,143 @@
+/*
+ * TeamPulse design tokens: the Coral theme.
+ *
+ * Warm paper desk, cotton sheets with a letterpress edge, ink for the one
+ * filled primary, coral only for focus and link hover. Status colours come
+ * in five soft families (late, warn, done, info, wait), each a tint and an ink.
+ *
+ * Token names from the first port are kept so component CSS stays put;
+ * their values now point at the Coral palette.
+ */
+:root {
+  color-scheme: light;
+
+  /* Coral palette */
+  --color-paper: oklch(97% 0.006 55);
+  --color-paper-2: oklch(94.5% 0.007 55);
+  --color-paper-3: oklch(91.5% 0.009 55);
+  --color-ink: oklch(21% 0.012 38);
+  --color-ink-2: oklch(29% 0.013 40);
+  --color-rule: oklch(87% 0.009 55);
+  --color-rule-2: oklch(81% 0.011 55);
+  --color-accent: oklch(74% 0.125 30);
+  --color-accent-2: oklch(54% 0.165 29);
+  --color-focus: oklch(54% 0.17 30);
+  --color-cotton: oklch(98.8% 0.0045 80);
+  --color-desk: oklch(94.3% 0.008 64);
+  --color-print: oklch(23% 0.012 38);
+  --color-board: oklch(22% 0.011 40);
+  --color-board-type: oklch(96.5% 0.006 70);
+
+  /* Status families: tint + ink (badges, tinted containers and rows) */
+  --color-late-soft: oklch(94.5% 0.03 22);
+  --color-late-ink: oklch(45% 0.15 27);
+  --color-warn-soft: oklch(95% 0.045 80);
+  --color-warn-ink: oklch(45% 0.1 65);
+  --color-done-soft: oklch(94.5% 0.035 150);
+  --color-done-ink: oklch(41% 0.1 150);
+  --color-info-soft: oklch(94.5% 0.03 250);
+  --color-info-ink: oklch(44% 0.12 255);
+  --color-wait-soft: oklch(93% 0.007 55);
+  --color-wait-ink: oklch(40% 0.012 45);
+
+  /* Surfaces */
+  --shade: 32% 0.03 50;
+  --lit: 100% 0.005 80;
+  --edge-stock:
+    inset 0 1px 0 oklch(var(--lit) / 0.9),
+    inset 0 -1px 0 oklch(var(--shade) / 0.07),
+    0 0 0 0.5px oklch(var(--shade) / 0.22), 0 1px 0 oklch(var(--shade) / 0.12);
+  --cast-stock: 6px 5px 10px -6px oklch(var(--shade) / 0.3);
+
+  /* Typography */
+  --font-body: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-body);
+  --font-mono: "Geist Mono Variable", ui-monospace, monospace;
+  --font-size-root: 14px;
+
+  /* Text scale, a step up from the first port for Coral's reading size.
+     Names keep the original pixel value so component CSS is unchanged. */
+  --text-7: 9px;
+  --text-8: 10px;
+  --text-9: 11px;
+  --text-10: 12px;
+  --text-11: 13px;
+  --text-12: 13.5px;
+  --text-13: 14px;
+  --text-14: 15px;
+  --text-15: 16px;
+  --text-16: 17px;
+  --text-23: 24px;
+
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 600;
+  --weight-extrabold: 650;
+
+  /* Core roles */
+  --color-brand: var(--color-board);
+  --color-brand-meta: #d8614c; /* theme-color meta + favicon: coral */
+  --color-text: var(--color-ink-2);
+  --color-muted: oklch(47% 0.013 45);
+  --color-canvas: var(--color-desk);
+  --color-surface: var(--color-cotton);
+  --color-on-brand: var(--color-board-type);
+  --color-border: var(--color-rule);
+  --color-focus-ring: var(--color-focus);
+  --color-focus-input: var(--color-focus);
+
+  /* Chat workspace */
+  --chat-text-secondary: var(--color-muted);
+
+  /* Health signals (work health: green = on track, amber = review,
+     red = intervention, gray = missing or stale confirmation) */
+  --health-green: var(--color-done-ink);
+  --health-green-border: oklch(87% 0.05 150);
+  --health-green-soft: var(--color-done-soft);
+  --health-green-wash: oklch(97.6% 0.016 150);
+  --health-amber: var(--color-warn-ink);
+  --health-amber-border: oklch(87% 0.06 78);
+  --health-amber-soft: var(--color-warn-soft);
+  --health-amber-wash: oklch(98% 0.02 80);
+  --health-red: var(--color-late-ink);
+  --health-red-border: oklch(87% 0.05 22);
+  --health-red-soft: var(--color-late-soft);
+  --health-red-wash: oklch(97.8% 0.012 22);
+  --health-gray: var(--color-wait-ink);
+  --health-gray-border: var(--color-rule);
+  --health-gray-soft: var(--color-wait-soft);
+  --health-gray-wash: oklch(97% 0.006 55);
+
+  /* Radius */
+  --radius-3: 3px;
+  --radius-4: 4px;
+  --radius-5: 6px;
+  --radius-6: 6px;
+  --radius-7: 6px;
+  --radius-8: 8px;
+  --radius-9: 8px;
+  --radius-10: 8px;
+  --radius-11: 8px;
+  --radius-16: 12px;
+  --radius-round: 50%;
+  --radius-pill: 999px;
+
+  /* Spacing (flex/grid gaps) */
+  --space-5: 5px;
+  --space-6: 6px;
+  --space-7: 7px;
+  --space-8: 8px;
+  --space-9: 9px;
+  --space-10: 10px;
+  --space-11: 11px;
+  --space-15: 12px;
+  --space-block: 12px; /* the one gap between blocks on a page */
+
+  /* Elevation */
+  --shadow-card: var(--edge-stock), var(--cast-stock);
+  --shadow-popover:
+    0 14px 40px -12px oklch(var(--shade) / 0.35),
+    0 0 0 0.5px oklch(var(--shade) / 0.22);
+  --color-popover-border: var(--color-rule);
+}

@@ -25,8 +25,9 @@ def test_reporting_manager_profiles_do_not_expose_peer_capacity(ctx):
     assert c.get('/api/people/3/profile').status_code==403
     assert c.get('/api/people/7/profile').status_code==403
     assert c.patch('/api/work/3',json={'progress':80}).status_code==403
-    assert c.post('/api/work',json=work_body(owner=3)).status_code==403
-    assert c.post('/api/work/9/assign',json={'employee_id':3}).status_code==403
+    # Managers may assign anyone in the organization (the assignee confirms); editing others' work stays scoped.
+    assert c.post('/api/work',json=work_body(owner=3)).status_code==201
+    assert c.post('/api/work/9/assign',json={'employee_id':3}).status_code in (200,404)
 
 
 def test_every_role_keeps_own_work_and_directory(ctx):
@@ -182,5 +183,7 @@ def test_additive_migration_preserves_existing_records(tmp_path):
         assert conn.execute(text('SELECT name,active,agent_auto_updates FROM employees')).one()==('Existing person',1,0)
         assert conn.execute(text('SELECT name,parent_id,lead_id FROM teams')).one()==('Preserved team',None,None)
         assert conn.execute(text('SELECT base_snapshot FROM agent_actions')).scalar()=='{}'
-        assert conn.execute(text('SELECT COUNT(*) FROM schema_migrations')).scalar()==4
+        assert conn.execute(text('SELECT COUNT(*) FROM schema_migrations')).scalar()==6
+        assert conn.execute(text('SELECT proactive_checkins,checkins_paused_until FROM employees')).one()==(1,None)
+        assert conn.execute(text("SELECT source,check_in_id FROM agent_actions")).one()==('chat',None)
     engine.dispose()

@@ -11,6 +11,9 @@ class AgentAction(Base):
     payload: Mapped[str] = mapped_column(Text)
     base_snapshot: Mapped[str] = mapped_column(Text, default='{}')
     status: Mapped[str] = mapped_column(String(20), default='Proposed')
+    check_in_id: Mapped[int | None] = mapped_column(ForeignKey('check_ins.id'), nullable=True)
+    source: Mapped[str] = mapped_column(String(20), default='chat')  # chat, checkin
+    applied_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=now)
 
 class Conversation(Base):
@@ -19,6 +22,7 @@ class Conversation(Base):
     employee_id: Mapped[int] = mapped_column(ForeignKey('employees.id'))
     role: Mapped[str] = mapped_column(String(20))
     message: Mapped[str] = mapped_column(Text)
+    agent: Mapped[str] = mapped_column(String(40), default='')  # which graph agent answered
     created_at: Mapped[datetime] = mapped_column(DateTime, default=now)
 
 class MessageReceipt(Base):

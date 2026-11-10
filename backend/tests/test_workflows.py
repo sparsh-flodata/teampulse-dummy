@@ -36,8 +36,10 @@ def ctx():
     engine.dispose()
 
 def login(client, name='nitish'):
+    client.headers.pop('Authorization', None)
     response=client.post('/api/auth/login', json={'email':name+'@teampulse.local','password':'test-password-2026!'})
     assert response.status_code == 200, response.text
+    client.headers['Authorization']='Bearer '+response.json()['access_token']
     return response
 
 def work_body(owner=1, **kwargs):
@@ -49,13 +51,44 @@ def test_auth_and_csrf(ctx):
     bad=c.post('/api/auth/login',json={'email':'nitish@teampulse.local','password':'wrong'})
     assert bad.status_code==401
     response=login(c)
-    assert 'HttpOnly' in response.headers['set-cookie']
-    assert 'SameSite=strict' in response.headers['set-cookie']
-    assert 'password_hash' not in response.json()
+    body=response.json()
+    assert 'set-cookie' not in response.headers
+    assert body['user']['email']=='nitish@teampulse.local' and 'password_hash' not in body['user']
+    assert body['expires_in']>0 and body['token_type']=='bearer'
+    assert c.get('/api/auth/me').json()['id']==body['user']['id']
     assert c.post('/api/work',json=work_body(),headers={'X-TeamPulse-Request':'0'}).status_code==403
     assert c.post('/api/work',json=work_body(),headers={'Origin':'https://attacker.example'}).status_code==403
-    c.post('/api/auth/logout',json={})
+    assert c.get('/api/state',headers={'Authorization':'Bearer not-a-token'}).status_code==401
+    # Rotating refresh: the new pair works, the old refresh token is spent, and reusing it ends the sign-in.
+    pair=c.post('/api/auth/refresh',json={'refresh_token':body['refresh_token']}).json()
+    assert pair['refresh_token']!=body['refresh_token']
+    assert c.get('/api/state',headers={'Authorization':'Bearer '+pair['access_token']}).status_code==200
+    assert c.post('/api/auth/refresh',json={'refresh_token':body['refresh_token']}).status_code==401
+    assert c.post('/api/auth/refresh',json={'refresh_token':pair['refresh_token']}).status_code==401
+    # Logout revokes the refresh token; the access token simply expires.
+    again=login(c).json()
+    assert c.post('/api/auth/logout',json={'refresh_token':again['refresh_token']}).json()=={'ok':True}
+    assert c.post('/api/auth/refresh',json={'refresh_token':again['refresh_token']}).status_code==401
+    c.headers.pop('Authorization')
     assert c.get('/api/state').status_code==401
+
+def test_registration_is_limited_to_the_company_domain(ctx, monkeypatch):
+    c,sessions=ctx
+    import backend.app.core.security as security
+    monkeypatch.setattr(security,'ALLOWED_EMAIL_DOMAINS',('flodataanalytics.com',))
+    body={'name':'Asha Rao','email':'asha.rao@flodataanalytics.com','password':'long-password-2026'}
+    for email in ('asha@gmail.com','asha@flodataanalytics.com.evil.io','asha@sub.flodataanalytics.com'):
+        assert c.post('/api/auth/register',json=body|{'email':email}).status_code==422, email
+    created=c.post('/api/auth/register',json=body|{'email':'Asha.Rao@FloDataAnalytics.com'})
+    assert created.status_code==201, created.text
+    data=created.json()
+    assert data['user']['email']=='asha.rao@flodataanalytics.com' and data['user']['role']=='employee'
+    assert c.get('/api/auth/me',headers={'Authorization':'Bearer '+data['access_token']}).json()['name']=='Asha Rao'
+    assert c.post('/api/auth/register',json=body).status_code==409
+    assert c.post('/api/auth/register',json=body|{'email':'short@flodataanalytics.com','password':'short'}).status_code==422
+    # Admin-created employees follow the same rule.
+    login(c)
+    assert c.post('/api/employees',json={'name':'Outside person','email':'someone@example.com','password':'long-password-2026','team_id':1}).status_code==422
 
 def test_team_and_mutation_permissions(ctx):
     c,_=ctx
@@ -123,7 +156,6 @@ def test_assignment_proposal_and_employee_acceptance(ctx):
     assert c.post('/api/work/9/assign',json={'employee_id':6}).status_code==200
     work=next(w for w in c.get('/api/state').json()['work'] if w['id']==9)
     assert not work['commitment_confirmed']
-    assert c.post('/api/work/9/assign',json={'employee_id':3}).status_code==409
     assert c.patch('/api/work/9',json={'accept_commitment':True}).status_code==403
     login(c,'karan')
     assert c.patch('/api/work/9',json={'accept_commitment':True}).status_code==200

@@ -3,18 +3,20 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 from backend.app.db.session import get_db
 from backend.app.models import Employee, Project, Commitment
-from backend.app.schemas import WorkCreate, WorkPatch, Assignment
-from backend.app.core.security import current_user, require_manager
-from backend.app.core.access import can_manage_person
-from backend.app.services.work import get_work, latest_commitment, create_work, patch_work, serialize_work, audit, notify, participates_in_project
+from backend.app.schemas import DependencyCreate, WorkCreate, WorkPatch, Assignment
+from backend.app.services.dependencies import create_dependency
+from backend.app.core.security import current_user
+from backend.app.services.work import get_work, create_work, patch_work, serialize_work, assign_work
 
 router = APIRouter()
 
 @router.post('/api/work', status_code=201)
 def new_work(body: WorkCreate, user: Employee = Depends(current_user), db: Session = Depends(get_db)):
     work = create_work(db, user, body)
+    for dependency in body.dependencies:
+        create_dependency(db, user, DependencyCreate(work_item_id=work.id, **dependency.model_dump()), creating=True)
     db.commit()
-    return serialize_work(db, work)
+    return serialize_work(db, work, user)
 
 @router.patch('/api/work/{work_id}')
 def update_work(work_id: int, body: WorkPatch, user: Employee = Depends(current_user), db: Session = Depends(get_db)):
@@ -29,19 +31,6 @@ def history(work_id: int, user: Employee = Depends(current_user), db: Session = 
 
 @router.post('/api/work/{work_id}/assign')
 def assign(work_id: int, body: Assignment, user: Employee = Depends(current_user), db: Session = Depends(get_db)):
-    require_manager(user)
-    work = get_work(db, user, work_id, edit=True)
-    if work.owner_id:
-        raise HTTPException(409, 'This work already has an owner. Existing work is not silently reassigned.')
-    person = db.get(Employee, body.employee_id)
-    if not participates_in_project(db, person, db.get(Project, work.project_id)):
-        raise HTTPException(422, 'Select an employee on the project team.')
-    if person.id != user.id and not can_manage_person(db, user, person.id):
-        raise HTTPException(403, 'You can only assign work within your reporting team.')
-    work.owner_id = person.id
-    work.confirmed_at = None
-    latest_commitment(db, work.id).confirmed_by = None
-    audit(db, user, f'Proposed “{work.title}” to {person.name}; awaiting employee confirmation.', work.id)
-    notify(db, person.id, f'assigned:{work.id}', f'Please review and confirm the proposed commitment: {work.title}.', work.id)
+    work = assign_work(db, user, get_work(db, user, work_id), body.employee_id)
     db.commit()
-    return serialize_work(db, work)
+    return serialize_work(db, work, user)

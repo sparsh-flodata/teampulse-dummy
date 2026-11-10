@@ -1,0 +1,86 @@
+/* Account switcher (new in the TanStack rebuild). Mirrors the
+   notification popover so it reads as part of the same system. */
+.account-trigger {
+  display: flex;
+  padding: 0;
+  border-radius: var(--radius-round);
+}
+.account-menu {
+  position: fixed;
+  right: 33px;
+  top: 60px;
+  width: 320px;
+  max-width: calc(100vw - 30px);
+  max-height: 75vh;
+  overflow: auto;
+  border: 1px solid var(--color-popover-border);
+  background: var(--color-surface);
+  border-radius: var(--radius-11);
+  box-shadow: var(--shadow-popover);
+  z-index: 80;
+}
+.account-menu > .split {
+  padding: 15px 15px 9px 17px;
+}
+.account-menu h3 {
+  font-size: var(--text-13);
+  color: var(--color-text);
+}
+.account-list,
+.account-actions {
+  display: grid;
+  padding: 4px 8px 8px;
+}
+.account-actions {
+  border-top: 1px solid var(--color-border);
+  padding-top: 8px;
+}
+.account-option,
+.account-actions button {
+  display: flex;
+  align-items: center;
+  gap: var(--space-10);
+  width: 100%;
+  padding: 9px;
+  border-radius: var(--radius-8);
+  text-align: left;
+}
+.account-option:hover,
+.account-actions button:hover,
+.account-option.active {
+  background: var(--color-canvas);
+}
+.account-option > span {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+  font-weight: var(--weight-semibold);
+  color: var(--color-text);
+}
+.account-option small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: var(--weight-regular);
+  color: var(--color-muted);
+}
+.account-option > svg {
+  color: var(--color-brand);
+}
+.account-actions button {
+  font-weight: var(--weight-medium);
+  color: var(--color-text);
+}
+.account-note {
+  display: block;
+  padding: 0 17px 13px;
+  color: var(--color-muted);
+}
+.login-back {
+  margin-top: 14px;
+}
+@media (max-width: 760px) {
+  .account-menu {
+    right: 15px;
+  }
+}

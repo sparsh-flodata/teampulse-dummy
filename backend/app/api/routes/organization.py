@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from backend.app.db.session import get_db
 from backend.app.models import Team, Employee
 from backend.app.schemas import TeamCreate, TeamPatch, EmployeePatch
-from backend.app.core.security import current_user
+from backend.app.core.security import current_user, revoke_employee_tokens
 from backend.app.core.access import validate_manager, require_admin, validate_team_parent
 from backend.app.services.work import serialize_person, audit
 from backend.app.services.organization import validate_lead
@@ -62,6 +62,8 @@ def edit_employee(person_id: int, body: EmployeePatch, user: Employee = Depends(
     before = {key: getattr(person, key) for key in fields}
     for key, value in fields.items():
         setattr(person, key, value)
+    if fields.get('active') is False:
+        revoke_employee_tokens(db, person.id)
     audit(db, user, f'Updated {person.name}: ' + '; '.join(f'{key.replace("_", " ")}: {before[key]} → {value}' for key, value in fields.items()))
     db.commit()
     return serialize_person(db, person)

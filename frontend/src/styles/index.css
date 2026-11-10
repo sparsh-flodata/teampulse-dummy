@@ -1,0 +1,19 @@
+/* Self-hosted fonts (no CDN): Geist and Geist Mono, both variable. */
+@import "@fontsource-variable/geist/wght.css";
+@import "@fontsource-variable/geist-mono/wght.css";
+
+@import "./tokens.css";
+
+/* Same order as the original entry point. */
+@import "./base.css";
+@import "./health.css";
+@import "./layout.css";
+@import "./chat.css";
+@import "./organization.css";
+@import "./responsive.css";
+@import "./account-menu.css";
+/* Coral: containers, badges, sidebar rules and density. Loaded last. */
+@import "./coral.css";
+@import "./projects.css";
+@import "./attachments.css";
+@import "./motion.css";

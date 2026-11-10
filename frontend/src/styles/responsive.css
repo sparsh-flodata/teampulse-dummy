@@ -15,49 +15,49 @@
   overflow-wrap: anywhere;
 }
 .sample-workspace-note > .sample-note-detail {
-  font-weight: 400;
+  font-weight: var(--weight-regular);
   color: inherit;
 }
 .reporting-team-compact {
   padding: 18px 20px;
-  margin-bottom: 22px;
+  margin-bottom: 14px;
   min-width: 0;
 }
 .reporting-team-heading {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: var(--space-10);
 }
 .reporting-team-heading h3 {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 13px;
-  font-weight: 600;
-  color: #79568c;
+  gap: var(--space-8);
+  font-size: var(--text-13);
+  font-weight: var(--weight-semibold);
+  color: oklch(30% 0.012 40);
 }
 .reporting-team-heading h3 > span {
-  font-size: 10px;
-  background: #f1eaf8;
-  color: #8a6b9f;
+  font-size: var(--text-10);
+  background: oklch(94.7% 0.006 55);
+  color: oklch(43.5% 0.012 40);
   padding: 3px 6px;
-  border-radius: 5px;
+  border-radius: var(--radius-5);
 }
 .reporting-team-heading .button {
   min-height: 34px;
 }
 .reporting-team-hint {
-  font-size: 10px;
+  font-size: var(--text-10);
   line-height: 1.6;
   margin-top: 5px;
-  color: #9d84ae;
+  color: oklch(46.8% 0.012 40);
 }
 .report-avatar-list {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: var(--space-8);
   padding-top: 13px;
 }
 .report-avatar-button,
@@ -69,31 +69,31 @@
   height: 44px;
   flex: 0 0 44px;
   padding: 3px;
-  border: 1px solid #eee5f5;
-  border-radius: 50%;
-  background: #fff;
+  border: 1px solid oklch(93.4% 0.007 55);
+  border-radius: var(--radius-round);
+  background: var(--color-surface);
   transition:
     background 0.15s,
     border-color 0.15s;
 }
 .report-avatar-button:hover,
 .report-avatar-more:hover {
-  background: #f5effb;
-  border-color: #cbb4de;
+  background: oklch(96% 0.005 55);
+  border-color: oklch(80.3% 0.009 55);
 }
 .report-avatar-button:focus-visible,
 .report-avatar-more:focus-visible {
-  outline: 2px solid #9270ba;
+  outline: 2px solid oklch(24% 0.012 40);
   outline-offset: 3px;
 }
 .report-avatar-button .avatar {
   flex: 0 0 36px;
 }
 .report-avatar-more {
-  font-size: 12px;
-  font-weight: 600;
-  color: #78518f;
-  background: #f4edf9;
+  font-size: var(--text-12);
+  font-weight: var(--weight-semibold);
+  color: oklch(30% 0.012 40);
+  background: oklch(95.5% 0.005 55);
 }
 .report-avatar-tooltip {
   position: fixed;
@@ -101,25 +101,25 @@
   width: 220px;
   max-width: calc(100vw - 24px);
   padding: 12px 14px;
-  border-radius: 9px;
-  background: #543a68;
-  color: #fff;
-  box-shadow: 0 5px 20px #39264b26;
+  border-radius: var(--radius-9);
+  background: oklch(39.8% 0.012 40);
+  color: var(--color-on-brand);
+  box-shadow: 0 5px 20px oklch(30.9% 0.012 40 / 0.149);
   pointer-events: none;
   overflow-wrap: anywhere;
 }
 .report-avatar-tooltip strong {
   display: block;
-  font-size: 12px;
+  font-size: var(--text-12);
   line-height: 1.5;
 }
 .report-avatar-tooltip span,
 .report-avatar-tooltip small {
   display: block;
-  font-size: 10px;
+  font-size: var(--text-10);
   line-height: 1.6;
   margin-top: 3px;
-  color: #eadff2;
+  color: oklch(58.8% 0.008 55);
 }
 .reporting-team-dialog {
   padding: 18px 22px 22px;
@@ -127,11 +127,11 @@
 .reporting-team-search {
   display: flex;
   align-items: center;
-  gap: 9px;
+  gap: var(--space-9);
   padding: 0 12px;
-  border: 1px solid #e9dff2;
-  border-radius: 8px;
-  color: #a18bb5;
+  border: 1px solid oklch(91.7% 0.008 55);
+  border-radius: var(--radius-8);
+  color: oklch(47.7% 0.012 40);
 }
 .reporting-team-search input {
   width: 100%;
@@ -140,8 +140,8 @@
   border: 0;
   outline: 0;
   background: transparent;
-  font-size: 14px;
-  color: #715382;
+  font-size: var(--text-14);
+  color: oklch(36.9% 0.012 40);
 }
 .reporting-team-results {
   max-height: min(420px, 55dvh);
@@ -154,13 +154,13 @@
   align-items: center;
   text-align: left;
   width: 100%;
-  gap: 11px;
+  gap: var(--space-11);
   padding: 13px 3px;
-  border-bottom: 1px solid #f0e9f5;
-  color: #80628f;
+  border-bottom: 1px solid oklch(94.3% 0.005 55);
+  color: oklch(41.9% 0.012 40);
 }
 .reporting-team-results > button:hover {
-  background: #fcf9fe;
+  background: oklch(98.6% 0.004 55);
 }
 .reporting-team-results > button > .avatar {
   flex-shrink: 0;
@@ -171,23 +171,28 @@
 }
 .reporting-team-results strong {
   display: block;
-  font-size: 12px;
-  font-weight: 500;
+  font-size: var(--text-12);
+  font-weight: var(--weight-medium);
   overflow-wrap: anywhere;
 }
 .reporting-team-results small {
   display: block;
-  font-size: 10px;
+  font-size: var(--text-10);
   margin-top: 5px;
   line-height: 1.6;
-  color: #9e86ad;
+  color: oklch(47% 0.012 40);
 }
 
 @media (max-width: 900px) {
   .login-page {
     display: block;
     min-height: 100svh;
-    background: linear-gradient(160deg, #f5effc 0%, #faf8fd 48%, #fff 100%);
+    background: linear-gradient(
+      160deg,
+      oklch(96.1% 0.006 55) 0%,
+      oklch(98.2% 0.004 55) 48%,
+      var(--color-surface) 100%
+    );
   }
   .login-story {
     display: none;
@@ -195,17 +200,17 @@
   .login-mobile-brand {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: var(--space-10);
     max-width: 420px;
     margin: 0 auto;
     padding: 27px 24px 0;
   }
   .login-mobile-brand .brand {
-    font-size: 23px;
+    font-size: var(--text-23);
   }
   .login-mobile-brand > span {
-    color: #987eaa;
-    font-size: 12px;
+    color: oklch(46% 0.012 40);
+    font-size: var(--text-12);
     padding-left: 1px;
   }
   .login-form-wrap {
@@ -217,10 +222,10 @@
     width: 380px;
     max-width: 100%;
     padding: 25px;
-    background: #fff;
-    border: 1px solid #ece1f5;
-    border-radius: 16px;
-    box-shadow: 0 10px 40px #77519908;
+    background: var(--color-surface);
+    border: 1px solid oklch(92.4% 0.009 55);
+    border-radius: var(--radius-16);
+    box-shadow: 0 10px 40px oklch(24% 0.012 40 / 0.031);
   }
   .login-form h2 {
     font-size: 28px;
@@ -228,42 +233,42 @@
     margin-top: 12px;
   }
   .login-form > p {
-    font-size: 13px;
+    font-size: var(--text-13);
     line-height: 1.7;
   }
   .login-form .form {
-    gap: 18px;
+    gap: 12px;
     padding: 27px 0 20px;
   }
   .login-form .form label {
     min-width: 0;
-    font-size: 12px;
+    font-size: var(--text-12);
   }
   .login-form .form input {
     min-width: 0;
     width: 100%;
     min-height: 48px;
-    font-size: 16px;
+    font-size: var(--text-16);
     padding: 12px;
   }
   .login-form .form > .button {
     min-height: 48px;
-    font-size: 13px;
+    font-size: var(--text-13);
   }
   .login-demo {
     padding: 13px;
-    gap: 8px;
+    gap: var(--space-8);
   }
   .login-demo > svg {
     flex: 0 0 18px;
   }
   .login-demo p {
-    font-size: 10px;
+    font-size: var(--text-10);
     line-height: 1.9;
   }
   .login-privacy {
     line-height: 1.7;
-    margin-top: 20px;
+    margin-top: 12px;
   }
 }
 @media (max-width: 380px) {
@@ -280,38 +285,38 @@
 @media (max-width: 760px) {
   .reporting-team-compact {
     padding: 15px;
-    margin-bottom: 17px;
+    margin-bottom: 12px;
   }
   .reporting-team-heading {
-    gap: 6px;
+    gap: var(--space-6);
   }
   .reporting-team-heading h3 {
-    font-size: 12px;
-    gap: 6px;
+    font-size: var(--text-12);
+    gap: var(--space-6);
   }
   .reporting-team-heading .button {
-    font-size: 10px;
+    font-size: var(--text-10);
     min-height: 38px;
     padding: 7px 9px;
   }
   .reporting-team-hint {
-    font-size: 10px;
+    font-size: var(--text-10);
   }
   .report-avatar-list {
-    gap: 7px;
+    gap: var(--space-7);
     padding-top: 11px;
   }
   .reporting-team-dialog {
     padding: 14px 16px 18px;
   }
   .reporting-team-search input {
-    font-size: 16px;
+    font-size: var(--text-16);
   }
   .reporting-team-results strong {
-    font-size: 13px;
+    font-size: var(--text-13);
   }
   .reporting-team-results small {
-    font-size: 11px;
+    font-size: var(--text-11);
   }
 }
 @media (max-width: 1000px) {
@@ -337,7 +342,7 @@
   .chat-page > .page-heading {
     flex: 0 0 auto;
     margin-bottom: 9px;
-    gap: 8px;
+    gap: var(--space-8);
   }
   .chat-page .heading-eyebrow,
   .chat-page .page-heading p,
@@ -353,7 +358,7 @@
     flex: 0 0 auto;
     padding: 6px 9px;
     margin: 0 0 9px;
-    font-size: 9px;
+    font-size: var(--text-9);
     min-height: 26px;
   }
   .chat-page .sample-note-detail {
@@ -364,7 +369,7 @@
   }
   .chat-page .connection-error {
     flex-shrink: 0;
-    font-size: 10px;
+    font-size: var(--text-10);
     margin-bottom: 8px;
   }
   .chat-workspace {
@@ -374,7 +379,7 @@
     height: auto;
     min-height: 0;
     padding: 0;
-    gap: 9px;
+    gap: var(--space-9);
     margin: 0;
     overflow: hidden;
   }
@@ -392,10 +397,10 @@
     justify-content: center;
     padding: 7px 10px;
     min-height: 32px;
-    font-size: 12px;
+    font-size: var(--text-12);
   }
   .chat-mobile-tabs > button > span {
-    font-size: 9px;
+    font-size: var(--text-9);
   }
   .coord-chat,
   .coord-updates {
@@ -406,16 +411,16 @@
   .coord-chat-header {
     flex-shrink: 0;
     padding: 12px 14px;
-    gap: 9px;
+    gap: var(--space-9);
   }
   .coord-chat-header > div {
     min-width: 0;
   }
   .coord-chat-header h2 {
-    font-size: 13px;
+    font-size: var(--text-13);
   }
   .coord-chat-header p {
-    font-size: 9px;
+    font-size: var(--text-9);
     line-height: 1.5;
     margin-top: 3px;
   }
@@ -423,12 +428,12 @@
     width: 32px;
     height: 32px;
     flex: 0 0 32px;
-    border-radius: 9px;
+    border-radius: var(--radius-9);
   }
   .chat-context-bar {
     flex-shrink: 0;
     padding: 8px 11px;
-    gap: 8px;
+    gap: var(--space-8);
   }
   .chat-context-bar > label {
     display: none;
@@ -439,12 +444,12 @@
     flex: 1;
     min-height: 39px;
     padding: 8px;
-    font-size: 13px;
+    font-size: var(--text-13);
   }
   .add-people-button {
     min-height: 39px;
     padding: 8px;
-    font-size: 11px;
+    font-size: var(--text-11);
   }
   .people-picker-wrap {
     position: static;
@@ -458,7 +463,7 @@
     padding: 12px;
   }
   .people-picker > input {
-    font-size: 16px;
+    font-size: var(--text-16);
   }
   .people-picker-list {
     max-height: min(250px, 32dvh);
@@ -467,10 +472,10 @@
     min-height: 48px;
   }
   .people-picker-list > button > span:nth-child(2) {
-    font-size: 12px;
+    font-size: var(--text-12);
   }
   .people-picker-list small {
-    font-size: 10px;
+    font-size: var(--text-10);
   }
   .mention-chips {
     max-height: 76px;
@@ -480,14 +485,14 @@
   }
   .mention-chips > span {
     max-width: 100%;
-    font-size: 10px;
+    font-size: var(--text-10);
     overflow-wrap: anywhere;
   }
   .mention-chips .avatar {
     flex-shrink: 0;
   }
   .mention-chips .text-button {
-    font-size: 10px;
+    font-size: var(--text-10);
   }
   .coord-transcript {
     min-height: 0;
@@ -495,7 +500,7 @@
     padding: 14px 12px;
   }
   .coord-message {
-    font-size: 13px;
+    font-size: var(--text-13);
     line-height: 1.8;
     padding: 12px;
     overflow-wrap: anywhere;
@@ -507,7 +512,7 @@
     margin-left: 12px;
   }
   .coord-author {
-    font-size: 10px;
+    font-size: var(--text-10);
   }
   .coord-welcome {
     padding: 17px 2px;
@@ -515,26 +520,26 @@
   .coord-welcome > span:first-child {
     width: 44px;
     height: 44px;
-    margin-bottom: 17px;
+    margin-bottom: 12px;
     border-radius: 13px;
   }
   .coord-welcome > .eyebrow {
     display: none;
   }
   .coord-welcome > h2 {
-    font-size: 23px;
+    font-size: var(--text-23);
     margin-top: 0;
   }
   .coord-welcome > p {
-    font-size: 12px;
+    font-size: var(--text-12);
     line-height: 1.7;
     margin-top: 9px;
   }
   .chat-suggestions {
     display: flex;
-    gap: 8px;
+    gap: var(--space-8);
     overflow-x: auto;
-    margin-top: 17px;
+    margin-top: 12px;
     text-align: left;
     padding-bottom: 5px;
   }
@@ -544,9 +549,9 @@
     padding: 11px;
   }
   .chat-suggestions strong {
-    font-size: 11px;
+    font-size: var(--text-11);
     white-space: nowrap;
-    gap: 8px;
+    gap: var(--space-8);
   }
   .chat-suggestions p,
   .coord-welcome p.chat-example {
@@ -560,12 +565,12 @@
     padding: 9px 11px;
     display: flex;
     align-items: flex-end;
-    gap: 9px;
+    gap: var(--space-9);
   }
   .coord-composer textarea {
     min-width: 0;
     flex: 1;
-    font-size: 16px;
+    font-size: var(--text-16);
     line-height: 1.5;
     min-height: 48px;
     max-height: 96px;
@@ -589,16 +594,16 @@
     padding: 13px 14px;
   }
   .coord-updates h3 {
-    font-size: 14px;
+    font-size: var(--text-14);
   }
   .coord-updates > header p {
-    font-size: 11px;
+    font-size: var(--text-11);
   }
   .updates-tabs {
     flex-shrink: 0;
   }
   .updates-tabs > button {
-    font-size: 12px;
+    font-size: var(--text-12);
     min-height: 40px;
   }
   .update-request-list {
@@ -613,39 +618,39 @@
     padding: 14px;
   }
   .update-request-card > h4 {
-    font-size: 14px;
+    font-size: var(--text-14);
   }
   .update-request-card > p,
   .request-response > p {
-    font-size: 12px;
+    font-size: var(--text-12);
     line-height: 1.8;
     overflow-wrap: anywhere;
   }
   .request-meta {
-    font-size: 10px;
+    font-size: var(--text-10);
   }
   .update-request-card .button {
     min-height: 40px;
-    font-size: 11px;
+    font-size: var(--text-11);
   }
   .updates-channel-note {
     flex-shrink: 0;
     padding: 9px 13px;
-    font-size: 10px;
+    font-size: var(--text-10);
     line-height: 1.6;
   }
   .coord-proposal {
     padding: 14px;
   }
   .coord-proposal h3 {
-    font-size: 14px;
+    font-size: var(--text-14);
   }
   .proposal-request-message {
-    font-size: 12px;
+    font-size: var(--text-12);
   }
   .proposal-controls .button {
     min-height: 40px;
-    font-size: 11px;
+    font-size: var(--text-11);
   }
 }
 @media (max-width: 760px) {
@@ -670,13 +675,13 @@
     padding: 9px 11px;
   }
   .coord-chat-header p {
-    font-size: 8px;
+    font-size: var(--text-8);
   }
 }
 
 @media (max-width: 1000px) {
   .chat-context-bar > select {
-    font-size: 16px;
+    font-size: var(--text-16);
   }
   .people-picker-list {
     max-height: min(250px, calc(var(--chat-viewport-height, 100dvh) * 0.34));

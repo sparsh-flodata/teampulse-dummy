@@ -75,10 +75,18 @@ def latest_commitment(db, work_id):
 def audit(db, user, message, work_id=None):
     db.add(AuditEvent(actor_id=user.id, work_item_id=work_id, message=message))
 
+# Workflow nudges that also go to Google Chat for people who connected it.
+# Update requests are sent by their own channel adapter.
+CHAT_MIRRORED = ('planning', 'weekly', 'due', 'overdue', 'dependency', 'escalation', 'requested', 'update-response', 'assigned', 'handover')
+
 def notify(db, recipient, key, message, work_id=None):
     if recipient and not db.scalar(select(Notification.id).where(Notification.key == key)):
         db.add(Notification(recipient_id=recipient, key=key, message=message, work_item_id=work_id))
         db.flush()
+        if key.split(':', 1)[0] in CHAT_MIRRORED:
+            from backend.app.channels.google_chat import queue_message
+            from backend.app.core.config import app_link
+            queue_message(db, recipient, f'{message}\n{app_link("/")}'.rstrip())
 
 def sync_blocked(db, work):
     deps = list(db.scalars(select(Dependency).where(Dependency.work_item_id == work.id, Dependency.status.in_(OPEN_DEP))))
@@ -96,14 +104,17 @@ def create_work(db, user, body: WorkCreate):
         raise HTTPException(404, 'Project not found.')
     owner_id = body.owner_id
     if not manager(user) and owner_id != user.id:
-        raise HTTPException(403, 'You can create work for yourself; managers assign team work.')
+        raise HTTPException(403, 'You can create work for yourself; managers and administrators assign it to others.')
     owner = db.get(Employee, owner_id) if owner_id else None
-    if owner_id and owner_id != user.id and not can_manage_person(db, user, owner_id):
-        raise HTTPException(403, 'You can only assign work within your reporting team.')
+    if owner_id and not owner:
+        raise HTTPException(422, 'Employee not found.')
     if owner and not owner.active:
         raise HTTPException(422, 'This employee is inactive.')
-    if owner_id and not participates_in_project(db, owner, project):
-        raise HTTPException(422, 'The owner must belong to the owning department or participate in this project.')
+    if owner_id == user.id and not manager(user) and not participates_in_project(db, owner, project):
+        raise HTTPException(403, 'Join the project before adding your own commitments to it.')
+    if owner:
+        # Managers and administrators can assign anyone in the organization; they join the project.
+        ensure_participant(db, user, owner, project)
     if body.due_date < today():
         raise HTTPException(422, 'New commitments must be due today or later.')
     work = WorkItem(title=body.title, description=body.description, project_id=body.project_id, owner_id=owner_id,
@@ -118,6 +129,84 @@ def create_work(db, user, body: WorkCreate):
         notify(db, owner_id, f'assigned:{work.id}', f'New proposed commitment: {work.title}. Review and confirm feasibility.', work.id)
     db.flush()
     return work
+
+def ensure_participant(db, user, person, project):
+    """Adds the person to the project if they are not in its department or already invited."""
+    if not participates_in_project(db, person, project):
+        db.add(ProjectMember(project_id=project.id, employee_id=person.id))
+        db.flush()
+        audit(db, user, f'Added {person.name} to the project “{project.name}”.')
+
+
+def assign_work(db, user, work, employee_id):
+    """Assign, reassign or take a commitment.
+
+    Managers and administrators: any active person in the organization, owned or not.
+    Everyone else: only take an unassigned commitment for themselves on a project they work on.
+    The new owner confirms the commitment unless they took it themselves; on a handover the
+    previous owner is told. Completed work is not reassigned.
+    """
+    project = db.get(Project, work.project_id)
+    person = db.get(Employee, employee_id)
+    if not person or not person.active:
+        raise HTTPException(422, 'Choose an active person.')
+    if work.status == 'Completed':
+        raise HTTPException(409, 'Completed work is not reassigned. Reopen it first.')
+    if work.owner_id == person.id:
+        return work
+    taking = person.id == user.id and work.owner_id is None
+    if not manager(user) and not (taking and participates_in_project(db, user, project)):
+        raise HTTPException(403, 'Managers and administrators assign commitments. You can take an unassigned commitment on a project you work on.')
+    ensure_participant(db, user, person, project)
+    previous = db.get(Employee, work.owner_id) if work.owner_id else None
+    commitment = latest_commitment(db, work.id)
+    work.owner_id = person.id
+    stamp = now().strftime('%Y%m%d%H%M%S%f')
+    if person.id == user.id:
+        work.confirmed_at = now()
+        commitment.confirmed_by = user.id
+        audit(db, user, f'{user.name} took “{work.title}”' + (f' over from {previous.name}.' if previous else '.'), work.id)
+    else:
+        work.confirmed_at = None
+        commitment.confirmed_by = None
+        audit(db, user, (f'Handed “{work.title}” over from {previous.name} to {person.name}; ' if previous else f'Proposed “{work.title}” to {person.name}; ')
+              + 'awaiting their confirmation.', work.id)
+        notify(db, person.id, f'assigned:{work.id}:{stamp}', f'{user.name} assigned you “{work.title}” in {project.name}. Review and confirm the commitment.', work.id)
+    if previous and previous.id not in (person.id, user.id):
+        notify(db, previous.id, f'handover:{work.id}:{stamp}', f'{user.name} handed “{work.title}” over to {person.name}. Its history stays with the work.', work.id)
+    db.flush()
+    return work
+
+
+_DEP_RANK = {'Requested': 0, 'Accepted': 1, 'In Progress': 2, 'At Risk': 2, 'Blocked': 2, 'Delivered': 3}
+
+
+def sync_upstream_dependencies(db, user, work):
+    """Dependencies that wait on this commitment follow it: confirmed means Accepted, started means
+    In Progress, ready for review means Delivered, and completed means the dependency is fulfilled.
+    Only moves forward; a manually reported At Risk or Blocked is kept until the work is completed."""
+    c = latest_commitment(db, work.id)
+    if work.status == 'Completed':
+        target = 'Verified'
+    elif work.status == 'Awaiting Verification':
+        target = 'Delivered'
+    elif work.status in ('In Progress', 'Partially Blocked', 'Blocked') or work.progress > 0:
+        target = 'In Progress'
+    elif c and c.confirmed_by:
+        target = 'Accepted'
+    else:
+        return
+    for dep in list(db.scalars(select(Dependency).where(Dependency.upstream_work_id == work.id, Dependency.status.in_(OPEN_DEP)))):
+        if target != 'Verified' and _DEP_RANK.get(dep.status, 0) >= _DEP_RANK[target]:
+            continue
+        dep.status = target
+        waiting = db.get(WorkItem, dep.work_item_id)
+        db.flush()
+        if waiting:
+            sync_blocked(db, waiting)
+        audit(db, user, f'Dependency “{dep.deliverable}” → {target}' + (' (its commitment was completed).' if target == 'Verified' else '.'), dep.work_item_id)
+        notify(db, dep.requester_id, f'dep-update:{dep.id}:{target}', f'{dep.deliverable}: {target}' + (', the commitment behind it is complete.' if target == 'Verified' else '.'), dep.work_item_id)
+
 
 def patch_work(db, user, work, body: WorkPatch):
     commitment = latest_commitment(db, work.id)
@@ -157,6 +246,7 @@ def patch_work(db, user, work, body: WorkPatch):
         work.confirmed_at = now()
     db.flush()
     sync_blocked(db, work)
+    sync_upstream_dependencies(db, user, work)
     audit(db, user, body.note or f'Updated “{work.title}” · {work.status} · {work.progress}%.', work.id)
     db.flush()
     return work
@@ -226,7 +316,7 @@ def health_summary(works):
 
 
 def serialize_person(db, p):
-    return {k: getattr(p, k) for k in ('id', 'name', 'email', 'role', 'title', 'team_id', 'manager_id', 'skills', 'weekly_hours', 'reserved_hours', 'planning', 'color', 'active', 'agent_auto_updates')} | {'capacity': capacity(db, p)}
+    return {k: getattr(p, k) for k in ('id', 'name', 'email', 'role', 'title', 'team_id', 'manager_id', 'skills', 'weekly_hours', 'reserved_hours', 'planning', 'color', 'active', 'agent_auto_updates', 'proactive_checkins')} | {'checkins_paused_until': str(p.checkins_paused_until) if p.checkins_paused_until else None, 'capacity': capacity(db, p)}
 
 def serialize_dependency(d):
     tone = 'green' if d.status in ('Verified', 'Cancelled') else 'red' if (not d.partial or d.due_date < today() or d.status in ('At Risk', 'Blocked')) else 'amber'

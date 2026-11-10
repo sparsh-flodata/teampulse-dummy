@@ -9,7 +9,7 @@ router = APIRouter()
 
 @router.get('/api/health')
 def health():
-    return {'status': 'ok', 'version': '0.3.0'}
+    return {'status': 'ok', 'version': '0.4.0'}
 
 @router.get('/api/state')
 def state(user: Employee = Depends(current_user), db: Session = Depends(get_db)):

@@ -10,15 +10,15 @@
 .sidebar-header {
   flex: 0 0 auto;
   padding: 26px 18px 0;
-  background: #fff;
+  background: var(--color-surface);
   position: relative;
 }
 .sidebar-header > .brand {
   padding-left: 9px;
-  margin-bottom: 25px;
+  margin-bottom: 16px;
 }
 .sidebar-header .workspace-switch {
-  margin: 0 1px 23px;
+  margin: 0 1px 14px;
 }
 .sidebar-scroll {
   flex: 1 1 auto;
@@ -29,11 +29,11 @@
   overscroll-behavior: contain;
   scrollbar-gutter: stable;
   scrollbar-width: thin;
-  scrollbar-color: #cfc2df transparent;
+  scrollbar-color: oklch(83.4% 0.009 55) transparent;
   outline: none;
 }
 .sidebar-scroll:focus-visible {
-  box-shadow: inset 0 0 0 1px #d9caeb;
+  box-shadow: inset 0 0 0 1px oklch(86.1% 0.009 55);
 }
 .sidebar-scroll .sidebar-label {
   margin-top: 2px;
@@ -42,7 +42,7 @@
   width: 100%;
 }
 .sidebar-scroll .sidebar-projects {
-  margin-top: 27px;
+  margin-top: 17px;
 }
 .sidebar-scroll .sidebar-projects > button {
   min-width: 0;
@@ -58,8 +58,8 @@
 .sidebar-footer {
   flex: 0 0 auto;
   padding: 11px 17px 0;
-  background: #fff;
-  border-top: 1px solid #eee8f4;
+  background: var(--color-surface);
+  border-top: 1px solid oklch(93.9% 0.005 55);
 }
 .sidebar-footer .sidebar-user {
   margin: 7px -17px 0;
@@ -73,27 +73,27 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 10px;
+  font-size: var(--text-10);
 }
 .sidebar-footer .sidebar-user small {
-  font-size: 8px;
+  font-size: var(--text-8);
 }
 .sidebar-footer .settings-link {
   padding: 7px 11px;
 }
 .nav-scroll-end {
   padding: 27px 9px 18px;
-  font-size: 8px;
+  font-size: var(--text-8);
   line-height: 1.8;
-  color: #b6a4c4;
+  color: oklch(51% 0.009 55);
 }
 .sidebar-scroll nav .nav-new {
-  font-size: 7px;
-  color: #aa8dc3;
-  background: #f0e7fa;
-  border: 1px solid #e8dcf3;
+  font-size: var(--text-7);
+  color: oklch(48.5% 0.012 40);
+  background: oklch(94.1% 0.008 55);
+  border: 1px solid oklch(91.1% 0.009 55);
   padding: 2px 4px;
-  border-radius: 3px;
+  border-radius: var(--radius-3);
   margin-left: auto;
   letter-spacing: 0.4px;
 }
@@ -107,18 +107,18 @@
 .sample-workspace-note {
   display: flex;
   align-items: center;
-  gap: 7px;
-  color: #ac95ba;
-  font-size: 9px;
-  margin: -6px 0 20px;
+  gap: var(--space-7);
+  color: oklch(49.1% 0.012 40);
+  font-size: var(--text-9);
+  margin: -6px 0 12px;
   padding: 9px 12px;
-  background: #faf6fd;
-  border: 1px dashed #e8dcf2;
-  border-radius: 6px;
+  background: oklch(97.8% 0.004 55);
+  border: 1px dashed oklch(91.1% 0.009 55);
+  border-radius: var(--radius-6);
 }
 .sample-workspace-note > span {
-  color: #9f7db7;
-  font-weight: 600;
+  color: oklch(30% 0.012 40);
+  font-weight: var(--weight-semibold);
 }
 .app-main main.chat-page {
   max-width: 1700px;
@@ -129,7 +129,7 @@
 }
 * {
   scrollbar-width: thin;
-  scrollbar-color: #d3c7e0 transparent;
+  scrollbar-color: oklch(84.7% 0.009 55) transparent;
 }
 ::-webkit-scrollbar {
   width: 5px;
@@ -139,32 +139,32 @@
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #d3c7e0;
-  border-radius: 8px;
+  background: oklch(84.7% 0.009 55);
+  border-radius: var(--radius-8);
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #bba5cc;
+  background: oklch(75.4% 0.009 55);
 }
 .sidebar-scroll::-webkit-scrollbar {
   width: 4px;
 }
 .sidebar-scroll::-webkit-scrollbar-thumb {
-  background: #d8cce3;
+  background: oklch(86.2% 0.009 55);
   border: 0;
-  border-radius: 8px;
+  border-radius: var(--radius-8);
 }
 .sidebar-scroll::-webkit-scrollbar-thumb:hover {
-  background: #bba2ce;
+  background: oklch(74.9% 0.009 55);
 }
 @media (max-height: 850px) {
   .sidebar-header {
     padding-top: 19px;
   }
   .sidebar-header > .brand {
-    margin-bottom: 19px;
+    margin-bottom: 12px;
   }
   .sidebar-header .workspace-switch {
-    margin-bottom: 20px;
+    margin-bottom: 12px;
   }
   .sidebar-footer .sidebar-user {
     padding-top: 11px;
@@ -202,10 +202,10 @@
     padding-right: 10px;
   }
   .sidebar-header > .brand {
-    margin-bottom: 20px;
+    margin-bottom: 12px;
   }
   .sample-workspace-note {
-    font-size: 8px;
+    font-size: var(--text-8);
     align-items: flex-start;
     line-height: 1.7;
   }

@@ -11,16 +11,17 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from fastapi import HTTPException
 from backend.app.models import Conversation, AgentAction, MessageReceipt, WorkItem
-from backend.app.schemas import WorkCreate, WorkPatch
+from backend.app.schemas import DependencyCreate, WorkCreate, WorkPatch
 from backend.app.services.coordination import coordination_intent,create_requests,validate_recipients,allowed_recipients
+from backend.app.services.formatting import sanitize
 from backend.app.services.work import today, business_day, serialize_work, visible_projects, visible_work, create_work, patch_work, get_work
 
 class Proposal(BaseModel):
     model_config = ConfigDict(extra='forbid')
-    kind: Literal['create', 'update', 'request_updates']
+    kind: Literal['create', 'update', 'request_updates', 'dependency']
     recipient_ids: list[int] = Field(default_factory=list,max_length=100)
     request_prompt: str = Field(default='Please share your progress, expected completion, and blockers.',max_length=2000)
-    channel: Literal['in_app','whatsapp'] = 'in_app'
+    channel: Literal['in_app','google_chat'] = 'in_app'
     work_item_id: int | None = None
     title: str | None = Field(default=None, min_length=3, max_length=200)
     project_id: int | None = None
@@ -30,11 +31,19 @@ class Proposal(BaseModel):
     progress: int | None = Field(default=None, ge=0, le=100)
     remaining_hours: float | None = Field(default=None, ge=0, le=1000)
     note: str = Field(default='', max_length=4000)
+    risk: bool | None = None  # check-ins: a blocker with no teammate to record it against
+    # dependency: who the selected work waits on, and for what
+    owner_id: int | None = None
+    deliverable: str | None = Field(default=None, min_length=3, max_length=200)
+    partial: bool = True
 
 class Interpretation(BaseModel):
     model_config = ConfigDict(extra='forbid')
     reply: str = Field(min_length=1, max_length=4000)
     proposal: Proposal | None = None
+
+def provider_configured():
+    return all(os.getenv(k, '') for k in ('AI_BASE_URL', 'AI_MODEL', 'AI_API_KEY'))
 
 async def provider_interpret(message, context, history):
     base, model, key = (os.getenv(k, '') for k in ('AI_BASE_URL', 'AI_MODEL', 'AI_API_KEY'))
@@ -116,57 +125,28 @@ async def converse(db, user, message, work_id, request_id=None, recipient_ids=No
     if receipt:
         return receipt_response(db, receipt, fingerprint)
 
-    works = [w for w in visible_work(db, user) if w.owner_id == user.id]
-    projects = visible_projects(db, user)
-    selected = next((w for w in works if w.id == work_id), None)
-    if work_id and selected is None:
-        raise HTTPException(403, 'Select one of your own work items.')
-    history_rows = list(db.scalars(select(Conversation).where(Conversation.employee_id == user.id).order_by(Conversation.id.desc()).limit(12)))[::-1]
-    history = [{'role': r.role, 'content': r.message} for r in history_rows]
-    context = {'today': str(today()), 'selected_work_item_id': work_id, 'work': [serialize_work(db, w) for w in works],
-               'projects': [{'id': p.id, 'name': p.name} for p in projects], 'requestable_people':[{'id':p.id,'name':p.name,'title':p.title} for p in allowed_recipients(db,user)]}
-    mode = 'offline'
-    coordinated = coordination_intent(db,user,message,recipient_ids)
-    try:
-        result = Interpretation.model_validate(coordinated) if coordinated else await provider_interpret(message, context, history)
-        if result and not coordinated:
-            mode = 'connected'
-        elif not result:
-            result = offline_interpret(message, works, projects, selected)
-    except (httpx.HTTPError, ValueError, KeyError, IndexError, ValidationError):
-        result = offline_interpret(message, works, projects, selected)
-        result.reply = 'The AI provider is unavailable. Using offline planning.\n\n' + result.reply
+    from backend.app.agents.graph import AGENTS, assistant_graph
+    state = await assistant_graph.ainvoke({'message': message, 'work_id': work_id, 'recipient_ids': recipient_ids or []},
+                                          config={'configurable': {'db': db, 'user': user}})
+    result = Interpretation.model_validate(state['interpretation'])
+    mode = state['mode']
     action = None
     if result.proposal:
         p = result.proposal
-        if p.kind == 'request_updates':
-            validate_recipients(db,user,p.recipient_ids)
-        elif p.kind == 'update':
-            target = get_work(db, user, p.work_item_id or 0, edit=True)
-            if target.owner_id != user.id:
-                raise HTTPException(403, 'The assistant can only propose updates to your own work.')
-        elif not all((p.title, p.project_id, p.due_date, p.effort_hours)) or p.project_id not in [p.id for p in projects]:
-            result = Interpretation(reply='I need a project, deliverable, estimated hours, and expected completion date to draft a commitment.')
-        elif any(w.title.casefold() == p.title.casefold() for w in works):
-            result = Interpretation(reply='A commitment with that title already exists. Select it to update existing work.')
-        if result.proposal:
-            base = snapshot(db, db.get(WorkItem, p.work_item_id)) if p.kind == 'update' else {}
-            action = AgentAction(employee_id=user.id, payload=p.model_dump_json(), base_snapshot=json.dumps(base))
-            db.add(action)
-            db.flush()
+        base = snapshot(db, db.get(WorkItem, p.work_item_id)) if p.kind == 'update' else {}
+        action = AgentAction(employee_id=user.id, payload=p.model_dump_json(), base_snapshot=json.dumps(base))
+        db.add(action)
+        db.flush()
     auto_applied = False
-    if action and selected and user.agent_auto_updates and result.proposal.kind == 'update':
-        proposal = result.proposal
-        deterministic = offline_interpret(message, works, projects, selected).proposal
-        # Only exact, explicit percentage/remaining-hour updates can auto-apply.
-        routine = proposal.status is None and proposal.due_date is None and (proposal.progress is not None or proposal.remaining_hours is not None)
-        if routine and deterministic and deterministic.model_dump() == proposal.model_dump():
-            apply_proposal(db, user, action)
-            action.status = 'Applied'
-            auto_applied = True
-            result.reply = 'Saved your explicit progress update using your automatic-update preference. Completion, new commitments, and delivery-date changes still require confirmation.'
-    db.add_all([Conversation(employee_id=user.id, role='user', message=message), Conversation(employee_id=user.id, role='assistant', message=result.reply)])
-    response = {'reply': result.reply, 'mode': mode, 'auto_applied': auto_applied, 'action': {'id': action.id, 'payload': json.loads(action.payload), 'status': action.status} if action else None}
+    if action and state.get('auto_apply'):
+        apply_proposal(db, user, action)
+        action.status = 'Applied'
+        auto_applied = True
+        result.reply = 'Saved your explicit progress update using your automatic-update preference. Completion, new commitments, and delivery-date changes still require confirmation.'
+    result.reply = sanitize(result.reply) or 'I could not put that into words. Please try again.'
+    db.add_all([Conversation(employee_id=user.id, role='user', message=message), Conversation(employee_id=user.id, role='assistant', message=result.reply, agent=AGENTS[state['route']])])
+    response = {'reply': result.reply, 'mode': mode, 'auto_applied': auto_applied,
+                'agent': AGENTS[state['route']], 'steps': state['steps'], 'action': {'id': action.id, 'payload': json.loads(action.payload), 'status': action.status} if action else None}
     db.add(MessageReceipt(employee_id=user.id, request_id=request_id, fingerprint=fingerprint, response_json=json.dumps(response)))
     try:
         db.commit()
@@ -182,6 +162,10 @@ def apply_proposal(db, user, action):
     p = Proposal.model_validate_json(action.payload)
     if p.kind == 'request_updates':
         return create_requests(db,user,p.recipient_ids,p.request_prompt,p.channel)
+    if p.kind == 'dependency':
+        from backend.app.services.dependencies import create_dependency
+        return create_dependency(db, user, DependencyCreate(work_item_id=p.work_item_id, owner_id=p.owner_id, deliverable=p.deliverable,
+                                                            reason=p.note[:2000], due_date=p.due_date, partial=p.partial))
     if p.kind == 'create':
         existing = list(db.scalars(select(WorkItem).where(WorkItem.owner_id == user.id)))
         if any(w.title.casefold() == p.title.casefold() for w in existing):
@@ -194,4 +178,4 @@ def apply_proposal(db, user, action):
     base = json.loads(action.base_snapshot)
     if not base or base != snapshot(db, work):
         raise HTTPException(409, 'Work changed since this proposal was drafted. Dismiss it and send a fresh update.')
-    return patch_work(db, user, work, WorkPatch(status=p.status, progress=p.progress, remaining_hours=p.remaining_hours, due_date=p.due_date, note=p.note))
+    return patch_work(db, user, work, WorkPatch(status=p.status, progress=p.progress, remaining_hours=p.remaining_hours, due_date=p.due_date, risk=p.risk, note=p.note))
