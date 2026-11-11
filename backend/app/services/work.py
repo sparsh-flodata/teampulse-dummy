@@ -5,7 +5,7 @@ from fastapi import HTTPException
 from sqlalchemy import select, or_
 from backend.app.models import Employee, Project, WorkItem, Commitment, Dependency, AuditEvent, Notification, ProjectMember, now
 from backend.app.schemas import WorkCreate, WorkPatch
-from backend.app.core.access import profile_ids, can_manage_person
+from backend.app.core.access import descendants, profile_ids, can_manage_person
 
 ACTIVE = ('Planned', 'In Progress', 'Partially Blocked', 'Blocked', 'Awaiting Verification')
 OPEN_DEP = ('Requested', 'Accepted', 'In Progress', 'At Risk', 'Blocked', 'Delivered')
@@ -34,23 +34,32 @@ def participates_in_project(db, person, project):
                 (person.team_id == project.team_id or db.get(ProjectMember, (project.id, person.id))))
 
 
-def shared_project_ids(user):
-    memberships = select(ProjectMember.project_id).where(ProjectMember.employee_id == user.id)
-    return select(Project.id).where(Project.archived.is_(False), or_(Project.team_id == user.team_id, Project.id.in_(memberships)))
+def involved_project_ids(db, user):
+    """Live projects the person, or anyone below them in the reporting line, is involved in: their department's
+    projects, projects they were added to, and projects where they have a commitment."""
+    people = {user.id} | descendants(db, user.id)
+    departments = select(Employee.team_id).where(Employee.id.in_(people))
+    memberships = select(ProjectMember.project_id).where(ProjectMember.employee_id.in_(people))
+    assigned = select(WorkItem.project_id).where(WorkItem.owner_id.in_(people))
+    return select(Project.id).where(Project.archived.is_(False), or_(
+        Project.team_id.in_(departments), Project.id.in_(memberships), Project.id.in_(assigned)))
 
 
 def visible_projects(db, user):
+    """Administrators see every project; everyone else, the projects they or their reporting line are involved in."""
     q = select(Project).where(Project.archived.is_(False))
     if user.role != 'admin':
-        owned_projects = select(WorkItem.project_id).where(WorkItem.owner_id.in_(profile_ids(db, user)))
-        q = q.where(or_(Project.id.in_(shared_project_ids(user)), Project.id.in_(owned_projects)))
+        q = q.where(Project.id.in_(involved_project_ids(db, user)))
     return list(db.scalars(q))
 
 
 def visible_work(db, user):
+    """Who sees which commitments (enforced here, for every page, list and endpoint):
+    administrators, all of them; everyone else, their own and their reporting line's commitments, plus every
+    commitment in a project that they or anyone below them is involved in (involved_project_ids)."""
     q = select(WorkItem).join(Project).where(Project.archived.is_(False))
     if user.role != 'admin':
-        q = q.where(or_(WorkItem.project_id.in_(shared_project_ids(user)), WorkItem.owner_id.in_(profile_ids(db, user))))
+        q = q.where(or_(WorkItem.project_id.in_(involved_project_ids(db, user)), WorkItem.owner_id.in_(profile_ids(db, user))))
     return list(db.scalars(q.order_by(WorkItem.id.desc())))
 
 

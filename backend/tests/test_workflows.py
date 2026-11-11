@@ -194,11 +194,13 @@ def test_freshness_and_workflow_deduplication(ctx):
 def test_assistant_proposals_are_private_and_idempotent(ctx):
     c,_=ctx
     login(c,'ananya')
-    r=c.post('/api/assistant/chat',json={'message':'65% complete, 4 hours remaining','work_item_id':7})
+    due=next(w for w in c.get('/api/state').json()['work'] if w['id']==7)['due_date']
+    moved=str(business_day(today(),6))
+    r=c.post('/api/assistant/chat',json={'message':'Move to '+moved+' because the scope grew','work_item_id':7})
     assert r.status_code==200,r.text
     action=r.json()['action']
-    assert action and action['status']=='Proposed'
-    assert next(w for w in c.get('/api/state').json()['work'] if w['id']==7)['progress']==30
+    assert action and action['status']=='Proposed'  # date moves still wait for confirmation
+    assert next(w for w in c.get('/api/state').json()['work'] if w['id']==7)['due_date']==due
     path='/api/assistant/actions/'+str(action['id'])+'/decide'
     login(c,'rahul')
     assert c.post(path,json={'approve':True}).status_code==404
@@ -206,7 +208,7 @@ def test_assistant_proposals_are_private_and_idempotent(ctx):
     login(c,'ananya')
     assert c.post(path,json={'approve':True}).status_code==200
     assert c.post(path,json={'approve':True}).status_code==200
-    assert next(w for w in c.get('/api/state').json()['work'] if w['id']==7)['progress']==65
+    assert next(w for w in c.get('/api/state').json()['work'] if w['id']==7)['due_date']==moved
 
 def test_assistant_create_and_duplicate_prevention(ctx):
     c,_=ctx
@@ -258,8 +260,9 @@ def test_planning_preferences_respect_existing_commitments(ctx):
 def test_declining_an_agent_proposal_leaves_work_unchanged(ctx):
     c,_=ctx
     login(c)
-    action=c.post('/api/assistant/chat',json={'message':'70% complete, 6 hours remaining','work_item_id':1}).json()['action']
+    due=next(w for w in c.get('/api/state').json()['work'] if w['id']==1)['due_date']
+    action=c.post('/api/assistant/chat',json={'message':'Move to '+str(business_day(today(),6))+' because the scope grew','work_item_id':1}).json()['action']
     result=c.post('/api/assistant/actions/'+str(action['id'])+'/decide',json={'approve':False})
     assert result.json()['status']=='Rejected'
     work=next(w for w in c.get('/api/state').json()['work'] if w['id']==1)
-    assert work['progress']==65 and work['remaining_hours']==12
+    assert work['due_date']==due and work['progress']==65 and work['remaining_hours']==12
