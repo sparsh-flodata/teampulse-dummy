@@ -14,20 +14,40 @@
 .knock-button:hover {
   color: var(--color-brand);
 }
-.knock-button[data-knocking] svg {
-  animation: knock 0.45s ease-in-out infinite;
+.knock-button:disabled {
+  opacity: 1;
+  cursor: progress;
 }
-@keyframes knock {
-  0%,
-  100% {
-    transform: rotate(0deg);
-  }
-  25% {
-    transform: rotate(-12deg);
-  }
-  75% {
-    transform: rotate(12deg);
-  }
+/* The icon sits on a small stage so the sound rings can spread past it. */
+.knock-stage {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 1em;
+  height: 1em;
+  font-size: 18px;
+  overflow: visible;
+}
+.knock-door {
+  display: inline-flex;
+  transform-origin: 85% 90%; /* the hinge side: a knock shakes the door from there */
+  will-change: transform;
+}
+.knock-ring {
+  position: absolute;
+  inset: -3px;
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+  pointer-events: none;
+}
+.knock-ring.is-open {
+  border-color: var(--color-done-ink);
+}
+.knock-button[data-phase="knocking"] {
+  color: var(--color-brand);
+}
+.knock-button[data-phase="opened"] {
+  color: var(--color-done-ink);
 }
 .pj-card .knock-button {
   justify-self: end;
@@ -231,10 +251,9 @@
 }
 .rm-team-row {
   display: grid;
-  grid-template-columns: auto minmax(0, 1.4fr) minmax(0, 1fr) minmax(
-      140px,
-      1fr
-    ) auto;
+  grid-template-columns:
+    auto minmax(0, 1.4fr) minmax(0, 1fr) minmax(140px, 1fr)
+    auto;
   align-items: center;
   gap: 14px;
   width: 100%;
@@ -292,10 +311,5 @@
   }
   .rm-team-progress {
     grid-column: 1 / -1;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .knock-button[data-knocking] svg {
-    animation: none;
   }
 }
