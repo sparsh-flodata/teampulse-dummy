@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { KnockButton } from "./KnockButton";
 import { useForm } from "@tanstack/react-form";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -147,6 +148,7 @@ export function WorkDetail({
           </div>
           <Badge value={work.status} />
           <Badge value={work.health} />
+          <KnockButton work={work} label />
         </div>
         <div className={"health-explanation tone-" + work.tone}>
           <strong>{work.health}</strong>

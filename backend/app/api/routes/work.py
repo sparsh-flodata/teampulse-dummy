@@ -29,6 +29,14 @@ def history(work_id: int, user: Employee = Depends(current_user), db: Session = 
     get_work(db, user, work_id)
     return [{'revision': c.revision, 'start_date': str(c.start_date), 'due_date': str(c.due_date), 'effort_hours': c.effort_hours, 'reason': c.reason, 'confirmed_by': c.confirmed_by} for c in db.scalars(select(Commitment).where(Commitment.work_item_id == work_id).order_by(Commitment.revision.desc()))]
 
+@router.post('/api/work/{work_id}/knock')
+def knock_work(work_id: int, user: Employee = Depends(current_user), db: Session = Depends(get_db)):
+    """Knock knock: ask the people involved in this commitment how it is going."""
+    from backend.app.services.coordination import knock
+    result = knock(db, user, get_work(db, user, work_id))
+    db.commit()
+    return result
+
 @router.post('/api/work/{work_id}/assign')
 def assign(work_id: int, body: Assignment, user: Employee = Depends(current_user), db: Session = Depends(get_db)):
     work = assign_work(db, user, get_work(db, user, work_id), body.employee_id)

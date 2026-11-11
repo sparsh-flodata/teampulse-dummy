@@ -12,6 +12,7 @@ class UpdateRequest(Base):
     recipient_id: Mapped[int] = mapped_column(ForeignKey('employees.id'))
     prompt: Mapped[str] = mapped_column(Text)
     channel: Mapped[str] = mapped_column(String(30), default='in_app')
+    kind: Mapped[str] = mapped_column(String(20), default='request')  # request (a manager's), knock (anyone on the work)
     status: Mapped[str] = mapped_column(String(30), default='Queued')
     delivery_detail: Mapped[str] = mapped_column(Text, default='')
     response: Mapped[str | None] = mapped_column(Text, nullable=True)

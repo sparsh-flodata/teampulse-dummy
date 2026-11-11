@@ -11,6 +11,8 @@ export const queryKeys = {
   preferences: ["me", "preferences"] as const,
   adminCheckIns: (date: string) => ["admin", "check-ins", date] as const,
   project: (projectId: number) => ["projects", projectId] as const,
+  roadmap: (personId: number | "me") => ["roadmaps", personId] as const,
+  teamRoadmaps: ["roadmaps", "team"] as const,
   attachments: (filters: Record<string, unknown>) =>
     ["attachments", filters] as const,
 };

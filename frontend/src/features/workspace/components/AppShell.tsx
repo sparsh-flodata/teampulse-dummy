@@ -63,6 +63,7 @@ const descriptions: Record<View, string> = {
   "Team & capacity": "Make room for the right work, together.",
   Activity: "The context behind every change.",
   "Files & links": "Everything people sent with their updates, in one place.",
+  Roadmap: "Where you are headed this quarter and the next two.",
   Settings: "Make TeamPulse work at your rhythm.",
   "AI chat": "Give instructions, coordinate updates, and keep work in sync.",
   "My profile":

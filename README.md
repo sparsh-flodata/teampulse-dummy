@@ -49,6 +49,18 @@ All 58 supplied company emails are ready. The initial password is `TeamPulse-dem
 - A database-backed scheduler checks every minute. It deduplicates deadline prompts, dependency reminders, and two-day dependency escalations. Multi-day work is remembered; it does not trigger daily planning questions. On-demand planning skips planning prompts. Weekly/hybrid plans receive Monday review prompts; missing plans get one prompt per planning period.
 - Automatic dashboard refresh every fifteen seconds while the page is visible. This is polling, not WebSockets.
 
+## Knock knock, skip-level notices, roadmaps
+
+- **Knock knock.** Every commitment (work tables, project rows and board cards, the commitment detail) has a knock
+  button. It asks the people working on it, meaning the assignee and the owners of what it waits on, how it is going.
+  The message arrives as a Google Chat DM and in their TeamPulse inbox, and their reply updates the work. Anyone
+  who can see the commitment can knock; nobody is knocked twice while a knock is unanswered.
+- **Skip-level notices.** When someone asks or knocks a person further down their own reporting line, every manager
+  in between is told (in TeamPulse and on Google Chat).
+- **Roadmap.** A sidebar page with each person's roadmap: this quarter and the next two, milestones, and how much is
+  achieved. People with a team also get a **Team's** tab listing everyone below them with a progress bar. A roadmap
+  is visible to its owner and their seniors only. The data is dummy, generated per person on the server.
+
 ## AI chat and update requests
 
 Open **AI chat** for private instructions and work planning. Ask `Take an update from Kapil Sharma about the client review`, or select teammates through **Add people**. Review the proposed recipients and prompt, then choose **Request updates**. Requests appear in the employee's **My inbox**; **Reply & update** saves a response and optionally updates their selected work item. The requester sees the response under **Requested**. Permissions are checked when drafting, sending, and replying. Existing pending requests are reused to avoid repeated reminders.

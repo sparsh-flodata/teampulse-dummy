@@ -13,7 +13,8 @@ TeamPulse talks to people through a Google Chat app, in direct messages only.
   told, the app asks which item. TeamPulse stores a reference, not the file, and opens uploads by fetching them
   from the Chat API.
 - **Messages out.** These are queued in `channel_outbox` and sent by the workflow tick, which runs every minute:
-  - Update requests (they also stay in the TeamPulse inbox).
+  - Update requests and knocks (they also stay in the TeamPulse inbox).
+  - Skip-level notices: when a senior asks someone further down, the managers in between are told.
   - The daily check-in (weekdays, see the [pilot runbook](PILOT_RUNBOOK.md)), and planning nudges.
   - A manager's notice when someone confirms a moved date or a blocker.
   - Overdue and escalation notices.

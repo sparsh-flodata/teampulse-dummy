@@ -1,4 +1,5 @@
 import { ChevronRight, Flag } from "lucide-react";
+import { KnockButton } from "@/features/work/components/KnockButton";
 import { motion } from "motion/react";
 import { Avatar, Badge, Empty, healthTone } from "@/components/ui";
 import { dateLabel } from "@/lib/format";
@@ -118,13 +119,16 @@ export function WorkTable({
                     </div>
                   </td>
                   <td>
-                    <button
-                      className="icon-button"
-                      aria-label={"Open " + w.title}
-                      onClick={() => onWork(w)}
-                    >
-                      <ChevronRight size={16} />
-                    </button>
+                    <span className="row-actions">
+                      <KnockButton work={w} />
+                      <button
+                        className="icon-button"
+                        aria-label={"Open " + w.title}
+                        onClick={() => onWork(w)}
+                      >
+                        <ChevronRight size={16} />
+                      </button>
+                    </span>
                   </td>
                 </tr>
               );

@@ -3,10 +3,10 @@ import re
 from collections import Counter
 from fastapi import HTTPException
 from sqlalchemy import select
-from backend.app.models import Employee, UpdateRequest, now
+from backend.app.models import Dependency, Employee, UpdateRequest, WorkItem, now
 from backend.app.schemas import WorkPatch
 from backend.app.core.access import profile_ids
-from backend.app.services.work import audit, patch_work, get_work, serialize_work, visible_work
+from backend.app.services.work import OPEN_DEP, audit, notify, patch_work, get_work, serialize_work, visible_work
 from backend.app.channels.delivery import CHANNELS, CHANNEL_LABELS
 
 
@@ -39,17 +39,95 @@ def create_requests(db,user,ids,prompt,channel='in_app'):
         if check_in:record_request_message(db,check_in,user,request)
         result=CHANNELS[channel].prepare(db,request,user,person)
         request.status=result.state;request.delivery_detail=result.detail
+        notify_skipped_managers(db,user,person,request)
         audit(db,user,f'Requested a work update from {person.name} through {CHANNEL_LABELS[channel]}.')
         records.append(request)
     db.flush()
     return records
 
 
+def skipped_managers(db, sender, recipient):
+    """The managers between sender and recipient, when the sender is higher up the recipient's reporting line.
+    Empty when the sender is not above them (a peer, or someone in another line)."""
+    chain, seen, current = [], {recipient.id}, recipient.manager_id
+    while current and current not in seen:
+        if current == sender.id:
+            return chain
+        seen.add(current)
+        person = db.get(Employee, current)
+        if not person:
+            break
+        chain.append(person)
+        current = person.manager_id
+    return []
+
+
+def notify_skipped_managers(db, sender, recipient, request):
+    """A senior asked someone further down: each manager in between hears about it (TeamPulse and Google Chat)."""
+    from backend.app.channels import google_chat
+    asked = 'knocked on' if request.kind == 'knock' else 'asked'
+    for manager in skipped_managers(db, sender, recipient):
+        if not manager.active:
+            continue
+        text = f'{sender.name} {asked} {recipient.name} (in your team) for an update: "{request.prompt}"'
+        notify(db, manager.id, f'skip-level:{request.id}:{manager.id}', text, request.work_item_id)
+        google_chat.queue_message(db, manager.id, text)
+
+
+def knock(db, user, work):
+    """Knock knock: ask everyone involved in a commitment how it is going, in TeamPulse and by Google Chat DM.
+
+    Involved: the assignee, and the owners of the open dependencies it waits on (asked about their linked
+    commitment). Anyone who can see the commitment may knock. Nobody is knocked twice about the same thing while
+    a knock is unanswered. A reply goes through the check-in handler, so it also updates the work.
+    """
+    from backend.app.services.proactive import open_request_check_in, record_request_message
+    if work.status == 'Completed':
+        raise HTTPException(409, 'This commitment is already complete.')
+    targets = []
+    if work.owner_id and work.owner_id != user.id:
+        owner = db.get(Employee, work.owner_id)
+        if owner and owner.active:
+            targets.append((owner, work.id, f'Knock knock: how is "{work.title}" going? Share progress, what is left, and anything blocking it.'))
+    for dep in db.scalars(select(Dependency).where(Dependency.work_item_id == work.id, Dependency.status.in_(OPEN_DEP)).order_by(Dependency.id)):
+        if dep.owner_id == user.id or any(person.id == dep.owner_id for person, _, _ in targets):
+            continue
+        person = db.get(Employee, dep.owner_id)
+        if not person or not person.active:
+            continue
+        upstream = db.get(WorkItem, dep.upstream_work_id) if dep.upstream_work_id else None
+        own = upstream.id if upstream and upstream.owner_id == person.id and upstream.status != 'Completed' else None
+        targets.append((person, own, f'Knock knock: "{work.title}" is waiting on you for "{dep.deliverable}". How is it going, and when can it be ready?'))
+    if not targets:
+        raise HTTPException(409, 'Nobody else is working on this commitment yet.')
+    knocked, already = [], []
+    for person, own, prompt in targets:
+        waiting = db.scalar(select(UpdateRequest.id).where(UpdateRequest.kind == 'knock', UpdateRequest.requester_id == user.id,
+                                                           UpdateRequest.recipient_id == person.id, UpdateRequest.prompt == prompt,
+                                                           UpdateRequest.status.in_(('Queued', 'Delivered'))))
+        if waiting:
+            already.append(person.name)
+            continue
+        request = UpdateRequest(requester_id=user.id, recipient_id=person.id, prompt=prompt, channel='google_chat', kind='knock', work_item_id=own)
+        db.add(request)
+        db.flush()
+        check_in = open_request_check_in(db, request, person)
+        if check_in:
+            record_request_message(db, check_in, user, request)
+        result = CHANNELS['google_chat'].prepare(db, request, user, person)
+        request.status, request.delivery_detail = result.state, result.detail
+        notify_skipped_managers(db, user, person, request)
+        audit(db, user, f'Knocked on {person.name} about "{work.title}".', work.id)
+        knocked.append(person.name)
+    db.flush()
+    return {'knocked': knocked, 'already': already}
+
+
 def serialize_request(db,request,user):
     sender=db.get(Employee,request.requester_id);recipient=db.get(Employee,request.recipient_id)
-    authorized=bool(sender and sender.active and recipient and recipient.active and recipient.id in profile_ids(db,sender))
+    authorized=bool(sender and sender.active and recipient and recipient.active and (request.kind=='knock' or recipient.id in profile_ids(db,sender)))
     visible_response=request.response if authorized else None
-    return {'id':request.id,'requester_id':request.requester_id,'recipient_id':request.recipient_id,'requester_name':sender.name if sender else 'Former teammate','recipient_name':recipient.name if recipient else 'Former teammate','prompt':request.prompt,'channel':request.channel,'status':request.status,'delivery_detail':request.delivery_detail,'response':visible_response,'work_item_id':request.work_item_id if authorized else None,'created_at':request.created_at.isoformat()+'Z','responded_at':request.responded_at.isoformat()+'Z' if request.responded_at else None,'can_reply':authorized and user.id==request.recipient_id and request.status=='Delivered','access_changed':not authorized,
+    return {'id':request.id,'requester_id':request.requester_id,'recipient_id':request.recipient_id,'requester_name':sender.name if sender else 'Former teammate','recipient_name':recipient.name if recipient else 'Former teammate','prompt':request.prompt,'channel':request.channel,'status':request.status,'delivery_detail':request.delivery_detail,'response':visible_response,'work_item_id':request.work_item_id if authorized else None,'created_at':request.created_at.isoformat()+'Z','responded_at':request.responded_at.isoformat()+'Z' if request.responded_at else None,'can_reply':authorized and user.id==request.recipient_id and request.status=='Delivered','access_changed':not authorized,'kind':request.kind,
             'attachments':request_attachments(db,request,user) if authorized else []}
 
 
@@ -65,7 +143,7 @@ def reply_to_request(db,user,request,body):
     if request.status=='Responded':return request
     if request.status!='Delivered':raise HTTPException(409,'This request has not been delivered or is no longer active.')
     sender=db.get(Employee,request.requester_id)
-    if not sender or not sender.active or user.id not in profile_ids(db,sender):raise HTTPException(403,'Reporting access changed. Ask your current manager for a fresh request.')
+    if not sender or not sender.active or (request.kind!='knock' and user.id not in profile_ids(db,sender)):raise HTTPException(403,'Reporting access changed. Ask your current manager for a fresh request.')
     if any(v is not None for v in (body.progress,body.remaining_hours,body.status)) and not body.work_item_id:raise HTTPException(422,'Select the work item this progress update belongs to.')
     if body.work_item_id:
         work=get_work(db,user,body.work_item_id,edit=True)

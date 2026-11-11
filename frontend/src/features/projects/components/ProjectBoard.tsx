@@ -1,4 +1,5 @@
 import { useState, type DragEvent } from "react";
+import { KnockButton } from "@/features/work/components/KnockButton";
 import { CalendarClock, Flag, GripVertical } from "lucide-react";
 import { Badge, FormError, healthTone } from "@/components/ui";
 import { dateLabel } from "@/lib/format";
@@ -158,6 +159,7 @@ export function ProjectBoard({
                         actions={actions}
                         compact
                       />
+                      <KnockButton work={w} />
                       {w.can_edit && (
                         <label className="pj-move">
                           <span>Move to</span>

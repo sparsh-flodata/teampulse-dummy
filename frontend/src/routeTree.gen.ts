@@ -22,6 +22,7 @@ import { Route as AppMeRouteImport } from './routes/_app/me'
 import { Route as AppMyWorkRouteImport } from './routes/_app/my-work'
 import { Route as AppOrganizationRouteImport } from './routes/_app/organization'
 import { Route as AppProjectsRouteImport } from './routes/_app/projects'
+import { Route as AppRoadmapRouteImport } from './routes/_app/roadmap'
 import { Route as AppSettingsRouteImport } from './routes/_app/settings'
 import { Route as AppTeamRouteImport } from './routes/_app/team'
 import { Route as AppPeoplePersonIdRouteImport } from './routes/_app/people.$personId'
@@ -91,6 +92,11 @@ const AppProjectsRoute = AppProjectsRouteImport.update({
   path: '/projects',
   getParentRoute: () => AppRoute,
 } as any)
+const AppRoadmapRoute = AppRoadmapRouteImport.update({
+  id: '/roadmap',
+  path: '/roadmap',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppSettingsRoute = AppSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -125,6 +131,7 @@ export interface FileRoutesByFullPath {
   '/my-work': typeof AppMyWorkRoute
   '/organization': typeof AppOrganizationRoute
   '/projects': typeof AppProjectsRoute
+  '/roadmap': typeof AppRoadmapRoute
   '/settings': typeof AppSettingsRoute
   '/team': typeof AppTeamRoute
   '/people/$personId': typeof AppPeoplePersonIdRoute
@@ -142,6 +149,7 @@ export interface FileRoutesByTo {
   '/my-work': typeof AppMyWorkRoute
   '/organization': typeof AppOrganizationRoute
   '/projects': typeof AppProjectsRoute
+  '/roadmap': typeof AppRoadmapRoute
   '/settings': typeof AppSettingsRoute
   '/team': typeof AppTeamRoute
   '/': typeof AppIndexRoute
@@ -162,6 +170,7 @@ export interface FileRoutesById {
   '/_app/my-work': typeof AppMyWorkRoute
   '/_app/organization': typeof AppOrganizationRoute
   '/_app/projects': typeof AppProjectsRoute
+  '/_app/roadmap': typeof AppRoadmapRoute
   '/_app/settings': typeof AppSettingsRoute
   '/_app/team': typeof AppTeamRoute
   '/_app/': typeof AppIndexRoute
@@ -183,6 +192,7 @@ export interface FileRouteTypes {
     | '/my-work'
     | '/organization'
     | '/projects'
+    | '/roadmap'
     | '/settings'
     | '/team'
     | '/people/$personId'
@@ -200,6 +210,7 @@ export interface FileRouteTypes {
     | '/my-work'
     | '/organization'
     | '/projects'
+    | '/roadmap'
     | '/settings'
     | '/team'
     | '/'
@@ -219,6 +230,7 @@ export interface FileRouteTypes {
     | '/_app/my-work'
     | '/_app/organization'
     | '/_app/projects'
+    | '/_app/roadmap'
     | '/_app/settings'
     | '/_app/team'
     | '/_app/'
@@ -324,6 +336,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppProjectsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/roadmap': {
+      id: '/_app/roadmap'
+      path: '/roadmap'
+      fullPath: '/roadmap'
+      preLoaderRoute: typeof AppRoadmapRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/settings': {
       id: '/_app/settings'
       path: '/settings'
@@ -366,6 +385,7 @@ interface AppRouteChildren {
   AppMyWorkRoute: typeof AppMyWorkRoute
   AppOrganizationRoute: typeof AppOrganizationRoute
   AppProjectsRoute: typeof AppProjectsRoute
+  AppRoadmapRoute: typeof AppRoadmapRoute
   AppSettingsRoute: typeof AppSettingsRoute
   AppTeamRoute: typeof AppTeamRoute
   AppIndexRoute: typeof AppIndexRoute
@@ -384,6 +404,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppMyWorkRoute: AppMyWorkRoute,
   AppOrganizationRoute: AppOrganizationRoute,
   AppProjectsRoute: AppProjectsRoute,
+  AppRoadmapRoute: AppRoadmapRoute,
   AppSettingsRoute: AppSettingsRoute,
   AppTeamRoute: AppTeamRoute,
   AppIndexRoute: AppIndexRoute,

@@ -20,6 +20,7 @@ def migrate(engine):
             'agent_actions': [('base_snapshot', "TEXT NOT NULL DEFAULT '{}'"), ('check_in_id', 'INTEGER REFERENCES check_ins(id)'),
                                ('source', "VARCHAR(20) NOT NULL DEFAULT 'chat'"), ('applied_at', 'TIMESTAMP')],
             'channel_outbox': [('check_in_id', 'INTEGER REFERENCES check_ins(id)')],
+            'update_requests': [('kind', "VARCHAR(20) NOT NULL DEFAULT 'request'")],
             'conversations': [('agent', "VARCHAR(40) NOT NULL DEFAULT ''")],
             'check_ins': [('message', "TEXT NOT NULL DEFAULT ''")],
         }
@@ -61,3 +62,5 @@ def migrate(engine):
             # Status, progress and hours from chat now save at once (with undo) for everyone; Settings can turn it off.
             conn.execute(text('UPDATE employees SET agent_auto_updates = true'))
             conn.execute(text("INSERT INTO schema_migrations(version, description) VALUES(7, 'Direct status and progress updates from chat, with undo')"))
+        if 8 not in applied:
+            conn.execute(text("INSERT INTO schema_migrations(version, description) VALUES(8, 'Knock knock on commitments')"))

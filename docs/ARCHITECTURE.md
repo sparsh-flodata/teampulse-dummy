@@ -89,6 +89,19 @@ Design and decisions: `docs/PROACTIVE_ASSISTANT_PLAN.md`. Operation: `docs/PILOT
 - **Format** (`services/formatting.py`, `components/ui/RichText.tsx`). One markdown subset, sanitized before
   storage, rendered as Google Chat syntax at the Chat edge and as React elements in the app (never raw HTML).
 
+## Knock knock, skip-level notices, roadmaps
+
+- **Knock** (`POST /api/work/{id}/knock`, `services/coordination.knock`). Visibility of the commitment is the only
+  requirement. It creates `UpdateRequest(kind='knock')` for the assignee and for owners of open dependencies (pointing
+  at their linked commitment), delivered like a manager request (inbox, notification, Google Chat DM) with a
+  `request` check-in, so the reply updates the work. Knocks are not limited to the reporting line: replies and their
+  visibility only require both people to be active. An unanswered knock with the same text is not repeated.
+- **Skip-level notices** (`skipped_managers`, `notify_skipped_managers`). For update requests and knocks, when the
+  sender is above the recipient in the reporting line, each manager in between gets a notification and a Chat DM.
+- **Roadmaps** (`services/roadmap.py`, `api/routes/roadmaps.py`). Dummy data generated per person (seeded by id,
+  shaped by job title) over the current quarter and the next two. `/roadmaps/{id}` is allowed for the person and
+  anyone above them (`descendants`), never peers; `/roadmaps/team` lists everyone below the viewer with a summary.
+
 ## Workflow and deployment
 
 A single application process runs deterministic workflow scans every minute: notifications, daily check-ins, then the Google Chat outbox. Notifications persist with deduplication keys, remember multi-day commitments, and handle planning, deadlines, and overdue dependencies. Update requests, check-ins and manager notices also go to Google Chat for people who connected it. TeamPulse's own loggers (`teampulse.*`) print at INFO with ids and counts only, never message text. Multiple instances require a distributed worker/lease design.

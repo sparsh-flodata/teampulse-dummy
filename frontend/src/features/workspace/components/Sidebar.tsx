@@ -17,6 +17,7 @@ import {
   X,
   ChevronDown,
   Plus,
+  Milestone,
   PanelLeftClose,
   PanelLeftOpen,
 } from "lucide-react";
@@ -33,6 +34,7 @@ const items: {
   { label: "AI chat", icon: Sparkles },
   { label: "My work", icon: CheckSquare },
   { label: "My profile", icon: UserRound },
+  { label: "Roadmap", icon: Milestone },
   { label: "My team", icon: Users },
   { label: "Organization", icon: GitBranch },
   { label: "All commitments", icon: Target },

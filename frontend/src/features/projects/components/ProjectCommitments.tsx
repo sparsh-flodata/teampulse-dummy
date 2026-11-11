@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { KnockButton } from "@/features/work/components/KnockButton";
 import {
   ArrowRightLeft,
   ChevronRight,
@@ -185,13 +186,16 @@ export function ProjectCommitments({
                     </div>
                   </td>
                   <td>
-                    <button
-                      className="icon-button"
-                      aria-label={"Open " + w.title}
-                      onClick={() => actions.openWork(w.id)}
-                    >
-                      <ChevronRight size={16} />
-                    </button>
+                    <span className="row-actions">
+                      <KnockButton work={w} />
+                      <button
+                        className="icon-button"
+                        aria-label={"Open " + w.title}
+                        onClick={() => actions.openWork(w.id)}
+                      >
+                        <ChevronRight size={16} />
+                      </button>
+                    </span>
                   </td>
                 </tr>
               ))}
