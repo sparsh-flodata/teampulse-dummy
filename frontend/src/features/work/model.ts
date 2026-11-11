@@ -54,6 +54,11 @@ export function commitmentsModel(
       active.some((w) => w.owner_id === p.id && w.commitment_confirmed),
     ).length;
 
+  // Several values per filter: any of the projects, and an assignee in any of the teams (their department).
+  // The single team/project params are still read so older links keep working.
+  const projectIds =
+      search.projects ?? (search.project ? [search.project] : []),
+    teamIds = search.teams ?? (search.team ? [search.team] : []);
   const filtered = state.work.filter((w: Work) => {
     const project = state.projects.find((p) => p.id === w.project_id),
       owner = state.directory.find((p) => p.id === w.owner_id);
@@ -65,8 +70,9 @@ export function commitmentsModel(
         (drillScope === "personal" && w.owner_id === me.id) ||
         (drillScope === "team" &&
           state.report_ids.includes(w.owner_id || 0))) &&
-      (!search.project || w.project_id === search.project) &&
-      (!search.team || project?.team_id === search.team) &&
+      (!projectIds.length || projectIds.includes(w.project_id)) &&
+      (!teamIds.length ||
+        (owner?.team_id != null && teamIds.includes(owner.team_id))) &&
       (!query ||
         [w.title, project?.name, owner?.name, w.required_skills]
           .join(" ")

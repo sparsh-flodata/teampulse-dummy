@@ -1,0 +1,167 @@
+/* Multi-value filters (teams, projects) and the chips that show what is applied. */
+.multi-filter {
+  position: relative;
+}
+.multi-filter-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 34px;
+  padding: 0 11px;
+  border: 1px solid var(--color-rule);
+  border-radius: var(--radius-7);
+  background: var(--color-surface);
+  color: var(--color-ink-2);
+  font: inherit;
+  font-size: var(--text-10, 13px);
+  cursor: pointer;
+}
+.multi-filter-trigger:hover {
+  border-color: var(--color-rule-2);
+  color: var(--color-ink);
+}
+.multi-filter-trigger:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+.multi-filter-trigger.has-value {
+  border-color: var(--color-info-ink);
+  background: var(--color-info-soft);
+  color: var(--color-info-ink);
+}
+.multi-filter-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--color-info-ink);
+  color: var(--color-surface);
+  font-size: 11px;
+  font-weight: 600;
+}
+.multi-filter-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 30;
+  display: grid;
+  gap: 6px;
+  width: 260px;
+  padding: 6px;
+  border: 1px solid var(--color-popover-border);
+  border-radius: var(--radius-7);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+}
+.multi-filter-options {
+  display: grid;
+  max-height: 300px;
+  overflow-y: auto;
+}
+.multi-filter-option {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 8px;
+  border-radius: var(--radius-4);
+  cursor: pointer;
+}
+.multi-filter-option:hover {
+  background: var(--color-paper-2);
+}
+.multi-filter-option input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.multi-filter-box {
+  display: inline-grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid var(--color-rule-2);
+  border-radius: 4px;
+  color: var(--color-surface);
+}
+.multi-filter-option.is-on .multi-filter-box {
+  border-color: var(--color-info-ink);
+  background: var(--color-info-ink);
+}
+.multi-filter-option input:focus-visible + .multi-filter-box {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+.multi-filter-option:not(:has(.multi-filter-dot)) {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+}
+.multi-filter-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+.multi-filter-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.multi-filter-option small {
+  color: var(--color-muted);
+  font-size: 11px;
+}
+.multi-filter-clear {
+  justify-self: start;
+  padding: 4px 8px;
+}
+
+/* The filters in use, as removable chips. */
+.applied-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: var(--radius-4);
+  background: var(--color-info-soft);
+}
+.applied-filters > span {
+  color: var(--color-info-ink);
+  font-size: 12px;
+  font-weight: 600;
+}
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 6px 3px 9px;
+  border: 1px solid color-mix(in oklab, var(--color-info-ink) 30%, transparent);
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--color-ink);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+.filter-chip:hover {
+  border-color: var(--color-info-ink);
+}
+.filter-chip:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+.filter-chip small {
+  color: var(--color-muted);
+}
+.applied-filters .text-button {
+  margin-left: auto;
+  font-size: 12px;
+}
+@media (max-width: 760px) {
+  .multi-filter-menu {
+    right: auto;
+    left: 0;
+    width: min(260px, calc(100vw - 32px));
+  }
+}

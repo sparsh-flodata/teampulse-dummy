@@ -61,6 +61,9 @@ export const workspaceSearchSchema = z.object({
   status: z.string().optional().catch(undefined),
   project: id.optional().catch(undefined),
   team: id.optional().catch(undefined),
+  /** Commitment filters with several values: any of these teams (the assignee's) and any of these projects. */
+  teams: z.array(id).optional().catch(undefined),
+  projects: z.array(id).optional().catch(undefined),
 });
 
 export type WorkspaceSearch = z.infer<typeof workspaceSearchSchema>;
@@ -73,6 +76,8 @@ const pickFilters = (s: WorkspaceSearch) => ({
   status: s.status,
   project: s.project,
   team: s.team,
+  teams: s.teams,
+  projects: s.projects,
 });
 export type PageFilters = ReturnType<typeof pickFilters>;
 

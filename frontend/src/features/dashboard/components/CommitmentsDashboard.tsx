@@ -10,8 +10,11 @@ import {
   X,
   SlidersHorizontal,
   Flag,
+  FolderKanban,
 } from "lucide-react";
 import { Avatar, Badge, Empty, healthTone } from "@/components/ui";
+import { MultiFilter } from "@/components/ui/MultiFilter";
+import { isManager } from "@/features/workspace/domain";
 import { dateLabel } from "@/lib/format";
 import { showToast } from "@/lib/ui-store";
 import { DependencyCard } from "@/features/work/components/DependencyCard";
@@ -37,6 +40,35 @@ export function CommitmentsDashboard({ view }: { view: CommitmentsView }) {
   const { dataUpdatedAt } = useQuery(stateQuery);
   const search = useWorkspaceSearch();
   const nav = useWorkspaceNavigation();
+  const teams = search.teams ?? (search.team ? [search.team] : []),
+    projects = search.projects ?? (search.project ? [search.project] : []),
+    canFilterTeams = view !== "My work" && isManager(state.user);
+  const teamOptions = state.teams.map((t) => ({
+      id: t.id,
+      label: t.name,
+      hint: String(
+        state.directory.filter((p) => p.team_id === t.id && p.active).length,
+      ),
+    })),
+    projectOptions = state.projects.map((p) => ({
+      id: p.id,
+      label: p.name,
+      color: p.color,
+    }));
+  const teamName = (id: number) =>
+      state.teams.find((t) => t.id === id)?.name ?? "Team",
+    projectName = (id: number) =>
+      state.projects.find((p) => p.id === id)?.name ?? "Project";
+  // The single params are cleared whenever the multi-value ones change.
+  const setFilters = (next: { teams?: number[]; projects?: number[] }) =>
+    nav.patchSearch({
+      team: undefined,
+      project: undefined,
+      teams: (next.teams ?? teams).length ? (next.teams ?? teams) : undefined,
+      projects: (next.projects ?? projects).length
+        ? (next.projects ?? projects)
+        : undefined,
+    });
   const {
     summary,
     active,
@@ -260,42 +292,63 @@ export function CommitmentsDashboard({ view }: { view: CommitmentsView }) {
                 ))}
               </div>
               <div className="filter-selects">
-                <select
-                  aria-label="Filter team"
-                  value={search.team ?? ""}
-                  onChange={(e) =>
-                    nav.patchSearch({
-                      team: e.target.value ? Number(e.target.value) : undefined,
-                    })
-                  }
-                >
-                  <option value="">All teams</option>
-                  {state.teams.map((t) => (
-                    <option key={t.id} value={t.id}>
-                      {t.name}
-                    </option>
-                  ))}
-                </select>
-                <select
-                  aria-label="Filter project"
-                  value={search.project ?? ""}
-                  onChange={(e) =>
-                    nav.patchSearch({
-                      project: e.target.value
-                        ? Number(e.target.value)
-                        : undefined,
-                    })
-                  }
-                >
-                  <option value="">All projects</option>
-                  {state.projects.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.name}
-                    </option>
-                  ))}
-                </select>
+                {canFilterTeams && (
+                  <MultiFilter
+                    label="Teams"
+                    icon={<Users size={14} aria-hidden="true" />}
+                    options={teamOptions}
+                    selected={teams}
+                    onChange={(next) => setFilters({ teams: next })}
+                  />
+                )}
+                <MultiFilter
+                  label="Projects"
+                  icon={<FolderKanban size={14} aria-hidden="true" />}
+                  options={projectOptions}
+                  selected={projects}
+                  onChange={(next) => setFilters({ projects: next })}
+                />
               </div>
             </div>
+            {(teams.length > 0 || projects.length > 0) && (
+              <div className="applied-filters" aria-label="Filters in use">
+                <span>Showing</span>
+                {teams.map((id) => (
+                  <button
+                    key={"team-" + id}
+                    className="filter-chip"
+                    aria-label={"Remove the " + teamName(id) + " filter"}
+                    onClick={() =>
+                      setFilters({ teams: teams.filter((x) => x !== id) })
+                    }
+                  >
+                    {teamName(id)}
+                    <small>team</small>
+                    <X size={12} aria-hidden="true" />
+                  </button>
+                ))}
+                {projects.map((id) => (
+                  <button
+                    key={"project-" + id}
+                    className="filter-chip"
+                    aria-label={"Remove the " + projectName(id) + " filter"}
+                    onClick={() =>
+                      setFilters({ projects: projects.filter((x) => x !== id) })
+                    }
+                  >
+                    {projectName(id)}
+                    <small>project</small>
+                    <X size={12} aria-hidden="true" />
+                  </button>
+                ))}
+                <button
+                  className="text-button"
+                  onClick={() => setFilters({ teams: [], projects: [] })}
+                >
+                  Clear all
+                </button>
+              </div>
+            )}
             {["blocked", "Completed"].includes(statusFilter) && (
               <div className="active-filter">
                 <SlidersHorizontal size={13} />
