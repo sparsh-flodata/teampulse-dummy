@@ -51,7 +51,7 @@ Adding a dependency (from the create form, a commitment's Dependencies tab, the 
 
 ## Internal agent ingestion
 
-`backend/app/agents/graph.py` is a LangGraph state graph: `gather_context → route → agent → validate → policy`. The agents are coordination (request updates), planning (new commitment), progress (own selected work), dependency (what selected work waits on), briefing (own week, or a manager's reporting team, from records), model (the configured chat-completions provider, e.g. Groq via `AI_BASE_URL`/`AI_MODEL`/`AI_API_KEY`) and guide. Agents only propose. `validate` re-checks permissions; `policy` allows auto-apply only for explicit progress numbers under the person's opt-in. Confirmed proposals go through the ordinary services. Each assistant message records which agent answered. In-app chat and Google Chat call the same graph.
+`backend/app/agents/graph.py` is a LangGraph state graph: `gather_context → route → agent → validate → policy`. The agents are coordination (request updates), planning (new commitment), progress (own selected work), dependency (what selected work waits on), briefing (own week, or a manager's reporting team, from records), model (the configured chat-completions provider, e.g. Groq via `AI_BASE_URL`/`AI_MODEL`/`AI_API_KEY`) and guide. Agents only propose. `validate` re-checks permissions; `policy` allows auto-apply only for explicit progress numbers under the person's opt-in. Confirmed proposals go through the ordinary services. Each assistant message records which agent answered. In-app chat and Google Chat both enter through `services/proactive.handle_inbound` (below); messages that are not check-in business reach this graph.
 
 Message receipts bind `(employee_id, request_id)` to a content fingerprint and response. Repeated messages return the original result; identifier reuse with different content is rejected. Proposed updates retain a base snapshot. Application claims the action, refreshes/locks work, and rejects a changed snapshot before writing. Failed changes roll back.
 
@@ -65,11 +65,35 @@ The React chat feature includes private history, reviewable action cards, people
 
 Google Chat transport needs the Cloud project values in `docs/GOOGLE_CHAT.md`; its event verification, linking, outbox and reply paths are covered by tests with Google stubbed.
 
+## Proactive check-ins
+
+Design and decisions: `docs/PROACTIVE_ASSISTANT_PLAN.md`. Operation: `docs/PILOT_RUNBOOK.md`.
+
+- **Outbound** (`services/proactive.py`). Each workflow tick calls `run_check_ins`. On weekdays from `CHECKIN_HOUR`
+  to 18:00 it creates at most one `daily` `CheckIn` per opted-in person (and only those in `PROACTIVE_PILOT_EMAILS`
+  when set). The unique `(employee_id, kind, period)` constraint makes duplicates impossible across ticks, restarts
+  and processes. The message is stored as an assistant turn, a notification, and a Chat outbox row (`Skipped` in
+  dry run). Manager update requests open a `request` check-in, so the reply also updates the work.
+- **Inbound router** (`handle_inbound`). For both channels, in order: commands (`pause`, `resume`, `undo`, `help`),
+  a pending yes/no, a reply to the newest open check-in, otherwise the assistant graph. Receipts deduplicate retries.
+- **Reply handling** (`services/checkin_reply.py`). The deterministic parser reads the reply first; the model is
+  asked only when the parser is unsure. Every extracted value must appear in the message (validation runs on both
+  paths). Progress, hours and the start of work apply at once as `AgentAction(source='checkin', status='Applied')`
+  with before/after snapshots for `undo`. Completion, date moves (with a reason) and blockers become proposals
+  confirmed by `yes` or the in-app card. Ambiguity gets one templated question at a time, two rounds at most.
+  Confirmed slips and blockers notify the manager. Reply text comes from templates, never from the model.
+- **Files and links** (`services/attachments.py`, `api/routes/attachments.py`). References only: Chat attachment
+  resource names, Drive file ids, or URLs, one row per commitment. Listing and opening re-check `visible_work`.
+  Open links carry a 30-minute per-viewer, per-file token. Chat uploads are streamed from the Chat API on open,
+  never stored, and only images and PDFs display inline (`Content-Security-Policy: sandbox`, `nosniff`).
+- **Format** (`services/formatting.py`, `components/ui/RichText.tsx`). One markdown subset, sanitized before
+  storage, rendered as Google Chat syntax at the Chat edge and as React elements in the app (never raw HTML).
+
 ## Workflow and deployment
 
-A single application process runs deterministic workflow scans every minute. Notifications persist with deduplication keys, remember multi-day commitments, and handle planning, deadlines, and overdue dependencies. Notifications remain in-app. Multiple instances require a distributed worker/lease design.
+A single application process runs deterministic workflow scans every minute: notifications, daily check-ins, then the Google Chat outbox. Notifications persist with deduplication keys, remember multi-day commitments, and handle planning, deadlines, and overdue dependencies. Update requests, check-ins and manager notices also go to Google Chat for people who connected it. TeamPulse's own loggers (`teampulse.*`) print at INFO with ids and counts only, never message text. Multiple instances require a distributed worker/lease design.
 
-Docker Compose and a combined frontend/API image are supplied. Docker/PostgreSQL execution, TLS, production monitoring, distributed scheduling, and disaster recovery need target-environment verification before rollout.
+Docker Compose runs PostgreSQL and the app, restarts both, and passes the proactive settings; the pilot machine runs it. TLS, production monitoring, distributed scheduling, and disaster recovery need target-environment verification before rollout.
 
 ## Authoritative organization and project participation
 

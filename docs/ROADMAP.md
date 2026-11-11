@@ -26,6 +26,16 @@
 - Fixed-height work tables with sticky headers and internal desktop/mobile scrolling.
 - Additive archive flags preserve earlier pilot history while keeping current dashboards focused.
 
+## Proactive assistant (built; pilot pending)
+
+- Daily weekday check-ins in AI chat and Google Chat, limited to the pilot by `PROACTIVE_PILOT_EMAILS`, with dry run
+  and a kill switch.
+- Replies update work: routine numbers at once (with `undo`), completion, date moves and blockers after `yes`, at
+  most two clarifying questions. Manager update requests use the same handling.
+- Files and links from updates, kept as references per commitment and project, plus a `/files` page.
+- Left before going live: verify Chat attachment download with a real file, then a dry-run day. See
+  `docs/PILOT_RUNBOOK.md`.
+
 ## Next: validate with a real team
 
 1. Pilot with 5–10 people and real reporting relationships for 2–4 weeks.
@@ -41,7 +51,8 @@
 - Reviewed production migrations/rollback, scheduled backups, and recovery drills.
 - HTTPS/secure cookies, managed secrets, application monitoring, error tracking, and CI.
 - A distributed job worker with leases/retries for multiple instances.
-- Business calendars, holidays, quiet hours, and configurable escalation rules.
+- Business calendars, holidays, and configurable escalation rules. (Check-ins already keep to weekdays, from
+  `CHECKIN_HOUR` to 18:00 in `ORG_TIMEZONE`.)
 
 ## Later: communication and intelligence
 

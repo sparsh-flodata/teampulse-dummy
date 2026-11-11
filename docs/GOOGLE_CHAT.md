@@ -3,10 +3,18 @@
 TeamPulse talks to people through a Google Chat app, in direct messages only.
 
 - **People connect themselves.** Someone opens Google Chat, finds the TeamPulse app and sends it a message. Google tells TeamPulse their verified email. If it matches an active `@flodataanalytics.com` account, that DM becomes their TeamPulse channel. Settings shows "Connected".
-- **Messages in.** A message in the DM goes to the assistant graph (`backend/app/agents/graph.py`), the same one behind in-app chat. If someone asked this person for an update, their next message answers that request instead. Proposed changes still need confirming in TeamPulse; the reply includes the link.
+- **Messages in.** Every DM goes through the same router as in-app chat (`services/proactive.py`): the commands
+  `pause`, `resume`, `undo` and `help`; a `yes` or `no` to a pending change; a reply to an open check-in or manager
+  request (which also updates the work); otherwise the assistant graph. Check-in changes are confirmed right in
+  the DM with `yes`. Changes the free-form assistant proposes still need confirming in TeamPulse; the reply includes
+  the link.
+- **Files.** A file or link sent with an update is recorded against the commitment it is about. If that can't be
+  told, the app asks which item. TeamPulse stores a reference, not the file, and opens uploads by fetching them
+  from the Chat API.
 - **Messages out.** These are queued in `channel_outbox` and sent by the workflow tick, which runs every minute:
   - Update requests (they also stay in the TeamPulse inbox).
-  - Check-in and planning nudges.
+  - The daily check-in (weekdays, see the [pilot runbook](PILOT_RUNBOOK.md)), and planning nudges.
+  - A manager's notice when someone confirms a moved date or a blocker.
   - Overdue and escalation notices.
   - Dependency requests.
   - Notices that someone replied to your request.
@@ -46,9 +54,16 @@ With Docker Compose, point `GOOGLE_CHAT_SERVICE_ACCOUNT_FILE` at the key on the 
 1. Open Google Chat, search for TeamPulse under Apps, and message it "hi". It replies "Connected to TeamPulse as …".
 2. In TeamPulse, a manager asks for an update from that person. Within a minute the person gets the request in Google Chat. Their reply shows up in the manager's Requested tab.
 3. Send "Summarize my week" in the DM. The briefing agent answers from their records.
+4. With check-ins on (dry run is enough), reply to the person's check-in in AI chat or, once live, in the DM:
+   `1 is 80%, 2h left`. The work updates, and `undo` reverses it.
+5. Send a screenshot with that reply, then open it from the commitment's Files & links tab as the manager. The
+   app log shows `Chat message with 1 attachment(s)` with the event's field names (never URLs or names).
 
 ## Limits for now
 
-- Only text messages: no cards or buttons yet. Confirming a proposed change still happens in TeamPulse.
+- Only text messages: no cards or buttons yet. Check-in changes are confirmed with `yes`/`no` in the DM; other
+  proposed changes are confirmed in TeamPulse.
+- Not yet verified with a real file: whether the app's credentials can download an uploaded attachment. If not,
+  Open shows "Google Chat did not return this file", and people should share from Drive instead.
 - Delivery retries 5 times, then marks the message Failed. The request itself stays in the TeamPulse inbox.
 - People are matched by the email Google asserts. Someone without a TeamPulse account gets a "register first" reply.

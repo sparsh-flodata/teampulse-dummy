@@ -38,7 +38,7 @@ All 58 supplied company emails are ready. The initial password is `TeamPulse-dem
 
 ## What works
 
-- Session sign-in and logout, salted scrypt password hashing, server-side role and team permissions, request-origin checks, and sign-in throttling.
+- JWT sign-in (15-minute access tokens, rotating refresh tokens), company-domain registration, salted scrypt password hashing, server-side role and team permissions, request-origin checks, and sign-in throttling.
 - Organization overview, employee workspace, project overview, team capacity, shared activity, and a personal notification center.
 - Create projects and employees, create and assign work, confirm proposed assignments, update progress and remaining effort, revise expected completion with a reason, and export the current commitment view to CSV.
 - Separate work items and versioned commitments. Every delivery-date revision retains its previous date and reason.
@@ -55,6 +55,22 @@ Open **AI chat** for private instructions and work planning. Ask `Take an update
 
 The in-app channel works end to end. The WhatsApp adapter is intentionally unconfigured: requests to it stay queued with an explicit explanation. A later adapter should use an outbox worker and verified sender/reply identities.
 
+## Proactive check-ins
+
+On weekdays at `CHECKIN_HOUR` (default 10:00, `ORG_TIMEZONE`), the assistant asks each opted-in person about work that
+needs their word: overdue or due-soon commitments, dependencies they owe, and stale confirmations. That's one message
+a day, in AI chat and as a Google Chat DM when they have connected it. They reply in their own words (`1 is 80%, 2h
+left. 2 is done`). Progress and hours save immediately and can be reversed with `undo` for two hours. Completion,
+date moves and blockers wait for a `yes`. Vague replies get at most two short questions. `pause`, `resume` and
+`help` work in both chats, and Settings has a **Check-ins** panel. Manager update requests use the same reply
+handling, so an answer also updates the work.
+
+Files and links sent with an update are stored as references (never the file itself) against the commitment.
+They are listed under **Files & links** on the commitment, on the project, and on the `/files` page.
+
+It is off by default. `PROACTIVE_ENABLED`, `PROACTIVE_DRY_RUN` and `PROACTIVE_PILOT_EMAILS` control it; see the
+[pilot runbook](docs/PILOT_RUNBOOK.md) and the [design](docs/PROACTIVE_ASSISTANT_PLAN.md).
+
 ## Conversational planning
 
 Without provider credentials, the assistant clearly displays **Offline planning**. This is a deterministic helper, not a language model. Try:
@@ -66,7 +82,9 @@ Without provider credentials, the assistant clearly displays **Offline planning*
 
 Ambiguous/negative completion statements ask for more information. Dependencies use a guided form in offline mode. Significant changes require **Confirm & save**. In Settings, employees may opt into automatic saving of explicit progress percentages and remaining hours for selected work. Completion, delivery dates, and new commitments still require confirmation. Message identifiers deduplicate retries, and stale proposals cannot overwrite newer updates. Conversations are visible only to their author. No external messages or email are sent.
 
-For a real model, set `AI_BASE_URL`, `AI_MODEL`, and `AI_API_KEY` on the server. The adapter expects a chat-completions-compatible endpoint at `<AI_BASE_URL>/chat/completions` supporting JSON responses. The signed-in employee's work, visible project names, and requestable reporting-team names/IDs/titles are included as context. The user's message is also sent to the configured provider; private conversations of other people are excluded. If the provider fails, offline planning remains available. Provider connectivity has not been tested with real credentials.
+For a real model, set `AI_BASE_URL`, `AI_MODEL`, and `AI_API_KEY` on the server. The adapter expects a chat-completions-compatible endpoint at `<AI_BASE_URL>/chat/completions` supporting JSON responses. The signed-in employee's work, visible project names, and requestable reporting-team names/IDs/titles are included as context. The user's message is also sent to the configured provider; private conversations of other people are excluded. If the provider fails, offline planning remains available. Groq (`openai/gpt-oss-120b`) was used with real credentials on
+2026-11-11. For check-in replies the deterministic parser reads first and the model is asked only when it is unsure
+(see the plan's status section).
 
 ## Project structure
 
@@ -121,7 +139,10 @@ docker compose up --build -d
 docker compose exec app python -m backend.app.cli.bootstrap --email you@company.com --name "Your Name"
 ```
 
-The compose file binds the app to local loopback and persists PostgreSQL in a named volume. The image serves both frontend and API. Run one application process for the included scheduler; a distributed job queue is a later deployment step. Docker/PostgreSQL deployment files are provided but have not been executed in this environment.
+The compose file binds the app to local loopback, persists PostgreSQL in a named volume, restarts both services on
+their own, and passes the proactive settings from `.env` (apply changes with `docker compose up -d`). Mount the
+Google Chat key through `GOOGLE_CHAT_SERVICE_ACCOUNT_FILE`. Run one application process for the included scheduler;
+a distributed job queue is a later deployment step. The pilot machine runs this setup (PostgreSQL 17, app on 8787).
 
 The pilot includes versioned additive SQLite/PostgreSQL schema upgrades in `backend/app/db/migrations.py`. Existing pilot work and commitment history are preserved. Before an upgrade, create a consistent SQLite backup with `.venv/Scripts/python.exe -m backend.app.cli.backup`; verified backup files are saved in `data/backups/`. PostgreSQL backups require pg_dump or a managed backup service. Before organizational rollout, add HTTPS and secure cookies, managed secrets, scheduled backups/recovery drills, SSO/password recovery, production monitoring, and a distributed worker. The pilot migration runner is not a substitute for a reviewed production migration/rollback process. This is a working pilot MVP, not completion of the entire multi-release product roadmap.
 
