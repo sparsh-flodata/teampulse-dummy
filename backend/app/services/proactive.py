@@ -240,9 +240,11 @@ def record_request_message(db, check_in, sender, request):
 
 # ---- Inbound ----------------------------------------------------------------------------------------
 
-def newest_check_in(db, employee, states=OPEN_STATES) -> CheckIn | None:
-    for check_in in db.scalars(select(CheckIn).where(CheckIn.employee_id == employee.id, CheckIn.status.in_(states),
-                                                     CheckIn.expires_at > now()).order_by(CheckIn.id.desc())):
+def newest_check_in(db, employee, states=OPEN_STATES, skip_kind: str | None = None) -> CheckIn | None:
+    query = select(CheckIn).where(CheckIn.employee_id == employee.id, CheckIn.status.in_(states), CheckIn.expires_at > now())
+    if skip_kind:
+        query = query.where(CheckIn.kind != skip_kind)
+    for check_in in db.scalars(query.order_by(CheckIn.id.desc())):
         if check_in.update_request_id:
             request = db.get(UpdateRequest, check_in.update_request_id)
             if not request or request.status == 'Cancelled':
@@ -322,7 +324,8 @@ def _ask_for_file_target(db, employee, refs, text) -> str | None:
         return None
     items = [{'n': i + 1, 'work_item_id': w.id, 'dependency_id': None} for i, w in enumerate(works)]
     pending = {'answered': [i['n'] for i in items], 'action_ids': [], 'question': {'ambiguity': 'which_item_for_file', 'n': None, 'asked': True},
-               'queue': [], 'files': [{k: v for k, v in r.items() if k != 'start'} for r in refs], 'type': 'clarify', 'ambiguity': 'which_item_for_file', 'n': None}
+               'queue': [], 'files': [{k: v for k, v in r.items() if k != 'start'} for r in refs], 'note': (text or '')[:300],
+               'type': 'clarify', 'ambiguity': 'which_item_for_file', 'n': None}
     check_in = CheckIn(employee_id=employee.id, kind='file', period=now().strftime('%Y%m%d%H%M%S%f')[:20], items_json=json.dumps(items),
                        status='Clarifying', clarify_rounds=1, pending_json=json.dumps(pending), expires_at=now() + timedelta(hours=FILE_QUESTION_HOURS),
                        last_message_at=now())
@@ -330,6 +333,34 @@ def _ask_for_file_target(db, employee, refs, text) -> str | None:
     db.flush()
     lines = '\n'.join(f'{i["n"]}. **{short_title(_md(db.get(WorkItem, i["work_item_id"]).title))}**' for i in items)
     return f'Which of your commitments is this for? Reply with its number:\n\n{lines}'
+
+
+def _file_answer(db, check_in, text) -> str | None:
+    """The answer to "which commitment is this file for?": its number, or its name (small typos allowed)."""
+    items = json.loads(check_in.items_json or '[]')
+    number = checkin_reply.NUMBER_ONLY.match(text or '')
+    if number:
+        return text if any(i['n'] == int(number[1]) for i in items) else None
+    works = {i['n']: db.get(WorkItem, i['work_item_id']) for i in items}
+    match = checkin_reply.match_title([w for w in works.values() if w], text)
+    return str(next(n for n, w in works.items() if w is match)) if match else None
+
+
+def _with_prefix(db, employee, request_id, result, prefix) -> dict:
+    """converse() has stored its turn; put the attachment line in front of its reply wherever it was kept."""
+    result = dict(result)
+    result['reply'] = sanitize(prefix + '\n\n' + (result.get('reply') or ''))
+    row = db.scalar(select(Conversation).where(Conversation.employee_id == employee.id, Conversation.role == 'assistant')
+                    .order_by(Conversation.id.desc()))
+    if row:
+        row.message = result['reply']
+    receipt = db.scalar(select(MessageReceipt).where(MessageReceipt.employee_id == employee.id, MessageReceipt.request_id == request_id))
+    if receipt:
+        stored = json.loads(receipt.response_json)
+        stored['reply'] = result['reply']
+        receipt.response_json = json.dumps(stored)
+    db.commit()
+    return result
 
 
 async def handle_inbound(db, employee, text, channel, request_id=None, *, work_id=None, recipient_ids=None,
@@ -358,10 +389,17 @@ async def handle_inbound(db, employee, text, channel, request_id=None, *, work_i
         return _finish(db, employee, shown, reply, request_id, fingerprint, steps=('checkin', 'confirmation'))
 
     # 3. A reply to an open check-in.
+    #    A pending "which commitment is this file for?" is answered by a number or by naming the commitment.
+    #    Anything else leaves that question open (the file is not dropped; it expires with the question) and moves on.
     check_in = newest_check_in(db, employee)
-    if check_in and check_in.kind == 'file' and not checkin_reply.NUMBER_ONLY.match(text):
-        check_in.status = 'Expired'  # they moved on without saying which commitment the file was for
-        check_in = newest_check_in(db, employee)
+    if check_in and check_in.kind == 'file':
+        answer = _file_answer(db, check_in, text)
+        if answer:
+            result = await checkin_reply.handle(db, employee, check_in, answer, channel=channel, chat_attachments=chat_attachments,
+                                                chat_message=chat_message)
+            return _finish(db, employee, shown, result['reply'], request_id, fingerprint, actions=result['actions'],
+                           auto_applied=result['auto_applied'], mode=result['mode'])
+        check_in = newest_check_in(db, employee, skip_kind='file')
     selected_elsewhere = False
     if check_in and work_id:
         selected_elsewhere = work_id not in {i['work_item_id'] for i in json.loads(check_in.items_json or '[]')}
@@ -381,6 +419,15 @@ async def handle_inbound(db, employee, text, channel, request_id=None, *, work_i
     elif refs and channel == 'google_chat':
         bare = len(files.URL.sub('', text).strip()) < 3
         if chat_attachments or bare:
+            # The words sent with the file may name the commitment ("media testing screenshot"): attach it there.
+            target = checkin_reply.match_title(_owned_active(db, employee, limit=50), text) if text else None
+            if target:
+                files.capture(db, employee, refs=refs, chat_message=chat_message, work_item_ids=[target.id], note=text, channel=channel)
+                db.commit()
+                attached = f'Attached to **{short_title(_md(target.title))}**: ' + ', '.join(r['name'] for r in refs)
+                if bare:
+                    return _finish(db, employee, shown, attached, request_id, fingerprint, steps=('attachments',))
+                return _with_prefix(db, employee, request_id, await converse(db, employee, text, work_id, request_id, recipient_ids), attached)
             question = _ask_for_file_target(db, employee, refs, text)
             if question:
                 return _finish(db, employee, shown, question, request_id, fingerprint, steps=('attachments',))

@@ -18,6 +18,7 @@ import logging
 import os
 import re
 from dataclasses import dataclass, field
+from difflib import SequenceMatcher
 from datetime import date, timedelta
 from typing import Literal
 import httpx
@@ -289,6 +290,8 @@ def _parse_segment(db, employee, n: int, text: str, work, base: date) -> tuple[I
     if SKIP.search(text):
         fields['skip'] = True
     completion = COMPLETION.search(text)
+    if completion and fields.get('progress') is not None and fields['progress'] < 100:
+        completion = None  # "completed 50%" reports progress, not completion
     if completion and HEDGE.search(text):
         return (ItemUpdate(n=n, evidence=evidence, **{k: v for k, v in fields.items() if k != 'skip'}) if fields.keys() - {'skip'} else None,
                 'hedged_completion', {})
@@ -337,6 +340,26 @@ def _title_match(db, items, sentence: str) -> int | None:
     best = max(scores.values())
     top = [n for n, s in scores.items() if s == best]
     return top[0] if len(top) == 1 else None
+
+
+def match_title(works, text: str):
+    """The one commitment the text names by its title words, allowing small typos ("media tesing").
+    Used only to place a file, never to decide an update. None when no title or more than one fits best."""
+    words = [w for w in re.findall(r'[a-z0-9]+', (text or '').casefold()) if len(w) >= 4 and w not in STOP]
+    if not words:
+        return None
+    scores = {}
+    for work in works:
+        title_words = {t for t in re.findall(r'[a-z0-9]+', work.title.casefold()) if len(t) >= 4 and t not in STOP}
+        score = sum(1 for t in title_words
+                    if any(x == t or (len(x) >= 5 and SequenceMatcher(None, x, t).ratio() >= 0.85) for x in words))
+        if score:
+            scores[work.id] = score
+    if not scores:
+        return None
+    best = max(scores.values())
+    top = [work_id for work_id, score in scores.items() if score == best]
+    return next(w for w in works if w.id == top[0]) if len(top) == 1 else None
 
 
 def deterministic_extract(db, employee, thread: Thread, text: str, focus: int | None = None) -> Parsed:
@@ -525,7 +548,9 @@ def validate(db, employee, thread: Thread, extraction: Extraction, message: str)
             data['progress'] = None
         if u.remaining_hours is not None and not _literal(u.remaining_hours, message):
             data['remaining_hours'] = None
-        if u.status == 'Completed':
+        if u.status == 'Completed' and u.progress is not None and u.progress < 100:
+            data['status'] = None  # "completed 50%" from the model: progress, not completion
+        elif u.status == 'Completed':
             context = u.evidence
             if not COMPLETION.search(context) or HEDGE.search(context):
                 data['status'] = None
@@ -942,7 +967,7 @@ async def handle(db, employee, check_in, text: str, *, channel: str, chat_attach
     kind = q.get('ambiguity')
     if kind == 'which_item_for_file' and number and thread.item(int(number[1])):
         n = int(number[1])
-        _attach(db, employee, thread, {n: pending.get('files', [])}, text, channel, chat_message, turn, request)
+        _attach(db, employee, thread, {n: pending.get('files', [])}, pending.get('note') or text, channel, chat_message, turn, request)
         pending['files'] = []
         answered_question = True
         refs = []
@@ -1025,6 +1050,7 @@ async def handle(db, employee, check_in, text: str, *, channel: str, chat_attach
         targets = _file_targets(thread, parsed, extraction, refs, focus or q.get('n'))
         if targets is None:
             pending['files'] = [{k: v for k, v in r.items() if k != 'start'} for r in refs]
+            pending['note'] = text[:300]
             questions.append({'ambiguity': 'which_item_for_file', 'n': None})
         else:
             _attach(db, employee, thread, targets, text, channel, chat_message, turn, request)

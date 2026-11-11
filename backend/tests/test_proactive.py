@@ -27,6 +27,7 @@ def weekday_morning():
 def on(monkeypatch):
     monkeypatch.setattr(config, 'PROACTIVE_ENABLED', True)
     monkeypatch.setattr(config, 'PROACTIVE_DRY_RUN', True)
+    monkeypatch.setattr(config, 'PROACTIVE_PILOT_EMAILS', ())  # tests never depend on the machine's .env
 
 
 def stale(db, *work_ids, hours=48):
@@ -346,6 +347,8 @@ def test_the_parser_reads_clauses_ordinals_skips_and_acknowledgements(ctx, on):
 
         ups, amb, _, _ = read('nothing new on 2, 1 is at 55%')  # was: 55% saved on item 2 as well
         assert ups[1].progress == 55 and ups[2].skip and ups[2].progress is None and amb == 'none'
+        ups, _, _, _ = read('1 is completed 50%')  # progress, not completion
+        assert ups[1].progress == 50 and ups[1].status != 'Completed'
         ups, amb, n, _ = read('almost done with 1')
         assert not ups and (amb, n) == ('hedged_completion', 1)
         ups, amb, n, _ = read('2 will be late')
@@ -473,6 +476,33 @@ def test_a_file_alone_with_two_items_asks_which_one(chat, on):
     question = post(c, chat_event('nitish@teampulse.local', '', 'spaces/nitish/messages/30', [upload(ref='r/b1')])).json()['text']
     assert question.startswith('Which item is this file for? Reply with its number: 1.')
     answer = post(c, event('MESSAGE', 'nitish@teampulse.local', '2', name='spaces/nitish/messages/31')).json()['text']
+    assert answer.startswith('Attached to *Employee document module*')
+    with sessions() as db:
+        assert db.scalar(select(Attachment)).work_item_id == 1
+
+
+def test_a_file_whose_message_names_the_commitment_is_attached_without_asking(chat):
+    """Seen in the pilot: the text named the commitment, but the bot still asked which one."""
+    c, sessions, _ = chat
+    post(c, event('ADDED_TO_SPACE', 'nitish@teampulse.local'))
+    reply = post(c, chat_event('nitish@teampulse.local', 'screenshot for the employe documnt work',  # typos on purpose
+                               'spaces/nitish/messages/40', [upload(ref='r/named')])).json()['text']
+    assert reply.startswith('Attached to *Employee document module*: screenshot.png')
+    with sessions() as db:
+        assert db.scalar(select(Attachment)).work_item_id == 1
+        assert not db.scalar(select(CheckIn.id).where(CheckIn.kind == 'file'))
+
+
+def test_the_file_question_takes_a_name_and_an_unrelated_reply_keeps_it_open(chat):
+    """Seen in the pilot: answering by name dropped the question, and the file was never saved."""
+    c, sessions, _ = chat
+    post(c, event('ADDED_TO_SPACE', 'nitish@teampulse.local'))
+    question = post(c, chat_event('nitish@teampulse.local', '', 'spaces/nitish/messages/50', [upload(ref='r/q')])).json()['text']
+    assert question.startswith('Which of your commitments is this for?')
+    post(c, event('MESSAGE', 'nitish@teampulse.local', 'Summarize my commitments', name='spaces/nitish/messages/51'))
+    with sessions() as db:
+        assert db.scalar(select(CheckIn).where(CheckIn.kind == 'file')).status == 'Clarifying'  # still waiting, file kept
+    answer = post(c, event('MESSAGE', 'nitish@teampulse.local', 'the employee documnt one', name='spaces/nitish/messages/52')).json()['text']
     assert answer.startswith('Attached to *Employee document module*')
     with sessions() as db:
         assert db.scalar(select(Attachment)).work_item_id == 1

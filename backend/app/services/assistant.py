@@ -54,7 +54,11 @@ async def provider_interpret(message, context, history):
               'Ask one concise clarification if an update is ambiguous. Never infer completion, capacity, dates, or dependencies from silence. '
               'Never create duplicate tasks. Propose updates to existing work. Never claim to have saved a proposal. '
               'Only change the current user\'s own work. You may propose request_updates only for IDs in requestable_people, and never claim delivery before confirmation. Do not assign others, change priorities or automatically resolve dependencies. '
-              'For revised dates, ask for a reason if missing. Facts: ' + json.dumps(context))
+              'For revised dates, ask for a reason if missing. '
+              'You cannot change anything yourself: a change happens only when the person confirms your proposal, so never say you '
+              'updated, marked or saved something, and without a proposal do not promise to. Do not invent screens or features. '
+              'In TeamPulse, files and links sent with updates are listed under Files & links on the commitment, on its project, '
+              'and on the Files & links page. Facts: ' + json.dumps(context))
     async with httpx.AsyncClient(timeout=25) as client:
         response = await client.post(base.rstrip('/') + '/chat/completions', headers={'Authorization': 'Bearer ' + key},
             json={'model': model, 'messages': [{'role': 'system', 'content': system}] + history + [{'role': 'user', 'content': message}],
