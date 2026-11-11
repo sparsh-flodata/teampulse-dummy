@@ -7,7 +7,7 @@ class Availability(Input):
     reserved_hours: float = Field(ge=0, le=80)
     capacity_confirmed: bool
     planning: Planning
-    agent_auto_updates: bool = False
+    agent_auto_updates: bool = True
 
 class Preferences(Input):
     proactive_checkins: bool | None = None

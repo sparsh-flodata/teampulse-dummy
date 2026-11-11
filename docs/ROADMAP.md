@@ -30,7 +30,7 @@
 
 - Daily weekday check-ins in AI chat and Google Chat, limited to the pilot by `PROACTIVE_PILOT_EMAILS`, with dry run
   and a kill switch.
-- Replies update work: routine numbers at once (with `undo`), completion, date moves and blockers after `yes`, at
+- Replies update work: status, progress and completion at once (with `undo`), date moves and blockers after `yes`, at
   most two clarifying questions. Manager update requests use the same handling.
 - Files and links from updates, kept as references per commitment and project, plus a `/files` page.
 - Left before going live: verify Chat attachment download with a real file, then a dry-run day. See

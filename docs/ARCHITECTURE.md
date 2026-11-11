@@ -51,11 +51,11 @@ Adding a dependency (from the create form, a commitment's Dependencies tab, the 
 
 ## Internal agent ingestion
 
-`backend/app/agents/graph.py` is a LangGraph state graph: `gather_context → route → agent → validate → policy`. The agents are coordination (request updates), planning (new commitment), progress (own selected work), dependency (what selected work waits on), briefing (own week, or a manager's reporting team, from records), model (the configured chat-completions provider, e.g. Groq via `AI_BASE_URL`/`AI_MODEL`/`AI_API_KEY`) and guide. Agents only propose. `validate` re-checks permissions; `policy` allows auto-apply only for explicit progress numbers under the person's opt-in. Confirmed proposals go through the ordinary services. Each assistant message records which agent answered. In-app chat and Google Chat both enter through `services/proactive.handle_inbound` (below); messages that are not check-in business reach this graph.
+`backend/app/agents/graph.py` is a LangGraph state graph: `gather_context → route → agent → validate → policy`. The agents are coordination (request updates), planning (new commitment), progress (own selected work), dependency (what selected work waits on), briefing (own week, or a manager's reporting team, from records), model (the configured chat-completions provider, e.g. Groq via `AI_BASE_URL`/`AI_MODEL`/`AI_API_KEY`) and guide. Agents only propose. `validate` re-checks permissions; `policy` applies at once any update to the person's own work that only changes status, progress or hours and that the message states (`checkin_reply.stated_in`), under `agent_auto_updates` (on by default). Confirmed proposals go through the ordinary services. Each assistant message records which agent answered. In-app chat and Google Chat both enter through `services/proactive.handle_inbound` (below); messages that are not check-in business reach this graph.
 
 Message receipts bind `(employee_id, request_id)` to a content fingerprint and response. Repeated messages return the original result; identifier reuse with different content is rejected. Proposed updates retain a base snapshot. Application claims the action, refreshes/locks work, and rejects a changed snapshot before writing. Failed changes roll back.
 
-Employees may opt into automatic saving of explicit progress percentages/remaining hours. This requires the same result from deterministic parsing of the source message. Completion, new commitments, and date changes remain proposed changes requiring confirmation. Private conversation histories are excluded from individual work dashboards.
+Direct updates (status, progress, hours, completion) are recorded as `AgentAction(status='Applied')` with before/after snapshots, and for a completion the dependencies it fulfilled, so `undo` can reverse them for `UNDO_WINDOW_MINUTES`. Numbers must appear in the message and completion needs an unhedged completion word. New commitments, date changes, dependencies and update requests remain proposals requiring confirmation. Private conversation histories are excluded from individual work dashboards.
 
 ## Employee update coordination
 
@@ -78,9 +78,9 @@ Design and decisions: `docs/PROACTIVE_ASSISTANT_PLAN.md`. Operation: `docs/PILOT
   a pending yes/no, a reply to the newest open check-in, otherwise the assistant graph. Receipts deduplicate retries.
 - **Reply handling** (`services/checkin_reply.py`). The deterministic parser reads the reply first; the model is
   asked only when the parser is unsure. Every extracted value must appear in the message (validation runs on both
-  paths). Progress, hours and the start of work apply at once as `AgentAction(source='checkin', status='Applied')`
-  with before/after snapshots for `undo`. Completion, date moves (with a reason) and blockers become proposals
-  confirmed by `yes` or the in-app card. Ambiguity gets one templated question at a time, two rounds at most.
+  paths). Progress, hours, the start of work and completion apply at once as `AgentAction(source='checkin',
+  status='Applied')` with before/after snapshots for `undo`. Date moves (with a reason) and blockers become
+  proposals confirmed by `yes` or the in-app card. Ambiguity gets one templated question at a time, two rounds at most.
   Confirmed slips and blockers notify the manager. Reply text comes from templates, never from the model.
 - **Files and links** (`services/attachments.py`, `api/routes/attachments.py`). References only: Chat attachment
   resource names, Drive file ids, or URLs, one row per commitment. Listing and opening re-check `visible_work`.

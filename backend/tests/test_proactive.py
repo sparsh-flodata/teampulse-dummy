@@ -9,7 +9,7 @@ from test_workflows import ctx, login
 from test_google_chat import chat, event, post
 from backend.app.core import config
 from backend.app.channels import google_chat
-from backend.app.models import (AgentAction, Attachment, AuditEvent, ChatLink, CheckIn, Commitment, Conversation, Employee, Notification,
+from backend.app.models import (AgentAction, Attachment, AuditEvent, ChatLink, CheckIn, Commitment, Conversation, Dependency, Employee, Notification,
                                 OutboxMessage, WorkItem, now)
 from backend.app.services import proactive, checkin_reply
 from backend.app.services.work import business_day, latest_commitment, today
@@ -171,21 +171,47 @@ def test_undo_leaves_work_that_moved_on(ctx, on):
     assert work(c, 1)['progress'] == 35
 
 
-def test_completion_waits_for_yes_and_no_leaves_it(ctx, on):
+def test_completion_applies_at_once_and_undo_reverses_it(ctx, on):
     c, sessions = ctx
     with sessions() as db:
         stale(db, 1, 12)
     run(sessions)
     login(c)
-    proposed = say(c, '2 is done')
-    assert 'Mark **Employee document module** as done? Reply `yes` or `no`.' in proposed['reply']
-    assert proposed['action']['status'] == 'Proposed' and work(c, 1)['status'] != 'Completed'
-    assert checkin(sessions, 1).status == 'Confirming'
-    assert say(c, 'no')['reply'].startswith('OK, I left it')
+    done = say(c, '2 is done')
+    assert done['auto_applied'] and '**Employee document module**' in done['reply'] and 'completed' in done['reply']
+    assert 'Say `undo`' in done['reply'] and work(c, 1)['status'] == 'Completed'
+    assert checkin(sessions, 1).status == 'Open'  # item 1 still needs an answer
+    assert say(c, 'undo')['reply'].startswith('Undone:')
     assert work(c, 1)['status'] != 'Completed'
-    say(c, '2 is finished')
-    assert say(c, 'yes')['reply'].startswith('Done:')
-    assert work(c, 1)['status'] == 'Completed'
+
+
+def test_undoing_a_completion_reopens_the_dependency_it_fulfilled(ctx, on):
+    c, sessions = ctx
+    with sessions() as db:
+        stale(db, 1, 12)
+        dep_id = db.scalar(select(Dependency.id).where(Dependency.upstream_work_id == 12))
+        for own in db.scalars(select(Dependency).where(Dependency.work_item_id == 12)):  # 12 may itself wait on something
+            own.status = 'Cancelled'
+        db.commit()
+    run(sessions)
+    login(c)
+    assert say(c, '1 is done')['auto_applied']
+    with sessions() as db:
+        assert db.get(Dependency, dep_id).status == 'Verified'
+    assert say(c, 'undo')['reply'].startswith('Undone:')
+    with sessions() as db:
+        assert db.get(Dependency, dep_id).status != 'Verified'
+        assert db.scalar(select(Notification.id).where(Notification.key.like(f'dep-reopened:{dep_id}:%')))
+
+
+def test_the_free_form_assistant_saves_stated_changes_and_undo_covers_them(ctx):
+    c, sessions = ctx
+    login(c)
+    saved = say(c, 'Finished', work_item_id=1)
+    assert saved['auto_applied'] and saved['action']['status'] == 'Applied' and work(c, 1)['status'] == 'Completed'
+    assert say(c, 'undo')['reply'].startswith('Undone:') and work(c, 1)['status'] != 'Completed'
+    hedged = say(c, 'almost finished', work_item_id=1)
+    assert not hedged['auto_applied'] and work(c, 1)['status'] != 'Completed'
 
 
 def test_hedged_completion_is_never_completed(ctx, on):
@@ -542,7 +568,7 @@ def test_check_in_expiry_dismisses_waiting_proposals(ctx, on):
         stale(db, 1, 12)
     run(sessions)
     login(c)
-    action = say(c, '2 is done')['action']
+    action = say(c, '2 is blocked, waiting on Ananya Rao for the upload API')['action']  # a blocker still waits for a yes
     with sessions() as db:
         ci = db.scalar(select(CheckIn).where(CheckIn.employee_id == 1))
         ci.expires_at = now() - timedelta(minutes=1)
@@ -557,7 +583,7 @@ def test_the_proposal_card_also_moves_the_check_in_on(ctx, on):
         stale(db, 1, 12)
     run(sessions)
     login(c)
-    action = say(c, '2 is done')['action']
+    action = say(c, '2 is blocked, waiting on Ananya Rao for the upload API')['action']
     assert c.post(f'/api/assistant/actions/{action["id"]}/decide', json={'approve': True}).json()['status'] == 'Approved'
-    assert work(c, 1)['status'] == 'Completed'
+    assert work(c, 1)['status'] == 'Partially Blocked'
     assert checkin(sessions, 1).status == 'Open'  # item 1 is still unanswered

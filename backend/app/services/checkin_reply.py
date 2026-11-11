@@ -31,7 +31,7 @@ from backend.app.models import AgentAction, Dependency, Employee, Project, Updat
 from backend.app.schemas import UpdateReply, WorkPatch
 from backend.app.services import attachments as files
 from backend.app.services.formatting import to_plain
-from backend.app.services.work import business_day, latest_commitment, notify, patch_work, today
+from backend.app.services.work import OPEN_DEP, audit, business_day, latest_commitment, notify, patch_work, sync_blocked, today
 
 log = logging.getLogger('teampulse.checkin')
 
@@ -139,6 +139,30 @@ def parse_date(text: str, base: date) -> date | None:
             ahead = (i - base.weekday()) % 7 or 7
             return base + timedelta(days=ahead)
     return None
+
+
+REVIEW = re.compile(r'\b(?:ready for review|for review|to review|verif(?:y|ied|ication)|review)\b', re.I)
+UNDOABLE = ('checkin', 'chat')  # applied directly, so `undo` can reverse them
+
+
+def stated_in(proposal: dict, message: str) -> bool:
+    """True when the message itself says every change in this update (status, progress, remaining hours).
+    Numbers must appear in the message; completion needs a completion word, no hedge, and no progress under 100%."""
+    if not any(proposal.get(k) is not None for k in ('status', 'progress', 'remaining_hours')):
+        return False
+    status = proposal.get('status')
+    if status == 'Completed':  # completion sets 100% and 0h itself, so the model's numbers are not checked here
+        progress = proposal.get('progress')
+        return bool(COMPLETION.search(message)) and not HEDGE.search(message) and not (progress is not None and progress < 100)
+    if proposal.get('progress') is not None and not _literal(int(proposal['progress']), message):
+        return False
+    if proposal.get('remaining_hours') is not None and not _literal(float(proposal['remaining_hours']), message):
+        return False
+    if status == 'In Progress':
+        return bool(STARTED.search(message) or PERCENT.search(message) or HOURS.search(message))
+    if status == 'Awaiting Verification':
+        return bool(REVIEW.search(message))
+    return status is None
 
 
 def short_date(d: date, base: date | None = None) -> str:
@@ -671,6 +695,24 @@ def apply_updates(db, employee, thread: Thread, updates: list[ItemUpdate], chann
         if u.skip and not any(v is not None for v in (u.progress, u.remaining_hours, u.status, u.new_due_date)):
             thread.pending['answered'].append(u.n)
             continue
+        if u.status == 'Completed':
+            # Completion applies at once; `undo` reverses it, including any dependency it fulfilled.
+            payload = _proposal(kind='update', work_item_id=work.id, status='Completed',
+                                note=f'Completed, from {employee.name}\'s check-in reply: "{u.evidence[:200]}"')
+            action = AgentAction(employee_id=employee.id, payload=payload.model_dump_json(), source='checkin', status='Proposed',
+                                 check_in_id=thread.check_in.id, base_snapshot=json.dumps(_snapshot(db, work)))
+            db.add(action)
+            db.flush()
+            try:
+                with db.begin_nested():
+                    turn.saved.append(apply_tracked_action(db, employee, action, stamp))
+                turn.applied_ids.append(action.id)
+            except HTTPException as exc:
+                action.status = 'Dismissed'
+                turn.notes.append(f'I couldn\'t mark **{short_title(_md(work.title))}** as done: {exc.detail}')
+            if u.n not in thread.pending['answered']:
+                thread.pending['answered'].append(u.n)
+            continue
         routine = {k: v for k, v in (('progress', u.progress), ('remaining_hours', u.remaining_hours),
                                     ('status', 'In Progress' if u.status == 'In Progress' and work.status in ('Planned',) else None)) if v is not None}
         if routine:
@@ -686,9 +728,6 @@ def apply_updates(db, employee, thread: Thread, updates: list[ItemUpdate], chann
             turn.applied_ids.append(action.id)
             turn.saved.append(f'**{short_title(_md(work.title))}**: {_summary(work, before)}')
         proposals = []
-        if u.status == 'Completed':
-            proposals.append(_proposal(kind='update', work_item_id=work.id, status='Completed',
-                                       note=f'Completed, from {employee.name}\'s check-in reply: "{u.evidence[:200]}"'))
         if u.new_due_date:
             if u.reason and len(u.reason.strip()) >= 3:
                 proposals.append(_proposal(kind='update', work_item_id=work.id, due_date=u.new_due_date, note=u.reason.strip()[:500]))
@@ -725,6 +764,25 @@ def apply_updates(db, employee, thread: Thread, updates: list[ItemUpdate], chann
         if routine or u.skip or (not proposals and not any(q.get('n') == u.n for q in questions)):
             if u.n not in thread.pending['answered']:
                 thread.pending['answered'].append(u.n)
+
+
+def apply_tracked_action(db, user, action, stamp=None) -> str:
+    """Apply an update proposal now and keep what `undo` needs: the work before and after, and for a completion
+    the dependencies it fulfilled. Raises HTTPException (nothing applied) when the change is not allowed."""
+    from backend.app.services.assistant import apply_proposal
+    payload = json.loads(action.payload)
+    work = db.get(WorkItem, payload.get('work_item_id'))
+    if not work or work.owner_id != user.id:
+        raise HTTPException(403, 'Only your own work can be updated this way.')
+    before = _snapshot(db, work)
+    deps = {}
+    if payload.get('status') == 'Completed':
+        deps = {str(d.id): d.status for d in db.scalars(select(Dependency).where(
+            Dependency.upstream_work_id == work.id, Dependency.status.in_(OPEN_DEP)))}
+    apply_proposal(db, user, action)
+    action.status, action.applied_at = 'Applied', stamp or now()
+    action.base_snapshot = json.dumps({'before': before, 'after': _snapshot(db, work), 'deps': deps}, default=str)
+    return f'**{short_title(_md(work.title))}**: {_summary(work, before)}'
 
 
 def _same_kind(old: dict, proposals) -> bool:
@@ -856,15 +914,15 @@ def _next_question(db, thread: Thread) -> list[str]:
 
 def undo(db, employee) -> str:
     since = now() - timedelta(minutes=config.UNDO_WINDOW_MINUTES)
-    latest = db.scalar(select(AgentAction).where(AgentAction.employee_id == employee.id, AgentAction.source == 'checkin',
+    latest = db.scalar(select(AgentAction).where(AgentAction.employee_id == employee.id, AgentAction.source.in_(UNDOABLE),
                                                  AgentAction.status == 'Applied', AgentAction.applied_at >= since)
                        .order_by(AgentAction.applied_at.desc(), AgentAction.id.desc()).limit(1))
     if not latest:
         return f'There\'s nothing to undo from the last {config.UNDO_WINDOW_MINUTES // 60 or config.UNDO_WINDOW_MINUTES} hours.' \
             if config.UNDO_WINDOW_MINUTES >= 60 else 'There\'s nothing recent to undo.'
-    group = list(db.scalars(select(AgentAction).where(AgentAction.employee_id == employee.id, AgentAction.source == 'checkin',
+    group = list(db.scalars(select(AgentAction).where(AgentAction.employee_id == employee.id, AgentAction.source.in_(UNDOABLE),
                                                       AgentAction.status == 'Applied', AgentAction.applied_at == latest.applied_at)
-                            .order_by(AgentAction.id)))
+                            .order_by(AgentAction.id.desc())))  # newest first
     restored, moved = [], []
     for action in group:
         payload = json.loads(action.payload)
@@ -877,10 +935,13 @@ def undo(db, employee) -> str:
         if work.owner_id != employee.id or _snapshot(db, work) != after:
             moved.append(f'**{title}**')
             continue
+        for dep_id, status in (states.get('deps') or {}).items():
+            _reopen_dependency(db, employee, int(dep_id), status, action.id)
         changes = {k: before[k] for k in ('progress', 'remaining_hours', 'status') if before[k] != after[k]}
-        patch_work(db, employee, work, WorkPatch(note='Undone from check-in', **changes))
+        patch_work(db, employee, work, WorkPatch(note='Undone from chat', **changes))
         action.status = 'Undone'
-        restored.append(f'**{title}**: back to {before["progress"]}%, {_fmt_hours(before["remaining_hours"])}h left')
+        status = f', {before["status"].lower()}' if before['status'] != after['status'] else ''
+        restored.append(f'**{title}**: back to {before["progress"]}%, {_fmt_hours(before["remaining_hours"])}h left{status}')
     parts = []
     if restored:
         parts.append('Undone:\n' + '\n'.join('- ' + r for r in restored))
@@ -889,9 +950,24 @@ def undo(db, employee) -> str:
     return '\n\n'.join(parts) or 'There\'s nothing to undo.'
 
 
+def _reopen_dependency(db, employee, dep_id: int, status: str, action_id: int):
+    """Undoing a completion: a dependency it fulfilled goes back to where it was, and its requester is told."""
+    dep = db.get(Dependency, dep_id)
+    if not dep or dep.status != 'Verified':
+        return
+    dep.status = status
+    db.flush()
+    waiting = db.get(WorkItem, dep.work_item_id)
+    if waiting:
+        sync_blocked(db, waiting)
+    audit(db, employee, f'Dependency “{dep.deliverable}” reopened: the commitment behind it is not complete after all.', dep.work_item_id)
+    notify(db, dep.requester_id, f'dep-reopened:{dep.id}:{action_id}',
+           f'{dep.deliverable} was reopened: the commitment behind it is not complete after all.', dep.work_item_id)
+
+
 def undo_available(db, employee) -> bool:
     since = now() - timedelta(minutes=config.UNDO_WINDOW_MINUTES)
-    return bool(db.scalar(select(AgentAction.id).where(AgentAction.employee_id == employee.id, AgentAction.source == 'checkin',
+    return bool(db.scalar(select(AgentAction.id).where(AgentAction.employee_id == employee.id, AgentAction.source.in_(UNDOABLE),
                                                        AgentAction.status == 'Applied', AgentAction.applied_at >= since).limit(1)))
 
 
@@ -1069,6 +1145,7 @@ async def handle(db, employee, check_in, text: str, *, channel: str, chat_attach
     if turn.saved:
         parts.append('Saved:\n' + '\n'.join('- ' + s for s in turn.saved))
     parts += turn.attached
+    parts += turn.notes
     waiting = _pending_actions(db, thread)
     if waiting:
         parts.append(confirm_text(db, waiting))

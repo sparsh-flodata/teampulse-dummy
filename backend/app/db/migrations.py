@@ -57,3 +57,7 @@ def migrate(engine):
         if 6 not in applied:
             # New tables (check_ins, attachments) come from create_all above; columns from the additions map.
             conn.execute(text("INSERT INTO schema_migrations(version, description) VALUES(6, 'Proactive check-ins, attachments, and undo support')"))
+        if 7 not in applied:
+            # Status, progress and hours from chat now save at once (with undo) for everyone; Settings can turn it off.
+            conn.execute(text('UPDATE employees SET agent_auto_updates = true'))
+            conn.execute(text("INSERT INTO schema_migrations(version, description) VALUES(7, 'Direct status and progress updates from chat, with undo')"))

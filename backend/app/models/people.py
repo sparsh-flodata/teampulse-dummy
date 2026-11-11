@@ -19,7 +19,7 @@ class Employee(Base):
     password_hash: Mapped[str] = mapped_column(Text)
     role: Mapped[str] = mapped_column(String(20), default='employee')
     active: Mapped[bool] = mapped_column(Boolean, default=True)
-    agent_auto_updates: Mapped[bool] = mapped_column(Boolean, default=False)
+    agent_auto_updates: Mapped[bool] = mapped_column(Boolean, default=True)  # direct status/progress updates from chat, with undo
     title: Mapped[str] = mapped_column(String(120), default='Team member')
     team_id: Mapped[int] = mapped_column(ForeignKey('teams.id'))
     manager_id: Mapped[int | None] = mapped_column(ForeignKey('employees.id'), nullable=True)

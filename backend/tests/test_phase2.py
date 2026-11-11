@@ -153,7 +153,7 @@ def test_channel_message_receipts_are_idempotent_and_bound_to_content(ctx):
         assert db.scalar(select(func.count()).select_from(AgentAction))==1
 
 
-def test_opt_in_automatic_routine_updates_exclude_completion_and_dates(ctx):
+def test_automatic_updates_save_status_and_progress_but_dates_wait(ctx):
     c,_=ctx
     login(c)
     settings={'weekly_hours':40,'reserved_hours':8,'capacity_confirmed':True,'planning':'Hybrid','agent_auto_updates':True}
@@ -162,10 +162,10 @@ def test_opt_in_automatic_routine_updates_exclude_completion_and_dates(ctx):
     assert result['auto_applied'] and result['action']['status']=='Applied'
     work=next(w for w in c.get('/api/state').json()['work'] if w['id']==1)
     assert work['progress']==75 and work['remaining_hours']==5
-    complete=c.post('/api/assistant/chat',json={'message':'Finished','work_item_id':1}).json()
-    assert not complete['auto_applied'] and complete['action']['status']=='Proposed'
     revised=c.post('/api/assistant/chat',json={'message':'Move to '+str(business_day(today(),4))+' because requirements changed','work_item_id':1}).json()
     assert not revised['auto_applied'] and revised['action']['status']=='Proposed'
+    complete=c.post('/api/assistant/chat',json={'message':'Finished','work_item_id':1}).json()
+    assert complete['auto_applied'] and complete['action']['status']=='Applied'
 
 
 def test_additive_migration_preserves_existing_records(tmp_path):
@@ -180,10 +180,10 @@ def test_additive_migration_preserves_existing_records(tmp_path):
     migrate(engine)
     migrate(engine)
     with engine.connect() as conn:
-        assert conn.execute(text('SELECT name,active,agent_auto_updates FROM employees')).one()==('Existing person',1,0)
+        assert conn.execute(text('SELECT name,active,agent_auto_updates FROM employees')).one()==('Existing person',1,1)  # migration 7
         assert conn.execute(text('SELECT name,parent_id,lead_id FROM teams')).one()==('Preserved team',None,None)
         assert conn.execute(text('SELECT base_snapshot FROM agent_actions')).scalar()=='{}'
-        assert conn.execute(text('SELECT COUNT(*) FROM schema_migrations')).scalar()==6
+        assert conn.execute(text('SELECT COUNT(*) FROM schema_migrations')).scalar()==7
         assert conn.execute(text('SELECT proactive_checkins,checkins_paused_until FROM employees')).one()==(1,None)
         assert conn.execute(text("SELECT source,check_in_id FROM agent_actions")).one()==('chat',None)
     engine.dispose()

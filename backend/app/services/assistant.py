@@ -143,10 +143,14 @@ async def converse(db, user, message, work_id, request_id=None, recipient_ids=No
         db.flush()
     auto_applied = False
     if action and state.get('auto_apply'):
-        apply_proposal(db, user, action)
-        action.status = 'Applied'
-        auto_applied = True
-        result.reply = 'Saved your explicit progress update using your automatic-update preference. Completion, new commitments, and delivery-date changes still require confirmation.'
+        from backend.app.services.checkin_reply import apply_tracked_action
+        try:
+            with db.begin_nested():
+                line = apply_tracked_action(db, user, action)
+            auto_applied = True
+            result.reply = 'Saved:\n- ' + line + '\n\nSay `undo` to reverse this.'
+        except HTTPException as exc:
+            result.reply += f'\n\nI couldn\'t save it directly: {exc.detail}'
     result.reply = sanitize(result.reply) or 'I could not put that into words. Please try again.'
     db.add_all([Conversation(employee_id=user.id, role='user', message=message), Conversation(employee_id=user.id, role='assistant', message=result.reply, agent=AGENTS[state['route']])])
     response = {'reply': result.reply, 'mode': mode, 'auto_applied': auto_applied,

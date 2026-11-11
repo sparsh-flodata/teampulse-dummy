@@ -227,20 +227,18 @@ def validate(state: AssistantState, config) -> AssistantState:
 
 
 def policy(state: AssistantState, config) -> AssistantState:
-    """What may apply without the person confirming.
+    """What applies without the person confirming (Employee.agent_auto_updates, on by default).
 
-    Only an explicit progress percentage or remaining-hours update to the user's
-    own selected work, when they opted in, and only when the deterministic parser
-    reads the message the same way. Completion, new work, date changes,
-    dependencies and requests to other people always wait for confirmation.
+    An update to the person's own work that changes only its status, progress or remaining hours applies at once
+    when the message itself states it (stated_in: numbers must appear in it; completion needs a completion word
+    and no hedge). `undo` reverses it for UNDO_WINDOW_MINUTES, including dependencies a completion fulfilled.
+    Delivery-date changes, new work, dependencies and requests to other people always wait for confirmation.
     """
+    from backend.app.services.checkin_reply import stated_in
     db, user = _ctx(config)
     proposal = (state['interpretation'] or {}).get('proposal')
-    allowed = False
-    if proposal and proposal.get('kind') == 'update' and user.agent_auto_updates and state['context']['selected_work_item_id']:
-        routine = proposal.get('status') is None and proposal.get('due_date') is None and (
-            proposal.get('progress') is not None or proposal.get('remaining_hours') is not None)
-        allowed = routine and (_offline(state, config).get('proposal') == proposal)
+    allowed = bool(proposal and proposal.get('kind') == 'update' and user.agent_auto_updates
+                   and proposal.get('due_date') is None and stated_in(proposal, state['message']))
     return {'auto_apply': allowed, 'steps': _step(state, 'policy')}
 
 

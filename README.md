@@ -60,8 +60,8 @@ The in-app channel works end to end. The WhatsApp adapter is intentionally uncon
 On weekdays at `CHECKIN_HOUR` (default 10:00, `ORG_TIMEZONE`), the assistant asks each opted-in person about work that
 needs their word: overdue or due-soon commitments, dependencies they owe, and stale confirmations. That's one message
 a day, in AI chat and as a Google Chat DM when they have connected it. They reply in their own words (`1 is 80%, 2h
-left. 2 is done`). Progress and hours save immediately and can be reversed with `undo` for two hours. Completion,
-date moves and blockers wait for a `yes`. Vague replies get at most two short questions. `pause`, `resume` and
+left. 2 is done`). Status, progress and hours (including completion) save immediately and can be reversed with
+`undo` for two hours. Date moves and blockers wait for a `yes`. Vague replies get at most two short questions. `pause`, `resume` and
 `help` work in both chats, and Settings has a **Check-ins** panel. Manager update requests use the same reply
 handling, so an answer also updates the work.
 
@@ -80,7 +80,7 @@ Without provider credentials, the assistant clearly displays **Offline planning*
 - Select your work item, then: `Finished` (completion is proposed for your confirmation)
 - `Plan: Build the monthly report; 4 hours; due 2026-11-03; project ERP Implementation` (use a current/future date)
 
-Ambiguous/negative completion statements ask for more information. Dependencies use a guided form in offline mode. Significant changes require **Confirm & save**. In Settings, employees may opt into automatic saving of explicit progress percentages and remaining hours for selected work. Completion, delivery dates, and new commitments still require confirmation. Message identifiers deduplicate retries, and stale proposals cannot overwrite newer updates. Conversations are visible only to their author. No external messages or email are sent.
+Ambiguous/negative completion statements ask for more information. Dependencies use a guided form in offline mode. Status, progress and remaining-hour changes to your own work that your message states save at once, including completion; say `undo` within two hours to reverse them (a completion's fulfilled dependencies reopen too). Settings can turn this off. Delivery dates, new commitments, dependencies and update requests still require **Confirm & save**. Message identifiers deduplicate retries, and stale proposals cannot overwrite newer updates. Conversations are visible only to their author. No external messages or email are sent.
 
 For a real model, set `AI_BASE_URL`, `AI_MODEL`, and `AI_API_KEY` on the server. The adapter expects a chat-completions-compatible endpoint at `<AI_BASE_URL>/chat/completions` supporting JSON responses. The signed-in employee's work, visible project names, and requestable reporting-team names/IDs/titles are included as context. The user's message is also sent to the configured provider; private conversations of other people are excluded. If the provider fails, offline planning remains available. Groq (`openai/gpt-oss-120b`) was used with real credentials on
 2026-11-11. For check-in replies the deterministic parser reads first and the model is asked only when it is unsure

@@ -5,9 +5,10 @@ TeamPulse talks to people through a Google Chat app, in direct messages only.
 - **People connect themselves.** Someone opens Google Chat, finds the TeamPulse app and sends it a message. Google tells TeamPulse their verified email. If it matches an active `@flodataanalytics.com` account, that DM becomes their TeamPulse channel. Settings shows "Connected".
 - **Messages in.** Every DM goes through the same router as in-app chat (`services/proactive.py`): the commands
   `pause`, `resume`, `undo` and `help`; a `yes` or `no` to a pending change; a reply to an open check-in or manager
-  request (which also updates the work); otherwise the assistant graph. Check-in changes are confirmed right in
-  the DM with `yes`. Changes the free-form assistant proposes still need confirming in TeamPulse; the reply includes
-  the link.
+  request (which also updates the work); otherwise the assistant graph. Status, progress and completion of your own
+  work save at once (`undo` reverses them for two hours). Date moves and blockers from a check-in are confirmed in
+  the DM with `yes`; other proposals (new commitments, update requests) are confirmed in TeamPulse, and the reply
+  includes the link.
 - **Files.** A file or link sent with an update is recorded against the commitment it is about. If that can't be
   told, the app asks which item. TeamPulse stores a reference, not the file, and opens uploads by fetching them
   from the Chat API.
@@ -61,8 +62,8 @@ With Docker Compose, point `GOOGLE_CHAT_SERVICE_ACCOUNT_FILE` at the key on the 
 
 ## Limits for now
 
-- Only text messages: no cards or buttons yet. Check-in changes are confirmed with `yes`/`no` in the DM; other
-  proposed changes are confirmed in TeamPulse.
+- Only text messages: no cards or buttons yet. Check-in date moves and blockers are confirmed with `yes`/`no` in
+  the DM; other proposals are confirmed in TeamPulse.
 - Not yet verified with a real file: whether the app's credentials can download an uploaded attachment. If not,
   Open shows "Google Chat did not return this file", and people should share from Drive instead.
 - Delivery retries 5 times, then marks the message Failed. The request itself stays in the TeamPulse inbox.

@@ -542,7 +542,9 @@ Tabs use the existing `TabPanel`, so they get the same transitions.
 
 ## 14. Decisions made here (change them before building if you disagree)
 
-1. Routine numbers from a check-in reply apply without confirmation. Completion, date moves and blockers wait for a yes.
+1. Status, progress and hours apply without confirmation, from check-in replies and the free-form assistant alike.
+   Completion too (changed 2026-11-11 at the user's request; `undo` reverses it, including dependencies it fulfilled).
+   Date moves and blockers wait for a yes.
 2. One daily check-in, weekdays at 10:00 in one org timezone. No reminders on silence.
 3. The model extracts and code writes the replies (templates), so wording stays predictable and checkable.
 4. Undo window: 2 hours.

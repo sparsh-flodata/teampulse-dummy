@@ -135,9 +135,9 @@ export function SettingsPage() {
               )}
             </form.Field>
             <span>
-              Automatically save explicit progress percentages and remaining
-              hours for selected work. Completion, new commitments, and
-              delivery-date changes still require confirmation.
+              Save status, progress and remaining hours from chat right away.
+              Say undo within two hours to reverse it. Delivery-date changes,
+              new commitments and blockers still ask first.
             </span>
           </label>
           {error && <div className="error">{error}</div>}
