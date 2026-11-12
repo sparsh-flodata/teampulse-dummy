@@ -36,6 +36,8 @@ services:
       AI_BASE_URL: ${AI_BASE_URL:-}
       AI_MODEL: ${AI_MODEL:-}
       AI_API_KEY: ${AI_API_KEY:-}
+      # Speech-to-text for Google Chat voice notes (same provider; Groq Whisper by default).
+      TRANSCRIBE_MODEL: ${TRANSCRIBE_MODEL:-}
       # Proactive assistant (docs/PROACTIVE_ASSISTANT_PLAN.md): off, and in dry run, unless .env says otherwise.
       PROACTIVE_ENABLED: ${PROACTIVE_ENABLED:-false}
       PROACTIVE_DRY_RUN: ${PROACTIVE_DRY_RUN:-true}

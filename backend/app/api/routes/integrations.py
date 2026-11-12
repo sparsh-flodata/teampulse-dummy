@@ -18,6 +18,7 @@ from backend.app.db.session import get_db
 from backend.app.models import ChatLink, Employee, MessageReceipt
 from backend.app.services.formatting import to_google_chat
 from backend.app.services.proactive import handle_inbound
+from backend.app.services import voice
 
 router = APIRouter()
 log = logging.getLogger('teampulse.google_chat')
@@ -117,6 +118,22 @@ async def google_chat_events(request: Request, db: Session = Depends(get_db)):
     if receipt:
         return _reply(json.loads(receipt.response_json).get('reply', ''), addon)
 
+    # A voice note becomes text first; from here on it is handled exactly like a typed message.
+    heard = ''
+    notes = voice.voice_notes(attachments)
+    if notes:
+        attachments = [a for a in attachments if a not in notes]  # the audio itself is not kept
+        if not voice.enabled():
+            return _reply('Voice notes need speech-to-text, which is not set up for this workspace yet. Please type your update.', addon)
+        try:
+            heard = await voice.transcribe(notes[0])
+        except Exception as exc:  # the provider, the download or the time limit; never log the audio or the words
+            log.warning('Voice note could not be transcribed (%s).', type(exc).__name__)
+            return _reply('I couldn\'t make out that voice note. Please try again, or type it.', addon)
+        if not heard:
+            return _reply('I couldn\'t hear any words in that voice note. Please try again, or type it.', addon)
+        text = f'{text}\n{heard}'.strip() if text else heard
+
     # Commands, a pending yes/no, a reply to a check-in or manager request, else the assistant (plan 6).
     try:
         result = await handle_inbound(db, employee, text[:4000], 'google_chat', request_id,
@@ -129,6 +146,8 @@ async def google_chat_events(request: Request, db: Session = Depends(get_db)):
     if action and action.get('status') == 'Proposed' and result.get('agent') != 'Check-in agent':
         link = app_link('/chat')
         answer += '\n\nThis is only a draft. Open TeamPulse, AI chat, to review and confirm it' + (f': {link}' if link else '.')
+    if heard:  # show what was heard, so a misheard word is easy to spot (and `undo` covers it)
+        answer = f'Heard: "{heard[:500]}"\n\n{answer}'
     return _reply(answer, addon)
 
 

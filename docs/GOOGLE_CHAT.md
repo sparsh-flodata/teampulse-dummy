@@ -9,6 +9,9 @@ TeamPulse talks to people through a Google Chat app, in direct messages only.
   work save at once (`undo` reverses them for two hours). Date moves and blockers from a check-in are confirmed in
   the DM with `yes`; other proposals (new commitments, update requests) are confirmed in TeamPulse, and the reply
   includes the link.
+- **Voice notes.** A voice note is downloaded from the Chat API, transcribed with the AI provider's speech-to-text
+  (`/audio/transcriptions`; Groq Whisper by default, `TRANSCRIBE_MODEL` to change it), and handled exactly like a
+  typed message. The reply starts with what was heard. The audio is never stored or logged.
 - **Files.** A file or link sent with an update is recorded against the commitment it is about. If that can't be
   told, the app asks which item. TeamPulse stores a reference, not the file, and opens uploads by fetching them
   from the Chat API.
