@@ -38,10 +38,6 @@ def seed(db):
     db.add_all([ProjectMember(project_id=pid, employee_id=person[0]) for pid, _, _, team_id, _ in projects
                 for person in people if person[5] == team_id])
     db.flush()
-    # Project membership is explicit: everyone on the demo projects is added, here by department.
-    db.add_all([ProjectMember(project_id=pid, employee_id=person[0]) for pid, _, _, team_id, _ in projects
-                for person in people if person[5] == team_id])
-    db.flush()
     tasks = [
         (1, 'Employee document module', 1, 1, 'In Progress', 'High', 65, 12, 2, 'Python', False),
         (2, 'Publish the updated database schema', 1, 2, 'In Progress', 'Urgent', 80, 10, -1, 'PostgreSQL', True),
