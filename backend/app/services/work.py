@@ -24,25 +24,23 @@ def manager(user):
     return user.role in ('manager', 'admin')
 
 def project_member_ids(db, project):
-    department = set(db.scalars(select(Employee.id).where(Employee.team_id == project.team_id, Employee.active.is_(True))))
-    invited = set(db.scalars(select(ProjectMember.employee_id).join(Employee, Employee.id == ProjectMember.employee_id).where(ProjectMember.project_id == project.id, Employee.active.is_(True))))
-    return department | invited
+    """The people on a project: those added to it (assigning someone work there adds them)."""
+    return set(db.scalars(select(ProjectMember.employee_id).join(Employee, Employee.id == ProjectMember.employee_id)
+                          .where(ProjectMember.project_id == project.id, Employee.active.is_(True))))
 
 
 def participates_in_project(db, person, project):
-    return bool(person and person.active and project and not project.archived and
-                (person.team_id == project.team_id or db.get(ProjectMember, (project.id, person.id))))
+    """On the project: added to it. Being in the department that owns it does not count."""
+    return bool(person and person.active and project and not project.archived and db.get(ProjectMember, (project.id, person.id)))
 
 
 def involved_project_ids(db, user):
-    """Live projects the person, or anyone below them in the reporting line, is involved in: their department's
-    projects, projects they were added to, and projects where they have a commitment."""
+    """Live projects the person, or anyone below them in the reporting line, is involved in: projects they were added
+    to, and projects where they have open work. Department is not a check."""
     people = {user.id} | descendants(db, user.id)
-    departments = select(Employee.team_id).where(Employee.id.in_(people))
     memberships = select(ProjectMember.project_id).where(ProjectMember.employee_id.in_(people))
-    assigned = select(WorkItem.project_id).where(WorkItem.owner_id.in_(people))
-    return select(Project.id).where(Project.archived.is_(False), or_(
-        Project.team_id.in_(departments), Project.id.in_(memberships), Project.id.in_(assigned)))
+    assigned = select(WorkItem.project_id).where(WorkItem.owner_id.in_(people), WorkItem.status != 'Completed')
+    return select(Project.id).where(Project.archived.is_(False), or_(Project.id.in_(memberships), Project.id.in_(assigned)))
 
 
 def visible_projects(db, user):
@@ -140,7 +138,7 @@ def create_work(db, user, body: WorkCreate):
     return work
 
 def ensure_participant(db, user, person, project):
-    """Adds the person to the project if they are not in its department or already invited."""
+    """Adds the person to the project if they are not on it yet."""
     if not participates_in_project(db, person, project):
         db.add(ProjectMember(project_id=project.id, employee_id=person.id))
         db.flush()

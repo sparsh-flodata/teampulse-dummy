@@ -159,6 +159,7 @@ export function ProjectPage({
             teams={state.teams}
             onProfile={(id) => void nav.openProfile(id)}
             onWork={actions.openWork}
+            onLeft={() => void nav.go("Projects")}
           />
         )}
         {tab === "Activity" && (

@@ -61,6 +61,13 @@ All 58 supplied company emails are ready. The initial password is `TeamPulse-dem
   achieved. People with a team also get a **Team's** tab listing everyone below them with a progress bar. A roadmap
   is visible to its owner and their seniors only. The data is dummy, generated per person on the server.
 
+## Project membership
+
+You see your own commitments, and every commitment in projects you, or anyone below you, are on. Being in the
+department that owns a project does not count. On a project's **People** tab, administrators and managers on the
+project add and remove people, and anyone can **Leave project**; both are refused while the person still has open
+commitments there. The Projects page marks the ones you're on and has a **My projects** tab.
+
 ## AI chat and update requests
 
 Open **AI chat** for private instructions and work planning. Ask `Take an update from Kapil Sharma about the client review`, or select teammates through **Add people**. Review the proposed recipients and prompt, then choose **Request updates**. Requests appear in the employee's **My inbox**; **Reply & update** saves a response and optionally updates their selected work item. The requester sees the response under **Requested**. Permissions are checked when drafting, sending, and replying. Existing pending requests are reused to avoid repeated reminders.

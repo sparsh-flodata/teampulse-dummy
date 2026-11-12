@@ -844,3 +844,54 @@
 .focus-footer {
   padding: 10px 16px;
 }
+
+/* Project membership: the People tab bar, and "My projects" on the Projects page. */
+.projects-page,
+.pj-people-page {
+  display: grid;
+  gap: 14px;
+}
+.projects-scope {
+  justify-self: start;
+}
+.projects-scope small {
+  margin-left: 6px;
+  color: var(--color-muted);
+  font-size: var(--text-9);
+}
+.pj-membership {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+}
+.pj-membership h2 {
+  margin: 0;
+  font-size: var(--text-11);
+}
+.pj-membership p {
+  margin: 2px 0 0;
+  color: var(--color-muted);
+  font-size: var(--text-9);
+}
+.pj-membership-actions,
+.pj-add-person {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.pj-add-person select {
+  min-width: 0;
+  max-width: 280px;
+}
+.pj-member-action {
+  justify-self: start;
+}
+.pj-member-action.is-armed {
+  border-color: var(--color-late-ink);
+  background: var(--color-late-soft);
+  color: var(--color-late-ink);
+}

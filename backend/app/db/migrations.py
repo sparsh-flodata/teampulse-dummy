@@ -64,3 +64,6 @@ def migrate(engine):
             conn.execute(text("INSERT INTO schema_migrations(version, description) VALUES(7, 'Direct status and progress updates from chat, with undo')"))
         if 8 not in applied:
             conn.execute(text("INSERT INTO schema_migrations(version, description) VALUES(8, 'Knock knock on commitments')"))
+        if 9 not in applied:
+            # Department no longer makes someone part of a project; membership is explicit (added, or assigned work).
+            conn.execute(text("INSERT INTO schema_migrations(version, description) VALUES(9, 'Explicit project membership: add, remove, leave')"))

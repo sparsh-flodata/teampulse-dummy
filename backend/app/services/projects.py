@@ -26,14 +26,11 @@ def project_detail(db, user, project_id: int) -> dict:
     ids = {w['id'] for w in serialized}
     team = db.get(Team, project.team_id)
 
-    # People involved: the owning department, invited participants, and anyone owning work here.
-    department = list(db.scalars(select(Employee).where(Employee.team_id == project.team_id, Employee.active.is_(True))))
+    # People involved: members (added, or assigned work here), and anyone else owning work here.
     invited = list(db.scalars(select(Employee).join(ProjectMember, ProjectMember.employee_id == Employee.id)
                               .where(ProjectMember.project_id == project.id, Employee.active.is_(True))))
     owners = {w['owner_id'] for w in serialized if w['owner_id']}
     people, involvement = {}, {}
-    for person in department:
-        people[person.id], involvement[person.id] = person, 'Department'
     for person in invited:
         people.setdefault(person.id, person)
         involvement.setdefault(person.id, 'Invited')
@@ -95,5 +92,52 @@ def project_detail(db, user, project_id: int) -> dict:
             'is_member': member,
             'can_take': member or manager(user),
             'can_create': member or manager(user),
+            # Administrators, and managers on the project, add and remove people; anyone on it can leave.
+            'can_manage_members': can_manage_members(db, user, project),
+            'can_leave': member,
         },
     }
+
+
+# ---- Membership -------------------------------------------------------------------------------------
+
+def can_manage_members(db, user, project) -> bool:
+    return user.role == 'admin' or (user.role == 'manager' and participates_in_project(db, user, project))
+
+
+def add_project_member(db, actor, person, project):
+    from backend.app.models import ProjectMember, now
+    from backend.app.services.work import audit, notify
+    if not person or not person.active:
+        raise HTTPException(422, 'Choose an active teammate.')
+    if db.get(ProjectMember, (project.id, person.id)):
+        raise HTTPException(409, f'{person.name} is already on this project.')
+    db.add(ProjectMember(project_id=project.id, employee_id=person.id))
+    db.flush()
+    audit(db, actor, f'Added {person.name} to the project "{project.name}".')
+    if person.id != actor.id:
+        notify(db, person.id, f'project-added:{project.id}:{person.id}:{now():%Y%m%d%H%M%S%f}',
+               f'{actor.name} added you to the project "{project.name}".')
+
+
+def remove_project_member(db, actor, person, project):
+    """Leave a project, or remove someone from it. Refused while they have open commitments there."""
+    from backend.app.models import ProjectMember, WorkItem, now
+    from backend.app.services.work import audit, notify
+    open_work = list(db.scalars(select(WorkItem).where(WorkItem.project_id == project.id, WorkItem.owner_id == person.id,
+                                                       WorkItem.status != 'Completed').order_by(WorkItem.id)))
+    if open_work:
+        titles = ', '.join(f'"{w.title}"' for w in open_work[:4]) + (f' and {len(open_work) - 4} more' if len(open_work) > 4 else '')
+        who = 'You have' if person.id == actor.id else f'{person.name} has'
+        raise HTTPException(409, f'{who} open commitments in this project: {titles}. Reassign or finish them first.')
+    member = db.get(ProjectMember, (project.id, person.id))
+    if not member:
+        raise HTTPException(409, f'{person.name} is not on this project.')
+    db.delete(member)
+    db.flush()
+    if person.id == actor.id:
+        audit(db, actor, f'Left the project "{project.name}".')
+    else:
+        audit(db, actor, f'Removed {person.name} from the project "{project.name}".')
+        notify(db, person.id, f'project-removed:{project.id}:{person.id}:{now():%Y%m%d%H%M%S%f}',
+               f'{actor.name} removed you from the project "{project.name}".')

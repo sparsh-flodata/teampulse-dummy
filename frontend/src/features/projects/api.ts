@@ -81,6 +81,10 @@ export type ProjectDetail = {
     is_member: boolean;
     can_take: boolean;
     can_create: boolean;
+    /** Administrators, and managers on the project. */
+    can_manage_members: boolean;
+    /** Anyone on the project may leave it. */
+    can_leave: boolean;
   };
 };
 
@@ -90,6 +94,24 @@ export const projectQuery = (projectId: number) =>
     queryFn: () => api.get<ProjectDetail>(`/projects/${projectId}`),
     refetchInterval: 15_000,
   });
+
+/** Add someone to a project (administrators and managers on it). */
+export const addProjectMember = (vars: {
+  projectId: number;
+  employeeId: number;
+}) =>
+  api.post<ProjectDetail>(`/projects/${vars.projectId}/members`, {
+    employee_id: vars.employeeId,
+  });
+
+/** Remove someone, or leave (your own id). Refused while they have open commitments there. */
+export const removeProjectMember = (vars: {
+  projectId: number;
+  employeeId: number;
+}) =>
+  api.delete<{ left: boolean }>(
+    `/projects/${vars.projectId}/members/${vars.employeeId}`,
+  );
 
 /** Kanban move: only the status changes; the server applies the usual rules. */
 export const moveWork = (vars: { id: number; status: string }) =>

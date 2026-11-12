@@ -1,7 +1,7 @@
 import os
 from datetime import timedelta
 from sqlalchemy import select
-from backend.app.models import Team, Employee, Project, WorkItem, Commitment, Dependency, AuditEvent, now
+from backend.app.models import Team, Employee, Project, ProjectMember, WorkItem, Commitment, Dependency, AuditEvent, now
 from backend.app.core.security import hash_password
 from backend.app.services.work import today, business_day
 
@@ -33,6 +33,14 @@ def seed(db):
                 (4, 'Internal Operations', 'Keep the everyday running smoothly.', 2, '#c96388')]
     for id, name, description, team_id, color in projects:
         db.add(Project(id=id, name=name, description=description, team_id=team_id, color=color))
+    db.flush()
+    # Project membership is explicit: everyone on the demo projects is added, here by department.
+    db.add_all([ProjectMember(project_id=pid, employee_id=person[0]) for pid, _, _, team_id, _ in projects
+                for person in people if person[5] == team_id])
+    db.flush()
+    # Project membership is explicit: everyone on the demo projects is added, here by department.
+    db.add_all([ProjectMember(project_id=pid, employee_id=person[0]) for pid, _, _, team_id, _ in projects
+                for person in people if person[5] == team_id])
     db.flush()
     tasks = [
         (1, 'Employee document module', 1, 1, 'In Progress', 'High', 65, 12, 2, 'Python', False),
