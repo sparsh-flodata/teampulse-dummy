@@ -16,11 +16,10 @@ class Preferences(Input):
 class EmployeeCreate(Input):
     name: str = Field(min_length=2, max_length=120)
     email: str = Field(min_length=3, max_length=254)
-    password: str = Field(min_length=12, max_length=256)
     title: str = Field(default='Team member', max_length=120)
     team_id: int
     skills: str = Field(default='', max_length=500)
-    role: Literal['employee', 'manager'] = 'employee'
+    role: Literal['employee', 'manager'] = 'employee'  # until their first sign-in; then FloData Auth decides
     manager_id: int | None = None
 
     @field_validator('email')
@@ -35,7 +34,7 @@ class EmployeePatch(Input):
     title: str | None = Field(default=None, min_length=2, max_length=120)
     team_id: int | None = None
     manager_id: int | None = None
-    role: Literal['employee', 'manager', 'admin'] | None = None
+    # No role: it comes from FloData Auth on every sign-in.
     active: bool | None = None
     skills: str | None = Field(default=None, max_length=500)
 

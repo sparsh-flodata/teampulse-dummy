@@ -22,7 +22,6 @@ export function AddTeammateForm({
       title: "Team member",
       team_id: String(state.teams[0]?.id ?? ""),
       role: "employee",
-      password: "",
       manager_id: String(state.user.id),
       skills: "",
     },
@@ -106,21 +105,6 @@ export function AddTeammateForm({
             )}
           </form.Field>
         </label>
-        <label>
-          Initial password
-          <form.Field name="password">
-            {(f) => (
-              <input
-                {...bind(f)}
-                type="password"
-                minLength={12}
-                maxLength={256}
-                required
-                autoComplete="new-password"
-              />
-            )}
-          </form.Field>
-        </label>
       </div>
       {state.can_manage_org && (
         <label>
@@ -155,8 +139,9 @@ export function AddTeammateForm({
         </form.Field>
       </label>
       <p className="form-note">
-        Share the initial password with your teammate through your usual secure
-        channel. No email is sent.
+        They sign in with their FloData account under this email. Access and
+        their role are granted in FloData Auth; the role here applies until
+        their first sign-in. No email is sent.
       </p>
     </CreateFormFrame>
   );

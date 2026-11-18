@@ -16,7 +16,8 @@ def migrate(engine):
         additions = {
             'teams': [('parent_id', 'INTEGER REFERENCES teams(id)'), ('lead_id', 'INTEGER REFERENCES employees(id)')],
             'employees': [('active', 'BOOLEAN NOT NULL DEFAULT true'), ('agent_auto_updates', 'BOOLEAN NOT NULL DEFAULT false'),
-                           ('proactive_checkins', 'BOOLEAN NOT NULL DEFAULT true'), ('checkins_paused_until', 'DATE')],
+                           ('proactive_checkins', 'BOOLEAN NOT NULL DEFAULT true'), ('checkins_paused_until', 'DATE'),
+                           ('flodata_sub', 'VARCHAR(255)')],
             'agent_actions': [('base_snapshot', "TEXT NOT NULL DEFAULT '{}'"), ('check_in_id', 'INTEGER REFERENCES check_ins(id)'),
                                ('source', "VARCHAR(20) NOT NULL DEFAULT 'chat'"), ('applied_at', 'TIMESTAMP')],
             'channel_outbox': [('check_in_id', 'INTEGER REFERENCES check_ins(id)')],
@@ -29,6 +30,8 @@ def migrate(engine):
             for column, definition in columns:
                 if column not in existing:
                     conn.execute(text(f'ALTER TABLE {table} ADD COLUMN {column} {definition}'))
+        # One TeamPulse person per FloData account (same name create_all gives the model's unique index).
+        conn.execute(text('CREATE UNIQUE INDEX IF NOT EXISTS ix_employees_flodata_sub ON employees (flodata_sub)'))
         # Upgrade only the unchanged, known local demo hierarchy. Never reparent custom staff.
         if 2 not in applied and os.getenv('SEED_DEMO', '').lower() == 'true':
             root = conn.execute(text("SELECT id FROM employees WHERE email='nitish@teampulse.local' AND manager_id IS NULL AND role='manager'")).scalar()

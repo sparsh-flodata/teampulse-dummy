@@ -11,7 +11,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 from backend.app.db.session import Base, get_db
 from backend.app.main import app
-from backend.app.api.routes.auth import attempts
+from conftest import sso_token
 from backend.app.models import WorkItem, Commitment, Employee, Notification, now
 from backend.app.seed.pilot import seed
 from backend.app.services.work import today, business_day, capacity, run_workflows
@@ -20,7 +20,6 @@ HEADERS = {'X-TeamPulse-Request': '1'}
 
 @pytest.fixture
 def ctx():
-    attempts.clear()
     engine = create_engine('sqlite://', connect_args={'check_same_thread':False}, poolclass=StaticPool)
     Base.metadata.create_all(engine)
     sessions = sessionmaker(bind=engine, expire_on_commit=False)
@@ -36,59 +35,82 @@ def ctx():
     engine.dispose()
 
 def login(client, name='nitish'):
-    client.headers.pop('Authorization', None)
-    response=client.post('/api/auth/login', json={'email':name+'@teampulse.local','password':'test-password-2026!'})
-    assert response.status_code == 200, response.text
-    client.headers['Authorization']='Bearer '+response.json()['access_token']
-    return response
+    """Signs in through (faked) FloData with the role the person already has. `name` is a demo first name or an email."""
+    client.headers['Authorization']='Bearer '+sso_token(name if '@' in name else name+'@teampulse.local')
 
 def work_body(owner=1, **kwargs):
     return {'title':'Ship a new report','project_id':1,'owner_id':owner,'due_date':str(business_day(today(),3)),'effort_hours':12, **kwargs}
 
-def test_auth_and_csrf(ctx):
+def test_sso_auth_and_csrf(ctx):
     c,_=ctx
+    # No session: APIs answer 401, page loads are sent to the FloData sign-in.
     assert c.get('/api/state').status_code==401
-    bad=c.post('/api/auth/login',json={'email':'nitish@teampulse.local','password':'wrong'})
-    assert bad.status_code==401
-    response=login(c)
-    body=response.json()
-    assert 'set-cookie' not in response.headers
-    assert body['user']['email']=='nitish@teampulse.local' and 'password_hash' not in body['user']
-    assert body['expires_in']>0 and body['token_type']=='bearer'
-    assert c.get('/api/auth/me').json()['id']==body['user']['id']
+    page=c.get('/api/state?view=board',headers={'Accept':'text/html'},follow_redirects=False)
+    assert page.status_code==303 and page.headers['location']=='/auth/login?next=%2Fapi%2Fstate%3Fview%3Dboard'
+    assert c.get('/api/state',headers={'Authorization':'Bearer not-a-token'}).status_code==401
+    login(c)
+    me=c.get('/api/auth/me').json()
+    assert me['email']=='nitish@teampulse.local' and me['role']=='admin' and me['roles']==['teampulse:admin']
+    assert me['account_url']=='https://sso.test/account' and me['logout_url']=='/auth/logout' and 'password_hash' not in me
     assert c.post('/api/work',json=work_body(),headers={'X-TeamPulse-Request':'0'}).status_code==403
     assert c.post('/api/work',json=work_body(),headers={'Origin':'https://attacker.example'}).status_code==403
-    assert c.get('/api/state',headers={'Authorization':'Bearer not-a-token'}).status_code==401
-    # Rotating refresh: the new pair works, the old refresh token is spent, and reusing it ends the sign-in.
-    pair=c.post('/api/auth/refresh',json={'refresh_token':body['refresh_token']}).json()
-    assert pair['refresh_token']!=body['refresh_token']
-    assert c.get('/api/state',headers={'Authorization':'Bearer '+pair['access_token']}).status_code==200
-    assert c.post('/api/auth/refresh',json={'refresh_token':body['refresh_token']}).status_code==401
-    assert c.post('/api/auth/refresh',json={'refresh_token':pair['refresh_token']}).status_code==401
-    # Logout revokes the refresh token; the access token simply expires.
-    again=login(c).json()
-    assert c.post('/api/auth/logout',json={'refresh_token':again['refresh_token']}).json()=={'ok':True}
-    assert c.post('/api/auth/refresh',json={'refresh_token':again['refresh_token']}).status_code==401
+    # The browser path: the access token in the httpOnly cookie works the same way.
     c.headers.pop('Authorization')
+    c.cookies.set('flodata_teampulse_at',sso_token('nitish@teampulse.local'))
+    assert c.get('/api/state').status_code==200
+    # A write carrying our cookies from another origin is refused before it reaches the app.
+    assert c.post('/api/work',json=work_body(),headers={'Origin':'https://sibling.example'}).status_code==403
+    c.cookies.clear()
     assert c.get('/api/state').status_code==401
 
-def test_registration_is_limited_to_the_company_domain(ctx, monkeypatch):
+def test_flodata_roles_gate_access_and_set_the_role(ctx):
     c,sessions=ctx
+    def as_(roles, email='nitish@teampulse.local'):
+        c.headers['Authorization']='Bearer '+sso_token(email,roles)
+    for roles in ('','teampulse:owner'):  # signed in, but no role in this tool
+        as_(roles)
+        refused=c.get('/api/state')
+        assert refused.status_code==403 and refused.json()['detail']=="You don't have access to this tool"
+    # Strict by tier, overwritten on every request; the most powerful role wins.
+    as_('teampulse:viewer')
+    assert c.get('/api/auth/me').json()['role']=='employee'
+    assert c.post('/api/teams',json={'name':'Needs admin'}).status_code==403
+    as_('teampulse:viewer,teampulse:editor')
+    assert c.get('/api/auth/me').json()['role']=='manager'
+    as_('teampulse:admin')
+    assert c.get('/api/auth/me').json()['role']=='admin'
+    assert c.post('/api/teams',json={'name':'Allowed now'}).status_code==201
+    # The role is managed in FloData Auth, so TeamPulse no longer edits it.
+    assert c.patch('/api/employees/3',json={'role':'manager'}).status_code==422
+
+def test_first_sign_in_links_by_email_or_creates_the_person(ctx, monkeypatch):
+    c,sessions=ctx
+    # An existing person is matched by email (any case) and linked to the FloData id; later the id wins.
+    c.headers['Authorization']='Bearer '+sso_token('Rahul@TeamPulse.local',sub='fd-rahul')
+    rahul=c.get('/api/auth/me').json()
+    assert rahul['email']=='rahul@teampulse.local'
+    c.headers['Authorization']='Bearer '+sso_token('rahul.sharma@teampulse.local','teampulse:editor',sub='fd-rahul',name='Rahul S.')
+    renamed=c.get('/api/auth/me').json()
+    assert renamed['id']==rahul['id'] and renamed['email']=='rahul.sharma@teampulse.local' and renamed['name']=='Rahul S.'
+    with sessions() as db:
+        assert db.get(Employee,rahul['id']).flodata_sub=='fd-rahul'
+    # Someone FloData lets in without a TeamPulse profile gets one on their first request.
+    c.headers['Authorization']='Bearer '+sso_token('asha.rao@flodataanalytics.com','teampulse:viewer',name='Asha Rao')
+    asha=c.get('/api/auth/me').json()
+    assert asha['name']=='Asha Rao' and asha['role']=='employee' and asha['team_id']==1
+    with sessions() as db:
+        assert db.scalar(select(func.count()).select_from(Employee).where(Employee.email=='asha.rao@flodataanalytics.com'))==1
+        assert db.get(Employee,asha['id']).password_hash==''
+    # An email already linked to another FloData account is not taken over.
+    c.headers['Authorization']='Bearer '+sso_token('asha.rao@flodataanalytics.com','teampulse:viewer',sub='fd-someone-else')
+    assert c.get('/api/auth/me').status_code==409
+    # Admin-added people still need a company address, and no password.
     import backend.app.core.security as security
     monkeypatch.setattr(security,'ALLOWED_EMAIL_DOMAINS',('flodataanalytics.com',))
-    body={'name':'Asha Rao','email':'asha.rao@flodataanalytics.com','password':'long-password-2026'}
-    for email in ('asha@gmail.com','asha@flodataanalytics.com.evil.io','asha@sub.flodataanalytics.com'):
-        assert c.post('/api/auth/register',json=body|{'email':email}).status_code==422, email
-    created=c.post('/api/auth/register',json=body|{'email':'Asha.Rao@FloDataAnalytics.com'})
-    assert created.status_code==201, created.text
-    data=created.json()
-    assert data['user']['email']=='asha.rao@flodataanalytics.com' and data['user']['role']=='employee'
-    assert c.get('/api/auth/me',headers={'Authorization':'Bearer '+data['access_token']}).json()['name']=='Asha Rao'
-    assert c.post('/api/auth/register',json=body).status_code==409
-    assert c.post('/api/auth/register',json=body|{'email':'short@flodataanalytics.com','password':'short'}).status_code==422
-    # Admin-created employees follow the same rule.
     login(c)
-    assert c.post('/api/employees',json={'name':'Outside person','email':'someone@example.com','password':'long-password-2026','team_id':1}).status_code==422
+    assert c.post('/api/employees',json={'name':'Outside person','email':'someone@example.com','team_id':1}).status_code==422
+    added=c.post('/api/employees',json={'name':'Inside person','email':'inside.person@flodataanalytics.com','team_id':1})
+    assert added.status_code==201, added.text
 
 def test_team_and_mutation_permissions(ctx):
     c,_=ctx
@@ -100,7 +122,7 @@ def test_team_and_mutation_permissions(ctx):
     assert c.patch('/api/work/10',json={'progress':99}).status_code==404
     assert c.post('/api/work',json=work_body(owner=2)).status_code==403
     assert c.post('/api/projects',json={'name':'Forbidden','team_id':1}).status_code==403
-    assert c.post('/api/employees',json={'name':'New person','email':'new@example.com','password':'long-password-2026','team_id':1}).status_code==403
+    assert c.post('/api/employees',json={'name':'New person','email':'new@example.com','team_id':1}).status_code==403
 
 def test_revision_history_and_owner_confirmation(ctx):
     c,_=ctx

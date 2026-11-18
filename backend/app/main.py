@@ -12,6 +12,7 @@ from backend.app.seed.pilot import seed
 from backend.app.db.migrations import migrate
 from backend.app.api.router import router
 from backend.app.core.config import FRONTEND_DIST, PUBLIC_HOST, PUBLIC_HOST_RESTRICTED, PUBLIC_PATHS
+from backend.app.core.security import auth
 from backend.app.channels.google_chat import process_outbox
 from backend.app.services.proactive import run_check_ins
 
@@ -65,7 +66,7 @@ async def lifespan(app):
 
 app = FastAPI(title='TeamPulse API', version='0.4.0', lifespan=lifespan)
 origins = os.getenv('ALLOWED_ORIGINS', 'http://127.0.0.1:5173,http://localhost:5173,http://127.0.0.1:8787,http://localhost:8787').split(',')
-app.add_middleware(CORSMiddleware, allow_origins=origins, allow_credentials=True, allow_methods=['GET', 'POST', 'PATCH', 'DELETE'], allow_headers=['Authorization', 'Content-Type', 'X-TeamPulse-Request'])
+app.add_middleware(CORSMiddleware, allow_origins=origins, allow_credentials=False, allow_methods=['GET', 'POST', 'PATCH', 'DELETE'], allow_headers=['Authorization', 'Content-Type', 'X-TeamPulse-Request'])
 
 # Called by Google, authenticated by Google's signed token instead of the app header.
 CSRF_EXEMPT = ('/api/integrations/google-chat/events',)
@@ -91,6 +92,8 @@ async def integrity_error(request, exc):
     return JSONResponse(status_code=409, content={'detail': 'This record already exists or changed concurrently. Refresh and try again.'})
 
 
+# FloData single sign-on: /auth/login, /auth/callback, /auth/logout and silent token refresh (cookies).
+auth.install(app)
 app.include_router(router)
 
 root = FRONTEND_DIST
@@ -98,6 +101,6 @@ if root.exists():
     app.mount('/assets', StaticFiles(directory=root / 'assets'), name='assets')
     @app.get('/{path:path}', include_in_schema=False)
     def frontend(path: str):
-        if path.startswith('api/'):
+        if path.startswith(('api/', 'auth/')):
             raise HTTPException(404, 'API route not found.')
         return FileResponse(root / 'index.html')

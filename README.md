@@ -38,7 +38,7 @@ All 58 supplied company emails are ready. The initial password is `TeamPulse-dem
 
 ## What works
 
-- JWT sign-in (15-minute access tokens, rotating refresh tokens), company-domain registration, salted scrypt password hashing, server-side role and team permissions, request-origin checks, and sign-in throttling.
+- FloData single sign-on (OpenID Connect, httpOnly cookies, silent refresh); roles come from FloData Auth (`teampulse:admin` / `editor` / `viewer` → admin / manager / employee), with server-side role and team permissions and request-origin checks. See [Identity](docs/ARCHITECTURE.md#identity).
 - Organization overview, employee workspace, project overview, team capacity, shared activity, and a personal notification center.
 - Create projects and employees, create and assign work, confirm proposed assignments, update progress and remaining effort, revise expected completion with a reason, and export the current commitment view to CSV.
 - Separate work items and versioned commitments. Every delivery-date revision retains its previous date and reason.
@@ -127,7 +127,7 @@ Use two terminals for hot reload:
 pnpm dev
 ```
 
-The Vite server prints its local URL (normally port 5173). In development the frontend uses an in-browser mock API by default (`VITE_API_MOCKS=true` in `frontend/.env.development`); set it to `false` to proxy `/api` to port 8787. The frontend expects JWT auth endpoints that the current backend does not provide yet; see [the frontend guide](docs/FRONTEND.md) for the contract. Add changed origins to `ALLOWED_ORIGINS` if necessary. Built assets are served by FastAPI for the one-process launch.
+The Vite server prints its local URL (normally port 5173). In development the frontend uses an in-browser mock API by default (`VITE_API_MOCKS=true` in `frontend/.env.development`); set it to `false` to proxy `/api` to port 8787. Sign-in needs the FloData settings in `.env` (`FLODATA_*`, see `.env.example`); open the app at `http://localhost:5173`, the address registered in FloData Auth, and Vite proxies `/auth` and `/api` to the backend. Add changed origins to `ALLOWED_ORIGINS` if necessary. Built assets are served by FastAPI for the one-process launch.
 
 ```powershell
 .venv/Scripts/python.exe -m pytest -q
@@ -140,13 +140,13 @@ Tests use isolated in-memory databases and never modify your pilot database.
 
 ## Start with a clean organization
 
-Set `SEED_DEMO=false` and `SEED_COMPANY=false`, and point `DATABASE_URL` to a new empty database. Then bootstrap the first administrator; the password is prompted and never passed in a command argument:
+Set `SEED_DEMO=false` and `SEED_COMPANY=false`, and point `DATABASE_URL` to a new empty database. Then bootstrap the first team and administrator (give them `teampulse:admin` in the FloData Auth console; there is no TeamPulse password):
 
 ```powershell
 .venv/Scripts/python.exe -m backend.app.cli.bootstrap --email you@company.com --name "Your Name" --team Engineering
 ```
 
-Sign in, create teams/projects, and add teammates. Everyone has a personal dashboard and can browse the organization directory. Managers can open full profiles only for direct and indirect reports; administrators can open all profiles. Shared project work is visible to the owning department and explicitly invited participants; a report on another project grants only that report's work. Structure visibility never grants access to private profiles or conversations.
+Sign in through FloData, create teams/projects, and add teammates. Everyone has a personal dashboard and can browse the organization directory. Managers can open full profiles only for direct and indirect reports; administrators can open all profiles. Shared project work is visible to the owning department and explicitly invited participants; a report on another project grants only that report's work. Structure visibility never grants access to private profiles or conversations.
 
 ## PostgreSQL and Docker
 

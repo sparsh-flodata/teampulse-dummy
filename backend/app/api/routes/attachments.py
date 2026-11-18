@@ -16,7 +16,7 @@ from sqlalchemy import select, and_, or_
 from sqlalchemy.orm import Session
 from backend.app.channels import google_chat
 from backend.app.core.config import JWT_SECRET
-from backend.app.core.security import ALGORITHM, ISSUER, current_user
+from backend.app.core.security import auth, current_user
 from backend.app.db.session import get_db
 from backend.app.models import Attachment, Employee, Project, WorkItem, now
 from backend.app.services.attachments import can_open, inline_type
@@ -24,6 +24,9 @@ from backend.app.services.work import visible_work
 
 router = APIRouter(prefix='/api')
 
+# Short-lived signed links for opening a file in a new tab (JWT_SECRET; separate from FloData sign-in).
+ISSUER = 'teampulse'
+ALGORITHM = 'HS256'
 OPEN_TTL = timedelta(minutes=30)
 MAX_BYTES = 25 * 1024 * 1024
 UPSTREAM_TIMEOUT = 30
@@ -101,7 +104,7 @@ def _viewer(request: Request, db: Session, attachment_id: int, token: str | None
         if not user or not user.active:
             raise HTTPException(401, 'Please sign in to continue.')
         return user
-    return current_user(request, db)
+    return current_user(auth.user(request), db)
 
 
 def _filename(name: str) -> str:

@@ -6,13 +6,17 @@ import { msw } from "msw/vite";
 export default defineConfig(({ command, mode }) => ({
   resolve: { tsconfigPaths: true },
   // Real backend (FastAPI, 8787 by default; override with API_PROXY_TARGET in
-  // frontend/.env.development.local). Ignored while MSW mocks are enabled.
+  // frontend/.env.development.local). /auth is FloData sign-in: proxied so the
+  // httpOnly session cookies belong to this origin (FLODATA_APP_URL). Open the
+  // app at http://localhost:5173, the address registered in FloData Auth.
   server: {
-    proxy: {
-      "/api":
+    proxy: Object.fromEntries(
+      ["/api", "/auth"].map((path) => [
+        path,
         loadEnv(mode, process.cwd(), "API_").API_PROXY_TARGET ||
-        "http://127.0.0.1:8787",
-    },
+          "http://127.0.0.1:8787",
+      ]),
+    ),
   },
   plugins: [
     // SPA mode: the build emits a static shell at dist/client/index.html that

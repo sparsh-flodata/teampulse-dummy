@@ -10,7 +10,6 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteImport } from './routes/_app'
-import { Route as LoginRouteImport } from './routes/login'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as AppActivityRouteImport } from './routes/_app/activity'
 import { Route as AppCapacityRouteImport } from './routes/_app/capacity'
@@ -30,11 +29,6 @@ import { Route as AppProjectsProjectIdRouteImport } from './routes/_app/projects
 
 const AppRoute = AppRouteImport.update({
   id: '/_app',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppIndexRoute = AppIndexRouteImport.update({
@@ -120,7 +114,6 @@ const AppProjectsProjectIdRoute = AppProjectsProjectIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
-  '/login': typeof LoginRoute
   '/activity': typeof AppActivityRoute
   '/capacity': typeof AppCapacityRoute
   '/chat': typeof AppChatRoute
@@ -138,7 +131,6 @@ export interface FileRoutesByFullPath {
   '/projects/$projectId': typeof AppProjectsProjectIdRoute
 }
 export interface FileRoutesByTo {
-  '/login': typeof LoginRoute
   '/activity': typeof AppActivityRoute
   '/capacity': typeof AppCapacityRoute
   '/chat': typeof AppChatRoute
@@ -159,7 +151,6 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppRouteWithChildren
-  '/login': typeof LoginRoute
   '/_app/activity': typeof AppActivityRoute
   '/_app/capacity': typeof AppCapacityRoute
   '/_app/chat': typeof AppChatRoute
@@ -181,7 +172,6 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/login'
     | '/activity'
     | '/capacity'
     | '/chat'
@@ -199,7 +189,6 @@ export interface FileRouteTypes {
     | '/projects/$projectId'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/login'
     | '/activity'
     | '/capacity'
     | '/chat'
@@ -219,7 +208,6 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/_app'
-    | '/login'
     | '/_app/activity'
     | '/_app/capacity'
     | '/_app/chat'
@@ -240,7 +228,6 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
-  LoginRoute: typeof LoginRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -250,13 +237,6 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof AppRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_app/': {
@@ -416,7 +396,6 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
-  LoginRoute: LoginRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

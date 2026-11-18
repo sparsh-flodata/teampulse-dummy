@@ -16,7 +16,8 @@ class Employee(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(120))
     email: Mapped[str] = mapped_column(String(254), unique=True)
-    password_hash: Mapped[str] = mapped_column(Text)
+    password_hash: Mapped[str] = mapped_column(Text, default='')  # legacy; sign-in is FloData single sign-on
+    flodata_sub: Mapped[str | None] = mapped_column(String(255), unique=True, index=True, nullable=True)  # FloData account id
     role: Mapped[str] = mapped_column(String(20), default='employee')
     active: Mapped[bool] = mapped_column(Boolean, default=True)
     agent_auto_updates: Mapped[bool] = mapped_column(Boolean, default=True)  # direct status/progress updates from chat, with undo
@@ -34,7 +35,7 @@ class Employee(Base):
     checkins_paused_until: Mapped[date | None] = mapped_column(Date, nullable=True)
 
 class RefreshToken(Base):
-    """One rotating refresh token. Tokens of one sign-in share a family_id;
+    """Legacy (before FloData sign-in); kept until the switch is confirmed. One rotating refresh token. Tokens of one sign-in share a family_id;
     presenting a token that was already rotated revokes the whole family."""
     __tablename__ = 'refresh_tokens'
     token_hash: Mapped[str] = mapped_column(String(64), primary_key=True)

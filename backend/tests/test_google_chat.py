@@ -130,9 +130,9 @@ def test_public_host_exposes_only_the_chat_endpoint(chat, monkeypatch):
     monkeypatch.setattr(main, 'PUBLIC_HOST_RESTRICTED', True)
     monkeypatch.setattr(main, 'PUBLIC_HOST', 'teampulse.example.com')
     public = {'Host': 'teampulse.example.com'}
-    for path in ('/', '/login', '/api/state', '/api/auth/login', '/api/auth/register'):
+    for path in ('/', '/auth/login', '/auth/callback', '/api/state', '/api/auth/me'):
         assert c.get(path, headers=public).status_code == 404, path
-    assert c.post('/api/auth/login', json={'email': 'a@b.co', 'password': 'x'}, headers=public).status_code == 404
+    assert c.post('/api/work', json={}, headers=public).status_code == 404
     assert c.post(EVENTS, json={}, headers=public | {'Authorization': 'Bearer google'}).status_code != 404
     assert c.get('/api/health', headers=public).status_code == 200
     assert c.get('/api/state').status_code == 401  # local host unaffected

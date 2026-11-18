@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from backend.app.db.session import get_db
 from backend.app.models import Team, Employee
 from backend.app.schemas import TeamCreate, TeamPatch, EmployeePatch
-from backend.app.core.security import current_user, revoke_employee_tokens
+from backend.app.core.security import current_user
 from backend.app.core.access import validate_manager, require_admin, validate_team_parent
 from backend.app.services.work import serialize_person, audit
 from backend.app.services.organization import validate_lead
@@ -50,20 +50,18 @@ def edit_employee(person_id: int, body: EmployeePatch, user: Employee = Depends(
     fields = body.model_dump(exclude_unset=True)
     if any(value is None and key != 'manager_id' for key, value in fields.items()):
         raise HTTPException(422, 'Only the reporting manager can be left empty.')
-    if person.id == user.id and (fields.get('active') is False or ('role' in fields and body.role != 'admin')):
+    if person.id == user.id and fields.get('active') is False:
         raise HTTPException(409, 'Ask another administrator to change your own access; this prevents workspace lockout.')
     if 'manager_id' in fields:
         validate_manager(db, person.id, body.manager_id)
     if 'team_id' in fields and not db.get(Team, body.team_id):
         raise HTTPException(422, 'Team not found.')
     active_reports = db.scalar(select(Employee.id).where(Employee.manager_id == person.id, Employee.active.is_(True)).limit(1))
-    if active_reports and (fields.get('active') is False or fields.get('role') == 'employee'):
-        raise HTTPException(409, 'Reassign active reports before deactivating or removing management access.')
+    if active_reports and fields.get('active') is False:
+        raise HTTPException(409, 'Reassign active reports before deactivating this person.')
     before = {key: getattr(person, key) for key in fields}
     for key, value in fields.items():
         setattr(person, key, value)
-    if fields.get('active') is False:
-        revoke_employee_tokens(db, person.id)
     audit(db, user, f'Updated {person.name}: ' + '; '.join(f'{key.replace("_", " ")}: {before[key]} → {value}' for key, value in fields.items()))
     db.commit()
     return serialize_person(db, person)

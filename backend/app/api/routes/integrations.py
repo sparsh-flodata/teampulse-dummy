@@ -61,9 +61,9 @@ def _employee(db: Session, user: dict) -> Employee | None:
 
 def _not_registered(user: dict) -> str:
     email = user.get('email') or 'this Google account'
-    where = f' at {app_link("/login")}' if app_link('/login') else ''
+    where = f' at {app_link("/")}' if app_link('/') else ''
     return (f'I couldn’t find an active TeamPulse account for {email}. '
-            f'Register with your work email{where}, then message me again.')
+            f'Sign in to TeamPulse once with your FloData account{where}, then message me again.')
 
 
 @router.post('/api/integrations/google-chat/events', include_in_schema=False)

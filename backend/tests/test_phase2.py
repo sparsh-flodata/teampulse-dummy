@@ -75,7 +75,7 @@ def test_circular_reporting_and_demotions_are_rejected(ctx):
     login(c)
     assert c.patch('/api/employees/1',json={'manager_id':2}).status_code==409
     assert c.patch('/api/employees/2',json={'manager_id':2}).status_code==409
-    assert c.patch('/api/employees/2',json={'role':'employee'}).status_code==409
+    assert c.patch('/api/employees/2',json={'role':'employee'}).status_code==422  # role comes from FloData Auth
     assert c.patch('/api/employees/2',json={'active':False}).status_code==409
     assert c.patch('/api/employees/1',json={'active':False}).status_code==409
     assert c.patch('/api/employees/3',json={'manager_id':9999}).status_code==422
@@ -95,7 +95,7 @@ def test_nested_team_creation_and_cycle_checks(ctx):
     assert c.post('/api/teams',json={'name':'Invalid','lead_id':4}).status_code==422
     login(c,'rahul')
     assert c.post('/api/teams',json={'name':'Forbidden'}).status_code==403
-    assert c.post('/api/employees',json={'name':'Unauthorized manager','email':'new@company.com','password':'long-password-2026','team_id':1,'role':'manager'}).status_code==403
+    assert c.post('/api/employees',json={'name':'Unauthorized manager','email':'new@company.com','team_id':1,'role':'manager'}).status_code==403
 
 
 def test_deactivation_invalidates_an_existing_session(ctx):
@@ -104,8 +104,9 @@ def test_deactivation_invalidates_an_existing_session(ctx):
     login(other,'ananya')
     login(c)
     assert c.patch('/api/employees/3',json={'active':False}).status_code==200
-    assert other.get('/api/state').status_code==401
-    assert other.post('/api/auth/login',json={'email':'ananya@teampulse.local','password':'test-password-2026!'}).status_code==401
+    # Still allowed in FloData, but inactive in TeamPulse: refused on the very next request.
+    refused=other.get('/api/state')
+    assert refused.status_code==403 and 'inactive' in refused.json()['detail']
 
 
 def test_health_never_calls_a_blocker_on_track(ctx):

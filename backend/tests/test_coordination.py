@@ -3,8 +3,6 @@ from sqlalchemy import select,func
 from test_workflows import ctx,login,HEADERS
 from backend.app.models import Employee,WorkItem,Notification,UpdateRequest,AuditEvent,OutboxMessage
 from backend.app.seed.company import seed_company,DATA_PATH
-from backend.app.core.security import verify_password
-from backend.app.api.routes.auth import attempts
 
 
 def test_chat_request_reaches_inbox_and_reply_updates_work(ctx):
@@ -123,7 +121,6 @@ def test_all_58_company_accounts_hierarchy_and_samples_are_idempotent(ctx):
         expected={p['email'] for p in rows}
         people={p.email:p for p in db.scalars(select(Employee)) if p.email in expected}
         assert set(people)==expected and len(people)==58
-        assert all(verify_password('test-password-2026!',p.password_hash) for p in people.values())
         teams={t.id:t.name for t in db.scalars(select(Team))}
         for row in rows:
             person=people[row['email']]
@@ -146,11 +143,7 @@ def test_all_58_company_accounts_hierarchy_and_samples_are_idempotent(ctx):
         outsider=people['himanshi.chauhan@flodataanalytics.com'].id
         worker=people['kapil.sharma@flodataanalytics.com'].id
     for email in ('ujjwal@flodataanalytics.com','nitish.kumar@flodataanalytics.com','swati.kashyap@flodataanalytics.com','kapil.sharma@flodataanalytics.com'):
-        attempts.clear()
-        c.headers.pop('Authorization',None)
-        response=c.post('/api/auth/login',json={'email':email,'password':'test-password-2026!'})
-        assert response.status_code==200,response.text
-        c.headers['Authorization']='Bearer '+response.json()['access_token']
+        login(c,email)
         state=c.get('/api/state').json()
         assert len(state['teams'])==8 and len([p for p in state['directory'] if p['active']])==58
         assert state['organization_source']=='org-tree.json'
@@ -164,8 +157,7 @@ def test_all_58_company_accounts_hierarchy_and_samples_are_idempotent(ctx):
         if email=='kapil.sharma@flodataanalytics.com':
             assert state['profile_ids']==[worker]
             assert c.get('/api/people/'+str(Management)+'/profile').status_code==403
-    attempts.clear()
-    c.headers['Authorization']='Bearer '+c.post('/api/auth/login',json={'email':'nitish.kumar@flodataanalytics.com','password':'test-password-2026!'}).json()['access_token']
+    login(c,'nitish.kumar@flodataanalytics.com')
     ambiguity=c.post('/api/assistant/chat',json={'message':'Ask Piyush for a status update'}).json()
     assert ambiguity['action'] is None and 'several teammates' in ambiguity['reply']
     draft=c.post('/api/assistant/chat',json={'message':'Ask Kapil Sharma for an update about planning'}).json()

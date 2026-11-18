@@ -13,15 +13,9 @@ export const profileQuery = (personId: number) =>
     refetchInterval: 15_000,
   });
 
-const ROLES = ["employee", "manager", "admin"] as const;
-
 export const createEmployeeSchema = z.object({
   name: z.string().trim().min(2, "Enter the full name.").max(120),
   email: z.email("Enter a valid work email.").max(254),
-  password: z
-    .string()
-    .min(12, "The initial password needs at least 12 characters.")
-    .max(256),
   title: z.string().trim().min(1).max(120),
   team_id: z.coerce.number().int().positive("Choose a team."),
   skills: z.string().max(500),
@@ -35,7 +29,7 @@ export const updateEmployeeSchema = z.object({
   title: z.string().trim().min(2, "Enter a job title."),
   team_id: z.coerce.number().int().positive(),
   manager_id: optionalId,
-  role: z.enum(ROLES),
+  // No role: it is managed in FloData Auth and applied at every sign-in.
   active: z.boolean(),
 });
 export type UpdateEmployeeInput = z.output<typeof updateEmployeeSchema>;

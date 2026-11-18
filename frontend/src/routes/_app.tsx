@@ -1,18 +1,17 @@
-import { createFileRoute, redirect, useRouter } from "@tanstack/react-router";
-import { getActiveAccount } from "@/features/auth/store";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { stateQuery } from "@/features/workspace/api";
 import { AppShell } from "@/features/workspace/components/AppShell";
 import { BootError, BootScreen } from "@/features/workspace/components/Boot";
 import { workspaceSearchSchema } from "@/features/workspace/navigation";
 
-/** Every signed-in page: auth guard, workspace snapshot, and the app shell. */
+/**
+ * Every signed-in page: workspace snapshot and the app shell. Signed out, the
+ * snapshot request answers 401 and the API client sends the browser to the
+ * FloData sign-in, which returns here.
+ */
 export const Route = createFileRoute("/_app")({
   validateSearch: workspaceSearchSchema,
   ssr: false,
-  beforeLoad: () => {
-    // UX guard only; the API rejects requests without a valid token.
-    if (!getActiveAccount()) throw redirect({ to: "/login" });
-  },
   loader: ({ context }) => context.queryClient.ensureQueryData(stateQuery),
   pendingComponent: BootScreen,
   errorComponent: function AppError({ error, reset }) {

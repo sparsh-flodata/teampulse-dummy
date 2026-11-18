@@ -47,11 +47,11 @@ def test_organization_and_project_payloads(ctx, monkeypatch):
     assert team.status_code == 201, team.text
     assert c.patch(f'/api/teams/{team.json()["id"]}', json={'name': 'Contract team 2', 'parent_id': 1, 'lead_id': 2}).status_code == 200
     # AddTeammateForm
-    person = c.post('/api/employees', json={'name': 'Contract Person', 'email': 'contract.person@example.com', 'password': 'long-password-2026',
+    person = c.post('/api/employees', json={'name': 'Contract Person', 'email': 'contract.person@example.com',
                                             'title': 'Analyst', 'team_id': 1, 'skills': '', 'role': 'employee', 'manager_id': None})
     assert person.status_code == 201, person.text
     # ReportingForm
-    edit = c.patch(f'/api/employees/{person.json()["id"]}', json={'name': 'Contract Person', 'title': 'Senior analyst', 'team_id': 1, 'manager_id': 2, 'role': 'employee', 'active': True})
+    edit = c.patch(f'/api/employees/{person.json()["id"]}', json={'name': 'Contract Person', 'title': 'Senior analyst', 'team_id': 1, 'manager_id': 2, 'active': True})
     assert edit.status_code == 200, edit.text
 
 

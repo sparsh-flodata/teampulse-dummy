@@ -1,5 +1,5 @@
-/* Account switcher (new in the TanStack rebuild). Mirrors the
-   notification popover so it reads as part of the same system. */
+/* Account menu (FloData sign-in). Mirrors the notification popover so it
+   reads as part of the same system. */
 .account-trigger {
   display: flex;
   padding: 0;
@@ -36,7 +36,7 @@
   padding-top: 8px;
 }
 .account-option,
-.account-actions button {
+.account-actions a {
   display: flex;
   align-items: center;
   gap: var(--space-10);
@@ -45,8 +45,7 @@
   border-radius: var(--radius-8);
   text-align: left;
 }
-.account-option:hover,
-.account-actions button:hover,
+.account-actions a:hover,
 .account-option.active {
   background: var(--color-canvas);
 }
@@ -67,17 +66,15 @@
 .account-option > svg {
   color: var(--color-brand);
 }
-.account-actions button {
+.account-actions a {
   font-weight: var(--weight-medium);
   color: var(--color-text);
+  text-decoration: none;
 }
 .account-note {
   display: block;
-  padding: 0 17px 13px;
+  padding: 4px 9px 0;
   color: var(--color-muted);
-}
-.login-back {
-  margin-top: 14px;
 }
 @media (max-width: 760px) {
   .account-menu {

@@ -10,13 +10,24 @@ export const fail = (status: number, detail: string) =>
 export const invalid = (msg: string) =>
   HttpResponse.json({ detail: [{ msg }] }, { status: 422 });
 
-/** Resolves the signed-in mock user from the Bearer token, or null. */
-export function authUser(request: Request): number | null {
-  const header = request.headers.get("Authorization") ?? "";
-  const token = header.startsWith("Bearer ") ? header.slice(7) : "";
-  const session = db.accessTokens[token];
-  if (!session || session.expiresAt <= Date.now()) return null;
-  return session.userId;
+/** Mock sign-in key: the user id to act as (see handlers/auth.ts). */
+export const MOCK_USER_KEY = "teampulse.mock.userId";
+
+/**
+ * The signed-in mock user. Real sign-in is FloData SSO (cookies set by the
+ * backend), which mocks cannot do, so every request acts as one seed account:
+ * localStorage "teampulse.mock.userId", else the first account.
+ */
+export function authUser(_request: Request): number | null {
+  let chosen = NaN;
+  try {
+    chosen = Number(localStorage.getItem(MOCK_USER_KEY));
+  } catch {
+    // Storage blocked: use the first account.
+  }
+  const account =
+    db.accounts.find((a) => a.user_id === chosen) ?? db.accounts[0];
+  return account?.user_id ?? null;
 }
 
 export const unauthorized = () => fail(401, "Please sign in to continue.");

@@ -1,7 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createRouter } from "@tanstack/react-router";
 import { ApiError } from "@/lib/api/client";
-import { setupAuth } from "@/features/auth/session";
 import { NotFound } from "@/features/workspace/components/NotFound";
 import { routeTree } from "./routeTree.gen";
 
@@ -29,17 +28,6 @@ export function getRouter() {
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     ),
   });
-  if (typeof window !== "undefined")
-    setupAuth({
-      queryClient,
-      navigate: (d) =>
-        void (d.to === "/login"
-          ? router.navigate({
-              to: "/login",
-              search: d.expired ? { expired: d.expired } : {},
-            })
-          : router.navigate({ to: "/" })),
-    });
   return router;
 }
 

@@ -32,14 +32,12 @@ ALLOWED_EMAIL_DOMAINS = tuple(
     for d in os.getenv('ALLOWED_EMAIL_DOMAINS', 'flodataanalytics.com').split(',')
     if d.strip()
 )
-ACCESS_TOKEN_TTL_SECONDS = int(os.getenv('ACCESS_TOKEN_TTL_SECONDS', '900'))
-REFRESH_TOKEN_TTL_DAYS = int(os.getenv('REFRESH_TOKEN_TTL_DAYS', '7'))
-# New self-registered people join this team (by name) until an admin moves them.
+# People who first sign in through FloData without a TeamPulse profile join this team (by name) until an admin moves them.
 REGISTRATION_TEAM = os.getenv('REGISTRATION_TEAM', '').strip()
 
 
 def _jwt_secret() -> str:
-    """JWT_SECRET from the environment, else a per-installation secret kept in data/.
+    """JWT_SECRET (signs short-lived attachment links) from the environment, else a per-installation secret kept in data/.
 
     Set JWT_SECRET explicitly in production so every instance signs with the same key.
     """

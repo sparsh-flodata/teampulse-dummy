@@ -1,6 +1,8 @@
-// The one fetch client every API function goes through. It attaches the
-// active account's access token, refreshes once on 401 and retries, and
-// normalizes error messages. It never logs request or token details.
+// The one fetch client every API function goes through. Sign-in is FloData
+// single sign-on: the session lives in httpOnly cookies set by the backend
+// (same origin), so no token is ever handled here. On 401 the browser goes to
+// the FloData sign-in and comes back to the current page. It never logs
+// request details.
 
 export class ApiError extends Error {
   constructor(
@@ -12,32 +14,13 @@ export class ApiError extends Error {
   }
 }
 
-type AuthHooks = {
-  getAccessToken: () => string | null;
-  /** Returns a fresh access token, or null when the session cannot be renewed. */
-  refreshAccessToken: (failedToken: string) => Promise<string | null>;
-  /** Called when refresh failed: the account must be signed out. */
-  onAuthFailure: (failedToken: string) => void;
-};
-
-let auth: AuthHooks = {
-  getAccessToken: () => null,
-  refreshAccessToken: async () => null,
-  onAuthFailure: () => {},
-};
-
-/** Wired by the auth feature so this module stays free of app imports. */
-export function configureApiClient(hooks: AuthHooks) {
-  auth = hooks;
-}
-
 export const API_BASE = "/api";
+export const SIGN_IN_URL = "/auth/login";
+export const SIGN_OUT_URL = "/auth/logout";
 
 export type RequestOptions = {
   method?: "GET" | "POST" | "PATCH" | "DELETE";
   body?: unknown;
-  /** Skip the Authorization header and refresh handling (sign-in, refresh). */
-  anonymous?: boolean;
 };
 
 async function errorMessage(response: Response) {
@@ -50,39 +33,37 @@ async function errorMessage(response: Response) {
   return "Please check the form.";
 }
 
-function send(
-  path: string,
-  method: string,
-  body: unknown,
-  token: string | null,
-) {
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-    "X-TeamPulse-Request": "1",
-  };
-  if (token) headers.Authorization = "Bearer " + token;
-  return fetch(API_BASE + path, {
-    method,
-    headers,
-    body: body === undefined ? undefined : JSON.stringify(body),
-  });
+let signingIn = false;
+
+/** Full-page trip to FloData sign-in; it returns to the page the user was on. */
+function goToSignIn(): Promise<never> {
+  if (!signingIn) {
+    signingIn = true;
+    const here = window.location.pathname + window.location.search;
+    window.location.assign(
+      SIGN_IN_URL + "?next=" + encodeURIComponent(here),
+    );
+  }
+  // The page is navigating away; leave callers pending rather than flash an error.
+  return new Promise<never>(() => {});
 }
 
 export async function apiRequest<T = unknown>(
   path: string,
-  { method, body, anonymous = false }: RequestOptions = {},
+  { method, body }: RequestOptions = {},
 ): Promise<T> {
   const verb = method ?? (body === undefined ? "GET" : "POST");
-  const token = anonymous ? null : auth.getAccessToken();
-  let response = await send(path, verb, body, token);
-
-  // On 401: refresh once, then retry once. A second 401 ends the session.
-  if (response.status === 401 && !anonymous && token) {
-    const fresh = await auth.refreshAccessToken(token);
-    if (fresh) response = await send(path, verb, body, fresh);
-    if (!fresh || response.status === 401) auth.onAuthFailure(token);
-  }
-
+  const response = await fetch(API_BASE + path, {
+    method: verb,
+    credentials: "same-origin",
+    headers: {
+      "Content-Type": "application/json",
+      "X-TeamPulse-Request": "1",
+    },
+    body: body === undefined ? undefined : JSON.stringify(body),
+  });
+  // The backend refreshes tokens silently; a 401 means the session is over.
+  if (response.status === 401) return goToSignIn();
   if (!response.ok)
     throw new ApiError(await errorMessage(response), response.status);
   return response.json() as Promise<T>;

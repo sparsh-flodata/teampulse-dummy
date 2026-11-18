@@ -1,19 +1,20 @@
 import { useEffect, useRef } from "react";
-import { useNavigate } from "@tanstack/react-router";
-import { useSelector } from "@tanstack/react-store";
-import { Check, LogOut, Plus, X } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { ExternalLink, LogOut, X } from "lucide-react";
 import { Avatar } from "@/components/ui";
-import { signOut, signOutAll, switchAccount } from "../session";
-import { PER_TAB_ACCOUNTS, authStore } from "../store";
+import { SIGN_OUT_URL } from "@/lib/api/client";
+import { sessionQuery } from "../api";
 
-/** Gmail-style account switcher opened from the top-bar avatar. */
+const ROLE_LABELS: Record<string, string> = {
+  employee: "Employee",
+  manager: "Manager",
+  admin: "Management / administrator",
+};
+
+/** Signed-in account, opened from the top-bar avatar. Identity is FloData's. */
 export function AccountMenu({ onClose }: { onClose: () => void }) {
-  const navigate = useNavigate();
   const ref = useRef<HTMLDivElement>(null);
-  const { accounts, activeAccountId } = useSelector(authStore, (s) => s);
-  const list = Object.entries(accounts);
-  const active = activeAccountId ? accounts[activeAccountId] : undefined;
-  const firstName = (active?.name ?? active?.email ?? "").split(" ")[0];
+  const { data: me } = useQuery(sessionQuery);
 
   // Close on Escape or a click outside; focus the menu when it opens.
   const closeRef = useRef(onClose);
@@ -22,7 +23,7 @@ export function AccountMenu({ onClose }: { onClose: () => void }) {
   });
   useEffect(() => {
     const menu = ref.current;
-    menu?.querySelector<HTMLElement>("button")?.focus();
+    menu?.querySelector<HTMLElement>("a, button")?.focus();
     const key = (e: KeyboardEvent) => e.key === "Escape" && closeRef.current();
     const click = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
@@ -37,75 +38,50 @@ export function AccountMenu({ onClose }: { onClose: () => void }) {
     };
   }, []);
 
-  const run = (action: () => unknown) => () => {
-    onClose();
-    void action();
-  };
-
   return (
-    <div className="account-menu" role="menu" aria-label="Accounts" ref={ref}>
+    <div className="account-menu" role="menu" aria-label="Account" ref={ref}>
       <div className="split">
-        <h3>Accounts</h3>
+        <h3>Account</h3>
         <button
           className="icon-button"
-          aria-label="Close accounts menu"
+          aria-label="Close account menu"
           onClick={onClose}
         >
           <X size={17} />
         </button>
       </div>
-      <div className="account-list">
-        {list.map(([id, account]) => (
-          <button
-            key={id}
-            role="menuitemradio"
-            aria-checked={id === activeAccountId}
-            className={
-              "account-option " + (id === activeAccountId ? "active" : "")
-            }
-            onClick={run(() => switchAccount(id))}
-          >
-            <Avatar
-              person={{
-                name: account.name ?? account.email,
-                color: account.color ?? "",
-              }}
-              size={32}
-            />
+      {me && (
+        <div className="account-list">
+          <div className="account-option active">
+            <Avatar person={me} size={32} />
             <span>
-              {account.name ?? account.email}
-              <small>{account.email}</small>
+              {me.name}
+              <small>{me.email}</small>
             </span>
-            {id === activeAccountId && <Check size={15} />}
-          </button>
-        ))}
-      </div>
-      <div className="account-actions">
-        <button
-          role="menuitem"
-          onClick={run(() => navigate({ to: "/login", search: { add: true } }))}
-        >
-          <Plus size={15} />
-          Add another account
-        </button>
-        {active && (
-          <button role="menuitem" onClick={run(() => signOut())}>
-            <LogOut size={15} />
-            Sign out of {firstName}
-          </button>
-        )}
-        {list.length > 1 && (
-          <button role="menuitem" onClick={run(signOutAll)}>
-            <LogOut size={15} />
-            Sign out of all accounts
-          </button>
-        )}
-      </div>
-      {PER_TAB_ACCOUNTS && list.length > 1 && (
-        <small className="account-note">
-          Development: each tab keeps its own active account.
-        </small>
+          </div>
+          <small className="account-note">
+            {ROLE_LABELS[me.role] ?? me.role} · managed in FloData Auth
+          </small>
+        </div>
       )}
+      <div className="account-actions">
+        {me && (
+          <a
+            role="menuitem"
+            href={me.account_url}
+            target="_blank"
+            rel="noreferrer"
+          >
+            <ExternalLink size={15} />
+            My account
+          </a>
+        )}
+        {/* Full navigation: the backend revokes the session and signs out of FloData. */}
+        <a role="menuitem" href={me?.logout_url ?? SIGN_OUT_URL}>
+          <LogOut size={15} />
+          Sign out of all FloData tools
+        </a>
+      </div>
     </div>
   );
 }

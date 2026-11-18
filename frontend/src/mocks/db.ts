@@ -36,7 +36,6 @@ export type View = {
   activity_ids: number[];
 };
 
-type Session = { userId: number; expiresAt: number };
 
 export type MockDb = {
   meta: {
@@ -61,12 +60,9 @@ export type MockDb = {
     string,
     { messages: ChatMessage[]; actions: AgentAction[] }
   >;
-  accessTokens: Record<string, Session>;
-  refreshTokens: Record<string, Session>;
 };
 
 const STORAGE_KEY = "teampulse.mockdb.v1";
-export const DEMO_PASSWORD = "TeamPulse-demo-2026!";
 
 /** Fills fields added after the seed (or a stored copy) was written. */
 function withDefaults(data: MockDb): MockDb {
@@ -78,14 +74,7 @@ function withDefaults(data: MockDb): MockDb {
 }
 
 function fresh(): MockDb {
-  return withDefaults({
-    ...(structuredClone(seedJson) as unknown as Omit<
-      MockDb,
-      "accessTokens" | "refreshTokens"
-    >),
-    accessTokens: {},
-    refreshTokens: {},
-  });
+  return withDefaults(structuredClone(seedJson) as unknown as MockDb);
 }
 
 function load(): MockDb {
@@ -118,10 +107,9 @@ export function persist() {
   }
 }
 
-/** Restore the original snapshot. Signed-in mock sessions are kept. */
+/** Restore the original snapshot. */
 export function resetMockData() {
-  const { accessTokens, refreshTokens } = db;
-  Object.assign(db, fresh(), { accessTokens, refreshTokens });
+  Object.assign(db, fresh());
   persist();
 }
 

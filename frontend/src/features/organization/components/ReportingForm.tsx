@@ -10,6 +10,13 @@ import type {
 } from "@/features/workspace/types";
 import { updateEmployee, updateEmployeeSchema } from "../api";
 
+/** The role comes from FloData Auth (admin / editor / viewer) at every sign-in. */
+const ROLE_LABELS: Record<string, string> = {
+  employee: "Employee",
+  manager: "Manager",
+  admin: "Management / administrator",
+};
+
 export function ReportingForm({
   state,
   person,
@@ -30,7 +37,6 @@ export function ReportingForm({
       title: person.title,
       team_id: String(person.team_id),
       manager_id: String(person.manager_id ?? ""),
-      role: person.role,
       active: person.active,
     },
     onSubmit: async ({ value }) => {
@@ -109,16 +115,12 @@ export function ReportingForm({
             </form.Field>
           </label>
           <label>
-            Workspace role
-            <form.Field name="role">
-              {(f) => (
-                <select {...bind(f)}>
-                  <option value="employee">Employee</option>
-                  <option value="manager">Manager</option>
-                  <option value="admin">Management / administrator</option>
-                </select>
-              )}
-            </form.Field>
+            Workspace role · managed in FloData Auth
+            <input
+              value={ROLE_LABELS[person.role] ?? person.role}
+              readOnly
+              disabled
+            />
           </label>
         </div>
         <label className="checkbox">
